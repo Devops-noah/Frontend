@@ -1,4 +1,5 @@
 # Frontend
+
 Frontend/
 ├── public/                              # Public assets and the HTML template
 │   ├── index.html                       # Main HTML file
