@@ -7,7 +7,7 @@ const SignUp = () => {
         prenom: "",
         type: "",
         email: "",
-        password: "",
+        motDePasse: "",
        // confirmPassword: "",
         telephone: "",
         adresse: "",
@@ -21,27 +21,25 @@ const SignUp = () => {
     };
 
     const handleSubmit = async (e) => {
-        console.log("hawa");
         e.preventDefault();
         setErrorMessage("");
         setSuccessMessage("");
 
-        // Vérification des mots de passe
-
+        console.log("Form data before submitting:", formData); // Log formData to check if 'password' is not empty
 
         try {
-            // Appel à l'API pour créer l'utilisateur
+            // API call to register the user
             const response = await axios.post("http://localhost:8080/api/auth/register", {
                 nom: formData.nom,
                 prenom: formData.prenom,
                 type: formData.type,
                 email: formData.email,
-                password: formData.password,
+                motDePasse: formData.motDePasse,
                 telephone: formData.telephone,
                 adresse: formData.adresse,
             });
 
-            console.log("reponse : ", response);
+            console.log("response : ", response);
 
             setSuccessMessage("Inscription réussie ! Vous pouvez vous connecter.");
             setFormData({
@@ -49,7 +47,7 @@ const SignUp = () => {
                 prenom: "",
                 type: "",
                 email: "",
-                password: "",
+                motDePasse: "",
                 telephone: "",
                 adresse: "",
             });
@@ -61,6 +59,7 @@ const SignUp = () => {
             }
         }
     };
+
 
     return (
         <div
@@ -146,8 +145,8 @@ const SignUp = () => {
                         <label className="block text-gray-700 font-semibold mb-2">Mot de passe</label>
                         <input
                             type="password"
-                            name="password"
-                            value={formData.password}
+                            name="motDePasse"
+                            value={formData.motDePasse}
                             onChange={handleInputChange}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Entrez votre mot de passe"

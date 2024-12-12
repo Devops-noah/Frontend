@@ -5,7 +5,7 @@ import axios from "axios"; // Importer Axios
 const LoginPage = () => {
     const [formData, setFormData] = useState({
         email: "",
-        password: "",
+        motDePasse: "",
     });
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
@@ -38,7 +38,7 @@ const LoginPage = () => {
 
             // Si la requête est réussie
             localStorage.setItem("token", response.data.token); // Stocker le token JWT
-            navigate("/annonces"); // Redirection vers la liste des annonces
+            navigate("/"); // Redirection vers la liste des annonces
         } catch (error) {
             // Gestion des erreurs
             if (error.response) {
@@ -79,10 +79,10 @@ const LoginPage = () => {
                     {/* Mot de passe */}
                     <div className="mb-4">
                         <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
+                            type="motDePasse"
+                            id="motDePasse"
+                            name="motDePasse"
+                            value={formData.motDePasse}
                             onChange={handleInputChange}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Entrez votre mot de passe"
