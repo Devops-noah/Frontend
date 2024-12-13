@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // Importer Axios
+import axios from "axios";
+import {jwtDecode} from "jwt-decode";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -36,8 +37,16 @@ const LoginPage = () => {
                 }
             );
 
+            // Get the token
+            const token = response.data.token;
+
+            // Decode the token to extract user info
+            const decodedToken = jwtDecode(token);
+            console.log("Decoded Token:", JSON.stringify(decodedToken.sub));
+
             // Si la requête est réussie
-            localStorage.setItem("token", response.data.token); // Stocker le token JWT
+            localStorage.setItem("token", token); // Stocker le token JWT
+            localStorage.setItem("userName", JSON.stringify(decodedToken.sub));
             navigate("/"); // Redirection vers la liste des annonces
         } catch (error) {
             if (error.response) {
