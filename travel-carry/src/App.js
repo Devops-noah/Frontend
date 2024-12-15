@@ -4,10 +4,12 @@ import Header from "./Header";
 import HomePage from "./HomePage";
 import Login from "./auth/Login";
 import SignUp from "./auth/SignUp";
+import { UserProvider } from "./context/UserContext";
+
 function App() {
     return (
-        <Router>
-            <div>
+        <UserProvider>
+            <Router>
                 <Header />
                 <div className="container">
                     <Routes>
@@ -16,8 +18,8 @@ function App() {
                         <Route path="/register" element={<SignUp />} />
                     </Routes>
                 </div>
-            </div>
-        </Router>
+            </Router>
+        </UserProvider>
     );
 }
 

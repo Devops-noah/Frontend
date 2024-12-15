@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // Importer Axios
+import axios from "axios";
+import {jwtDecode} from "jwt-decode";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
         email: "",
-        password: "",
+        motDePasse: "",
     });
+    const [showPassword, setShowPassword] = useState(false); // État pour basculer la visibilité du mot de passe
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
@@ -25,10 +27,9 @@ const LoginPage = () => {
         setErrorMessage("");
 
         try {
-            // Remplacer fetch par axios pour l'appel à l'API
             const response = await axios.post(
                 "http://localhost:8080/api/auth/login",
-                formData, // Axios gère automatiquement la conversion en JSON
+                formData,
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -36,21 +37,25 @@ const LoginPage = () => {
                 }
             );
 
+            // Get the token
+            const token = response.data.token;
+
+            // Decode the token to extract user info
+            const decodedToken = jwtDecode(token);
+            console.log("Decoded Token:", JSON.stringify(decodedToken.sub));
+
             // Si la requête est réussie
-            localStorage.setItem("token", response.data.token); // Stocker le token JWT
-            navigate("/annonces"); // Redirection vers la liste des annonces
+            localStorage.setItem("token", token); // Stocker le token JWT
+            localStorage.setItem("userName", JSON.stringify(decodedToken.sub));
+            navigate("/"); // Redirection vers la liste des annonces
         } catch (error) {
-            // Gestion des erreurs
             if (error.response) {
-                // Si l'API retourne une réponse d'erreur
                 setErrorMessage(error.response.data.message || "Identifiants incorrects.");
             } else {
-                // Autre type d'erreur (exemple : problème réseau)
                 setErrorMessage("Une erreur s'est produite. Veuillez réessayer.");
             }
         }
     };
-    console.log("teessss: ", formData)
 
     return (
         <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -77,17 +82,25 @@ const LoginPage = () => {
                     </div>
 
                     {/* Mot de passe */}
-                    <div className="mb-4">
+                    <div className="mb-4 relative">
                         <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
+                            type={showPassword ? "text" : "password"} // Afficher ou masquer le mot de passe
+                            id="motDePasse"
+                            name="motDePasse"
+                            value={formData.motDePasse}
                             onChange={handleInputChange}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Entrez votre mot de passe"
                             required
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)} // Basculer la visibilité
+                            className="absolute right-2 top-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                            aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                        >
+                            {showPassword ? "👁️" : "🙈"} {/* Icône pour afficher/masquer */}
+                        </button>
                     </div>
 
                     {/* Bouton de connexion */}
