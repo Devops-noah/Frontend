@@ -27,7 +27,7 @@ Frontend/
 │   │   └── ProfilePage.js               # User profile page
 │   ├── styles/                          # CSS or styled components
 │   │   └── global.css                   # Global styles
-│   ├── App.js                           # Main app component
+│   ├── AppOumar.js                           # Main app component
 │   ├── index.js                         # Entry point for React
 │   └── utils/                           # Utility functions
 │       └── validation.js                # Validation functions
