@@ -1,260 +1,173 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import debounce from 'lodash/debounce';
+import React, { useState } from "react";
+import axios from "axios";
 
 const AnnonceList = () => {
-    const [annonces, setAnnonces] = useState([]);
-    const [error, setError] = useState(null);
-    const [filter, setFilter] = useState({
-        dateDepart: '',
-        prixMax: '',
-        poidsMin: '',
-        destinationNom: '',
+    const [annonce, setAnnonce] = useState({
+        id: null,
+        dateDepart: "",
+        dateArrivee: "",
+        datePublication: "",
+        poidsDisponible: 0,
+        voyageur: null,
+        demandes: [],
+        voyage: null,
+        paysDestination: null,
+        paysDepart: null,
     });
-    const [newAnnonce, setNewAnnonce] = useState({
-        titre: '',
-        poids: '',
-        prix: '',
-        dateDepart: '',
-        paysDepart: '',
-        paysDestination: '',
-    });
-    const [editAnnonce, setEditAnnonce] = useState(null); // For editing an annonce
 
-    const handleFilterChange = (e) => {
+    // Handle form field changes
+    const handleChange = (e) => {
         const { name, value } = e.target;
-        setFilter((prevFilter) => ({
-            ...prevFilter,
-            [name]: value,
-        }));
-    };
-
-    const handleNewAnnonceChange = (e) => {
-        const { name, value } = e.target;
-        setNewAnnonce((prevAnnonce) => ({
+        setAnnonce((prevAnnonce) => ({
             ...prevAnnonce,
             [name]: value,
         }));
     };
 
-    // Debounced fetch function to avoid rapid calls
-    const debouncedFetchAnnonces = debounce(async () => {
-        const filteredRequestBody = {};
-        for (const key in filter) {
-            if (filter[key]) filteredRequestBody[key] = filter[key];
-        }
+    // Handle submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:8080/api/annonces/filter', filteredRequestBody, {
-                headers: { 'Content-Type': 'application/json' },
+            const response = await axios.post("http://localhost:8080/api/annonces", annonce);
+            console.log("Annonce créée avec succès:", response.data);
+            alert("Annonce créée avec succès !");
+
+            // Réinitialise le formulaire si nécessaire
+            setAnnonce({
+                id: null,
+                dateDepart: "",
+                dateArrivee: "",
+                datePublication: "",
+                poidsDisponible: 0,
+                voyageur: null,
+                demandes: [],
+                voyage: null,
+                paysDestination: null,
+                paysDepart: null,
             });
-            setAnnonces(response.data);
-        } catch (err) {
-            console.error('Error fetching annonces:', err);
-            setError('Failed to fetch annonces');
-        }
-    }, 300); // Adjust the debounce delay as needed
-
-    useEffect(() => {
-        debouncedFetchAnnonces();
-    }, [filter]);
-
-    // Add a new annonce
-    const handleCreateAnnonce = async () => {
-        try {
-            const response = await axios.post('http://localhost:8080/api/annonces', newAnnonce, {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            setAnnonces((prevAnnonces) => [...prevAnnonces, response.data]);
-            setNewAnnonce({
-                titre: '',
-                poids: '',
-                prix: '',
-                dateDepart: '',
-                paysDepart: '',
-                paysDestination: '',
-            }); // Reset new annonce form
-        } catch (err) {
-            setError('Failed to create annonce');
-        }
-    };
-
-    // Update an existing annonce
-    const handleEditAnnonce = async (id) => {
-        try {
-            const response = await axios.put(`http://localhost:8080/api/annonces/${id}`, editAnnonce, {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            setAnnonces((prevAnnonces) =>
-                prevAnnonces.map((annonce) =>
-                    annonce.id === id ? response.data : annonce
-                )
-            );
-            setEditAnnonce(null); // Close edit form
-        } catch (err) {
-            setError('Failed to update annonce');
-        }
-    };
-
-    // Delete an annonce
-    const handleDeleteAnnonce = async (id) => {
-        try {
-            await axios.delete(`http://localhost:8080/api/annonces/${id}`);
-            setAnnonces((prevAnnonces) => prevAnnonces.filter((annonce) => annonce.id !== id));
-        } catch (err) {
-            setError('Failed to delete annonce');
+        } catch (error) {
+            console.error("Erreur lors de la création de l'annonce:", error);
+            alert("Une erreur est survenue lors de la création de l'annonce.");
         }
     };
 
     return (
-        <div className="p-6 bg-gray-100 min-h-screen">
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Créer une Annonce</h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                    {/* Date de Départ */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Date de Départ</label>
+                        <input
+                            type="date"
+                            name="dateDepart"
+                            value={annonce.dateDepart}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                    </div>
 
-            {/* Filter Section */}
-            <div className="w-1/2 mx-auto">
-                <h2 className="text-2xl font-semibold text-center text-blue-600 mb-6">Filter Annonces</h2>
+                    {/* Date d'Arrivée */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Date d'Arrivée</label>
+                        <input
+                            type="date"
+                            name="dateArrivee"
+                            value={annonce.dateArrivee}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                    </div>
 
-                <div className="flex flex-wrap items-center gap-3 mb-6 bg-white p-4 rounded-lg shadow">
-                    <input
-                        type="date"
-                        name="dateDepart"
-                        value={filter.dateDepart}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Date de départ"
-                    />
-                    <input
-                        type="number"
-                        name="poidsMin"
-                        value={filter.poidsMin}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Poids minimum"
-                    />
-                    <input
-                        type="number"
-                        name="prixMax"
-                        value={filter.prixMax}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Prix maximum"
-                    />
-                    <input
-                        type="text"
-                        name="destinationNom"
-                        value={filter.destinationNom}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Destination"
-                    />
-                    <button
-                        onClick={debouncedFetchAnnonces}
-                        className="bg-blue-500 text-white rounded-md p-2 w-full md:w-auto md:px-6 hover:bg-blue-600 transition"
-                    >
-                        Filtres
-                    </button>
+                    {/* Date de Publication */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Date de Publication</label>
+                        <input
+                            type="date"
+                            name="datePublication"
+                            value={annonce.datePublication}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                    </div>
+
+                    {/* Poids Disponible */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Poids Disponible</label>
+                        <input
+                            type="number"
+                            name="poidsDisponible"
+                            value={annonce.poidsDisponible}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                    </div>
                 </div>
-            </div>
 
-            {/* Create Annonce Form */}
-            <div className="w-1/2 mx-auto bg-white p-4 rounded-lg shadow mb-6">
-                <h2 className="text-2xl font-semibold text-center text-blue-600 mb-4">Créer une Annonce</h2>
-                <input
-                    type="text"
-                    name="titre"
-                    value={newAnnonce.titre}
-                    onChange={handleNewAnnonceChange}
-                    placeholder="Titre"
-                    className="border border-gray-300 rounded-md p-2 w-full mb-2"
-                />
-                <input
-                    type="number"
-                    name="poids"
-                    value={newAnnonce.poids}
-                    onChange={handleNewAnnonceChange}
-                    placeholder="Poids (kg)"
-                    className="border border-gray-300 rounded-md p-2 w-full mb-2"
-                />
-                <input
-                    type="number"
-                    name="prix"
-                    value={newAnnonce.prix}
-                    onChange={handleNewAnnonceChange}
-                    placeholder="Prix ($)"
-                    className="border border-gray-300 rounded-md p-2 w-full mb-2"
-                />
-                <input
-                    type="date"
-                    name="dateDepart"
-                    value={newAnnonce.dateDepart}
-                    onChange={handleNewAnnonceChange}
-                    className="border border-gray-300 rounded-md p-2 w-full mb-2"
-                />
-                <input
-                    type="text"
-                    name="paysDepart"
-                    value={newAnnonce.paysDepart}
-                    onChange={handleNewAnnonceChange}
-                    placeholder="Pays de départ"
-                    className="border border-gray-300 rounded-md p-2 w-full mb-2"
-                />
-                <input
-                    type="text"
-                    name="paysDestination"
-                    value={newAnnonce.paysDestination}
-                    onChange={handleNewAnnonceChange}
-                    placeholder="Pays de destination"
-                    className="border border-gray-300 rounded-md p-2 w-full mb-4"
-                />
+                {/* Voyageur */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Voyageur (ID)</label>
+                    <input
+                        type="number"
+                        name="voyageur"
+                        value={annonce.voyageur || ""}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    />
+                </div>
+
+                {/* Voyage */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Voyage (ID)</label>
+                    <input
+                        type="number"
+                        name="voyage"
+                        value={annonce.voyage || ""}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    />
+                </div>
+
+                {/* Pays Destination */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Pays Destination (ID)</label>
+                    <input
+                        type="number"
+                        name="paysDestination"
+                        value={annonce.paysDestination || ""}
+                        onChange={handleChange}
+                        required
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    />
+                </div>
+
+                {/* Pays Départ */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Pays Départ (ID)</label>
+                    <input
+                        type="number"
+                        name="paysDepart"
+                        value={annonce.paysDepart || ""}
+                        onChange={handleChange}
+                        required
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    />
+                </div>
+
+                {/* Submit Button */}
                 <button
-                    onClick={handleCreateAnnonce}
-                    className="bg-blue-500 text-white rounded-md p-2 w-full hover:bg-blue-600 transition"
+                    type="submit"
+                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    Créer l'Annonce
+                    Créer
                 </button>
-            </div>
-
-            {/* Annonce List */}
-            <h2 className="text-2xl font-semibold text-center text-blue-600 mb-4">Available Annonces</h2>
-            {annonces.length === 0 ? (
-                <p className="text-center text-gray-600">No annonces available.</p>
-            ) : (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white rounded-lg shadow">
-                        <thead>
-                        <tr className="bg-blue-600 text-white">
-                            <th className="px-4 py-3 font-semibold text-left">ID</th>
-                            <th className="px-4 py-3 font-semibold text-left">Poids (kg)</th>
-                            <th className="px-4 py-3 font-semibold text-left">Prix ($)</th>
-                            <th className="px-4 py-3 font-semibold text-left">Date de Départ</th>
-                            <th className="px-4 py-3 font-semibold text-left">Pays de Départ</th>
-                            <th className="px-4 py-3 font-semibold text-left">Pays de Destination</th>
-                            <th className="px-4 py-3 font-semibold text-left">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {annonces.map((annonce, index) => (
-                            <tr key={annonce.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                                <td className="border-t px-4 py-2">{annonce.id}</td>
-                                <td className="border-t px-4 py-2">{annonce.poids}</td>
-                                <td className="border-t px-4 py-2">{annonce.prix}</td>
-                                <td className="border-t px-4 py-2">{annonce.voyage?.dateDepart || 'Voyage not available'}</td>
-                                <td className="border-t px-4 py-2">{annonce.paysDepart?.nom}</td>
-                                <td className="border-t px-4 py-2">{annonce.paysDestination?.nom}</td>
-                                <td className="border-t px-4 py-2">
-                                    <button
-                                        onClick={() => handleDeleteAnnonce(annonce.id)}
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        Supprimer
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+            </form>
         </div>
     );
 };
