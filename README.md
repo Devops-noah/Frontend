@@ -81,7 +81,7 @@ src/
     React Router : Gestion des routes dans l'application.
     Axios : Gestion des appels API vers le backend.
     React Context API : Gestion des états globaux (authentification, notifications).
-    Tailwind CSS (optionnel) : Framework pour le style.
+    Tailwind CSS  : Framework pour le style.
     HTML5 / CSS3 : Structure et mise en forme.
 
 # 🚀 Installation et Lancement
