@@ -3,8 +3,7 @@ Ce projet est la partie Frontend de l'application **Travel Carry**, développée
 
 ## 📦 **Structure du Projet**  
 
-
-
+```
 Frontend/
 ├── public/                              # Fichiers publics et modèles HTML
 │   ├── index.html                       # Fichier HTML principal
@@ -50,6 +49,8 @@ Frontend/
 ├── package.json                         # Dépendances et scripts NPM
 └── README.md                            # Documentation du projet
 
+```
+
 📄 Description des Dossiers et Fichiers
 public/
 
@@ -74,7 +75,7 @@ src/
     App.js : Composant principal contenant les routes de l'application.
     index.js : Point d'entrée principal pour l'application React.
 
-#🛠️ Technologies Utilisées
+# 🛠️ Technologies Utilisées
 
     React.js : Bibliothèque principale pour la construction de l'interface utilisateur.
     React Router : Gestion des routes dans l'application.
@@ -83,7 +84,7 @@ src/
     Tailwind CSS (optionnel) : Framework pour le style.
     HTML5 / CSS3 : Structure et mise en forme.
 
-#🚀 Installation et Lancement
+# 🚀 Installation et Lancement
 1. Prérequis
 
     Node.js installé sur votre machine.
@@ -104,13 +105,13 @@ Pour démarrer l'application en local :
 npm start
 
 L'application sera accessible sur http://localhost:3000.
-#🔧 Configuration
+# 🔧 Configuration
 
 Pour configurer les variables d'environnement, créez un fichier .env dans le dossier root :
 
 REACT_APP_API_URL=http://localhost:8080/api
 
-#📢 Fonctionnalités Principales
+# 📢 Fonctionnalités Principales
 
     Connexion et Inscription :
         Authentification sécurisée avec gestion de sessions.
