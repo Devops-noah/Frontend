@@ -1,0 +1,44 @@
+/* Conteneur principal */
+.notation-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 50%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Champs de formulaire */
+.notation-form-container input,
+.notation-form-container textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Note globale dynamique */
+.note-globale {
+    margin: 10px 0;
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+}
+
+/* Bouton de soumission */
+.notation-form-container button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.notation-form-container button:hover {
+    background-color: #0056b3;
+}
+
+
