@@ -35,10 +35,16 @@ export default function HomePage() {
                     Notations
                 </button>
             </Link>
+
+            {/* Lien vers la page des détails du colis */}
+            <div style={{ marginTop: "20px" }}>
+                <Link
+                    to="/colis/details"
+                    className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    Détails du colis
+                </Link>
+            </div>
         </div>
     );
 }
-
-
-
-
