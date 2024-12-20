@@ -6,6 +6,7 @@ import Login from "./auth/Login";
 import SignUp from "./auth/SignUp";
 import { UserProvider } from "./context/UserContext";
 import AnnonceList from "./AnnonceList";
+import AnnonceForm from "./AnnonceForm";
 
 function App() {
     return (
@@ -17,7 +18,15 @@ function App() {
                         <Route path="/" element={<HomePage />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<SignUp />} />
-                        <Route path="/" element={<AnnonceList />} />
+                        <Route path="/annonces" element={<AnnonceList />} />
+                        <Route path="/create-new" element={<AnnonceForm />} />
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<SignUp />} />
+                        <Route path="/annonces" element={<AnnonceList />} />
+                        <Route path="/annonce/new" element={<AnnonceForm />} />
+
+
                     </Routes>
                 </div>
             </Router>
