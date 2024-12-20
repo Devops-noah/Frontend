@@ -4,6 +4,7 @@ import debounce from 'lodash/debounce';
 
 const AnnonceList = () => {
     const [annonces, setAnnonces] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState({
         dateDepart: '',
@@ -12,6 +13,7 @@ const AnnonceList = () => {
         destinationNom: '',
     });
 
+    // Handle filter changes
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilter((prevFilter) => ({
@@ -20,7 +22,7 @@ const AnnonceList = () => {
         }));
     };
 
-    // Debounced fetch function to avoid rapid calls
+    // Debounced fetch function for filtered annonces
     const debouncedFetchAnnonces = debounce(async () => {
         const filteredRequestBody = {};
         for (const key in filter) {
@@ -28,20 +30,47 @@ const AnnonceList = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:8080/api/annonces/filter', filteredRequestBody, {
-                headers: { 'Content-Type': 'application/json' },
-            });
+            const response = await axios.post(
+                'http://localhost:8080/api/annonces/filter',
+                filteredRequestBody,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
             setAnnonces(response.data);
         } catch (err) {
-            console.error('Error fetching annonces:', err);
+            console.error('Error fetching filtered annonces:', err);
             setError('Failed to fetch annonces');
         }
     }, 300); // Adjust the debounce delay as needed
 
+    // Fetch all annonces on component load
+    const fetchAnnonces = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/annonces');
+            setAnnonces(response.data);
+        } catch (err) {
+            console.error('Erreur lors de la récupération des annonces:', err);
+            setError('Impossible de récupérer les annonces.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAnnonces();
+    }, []);
+
+    // Trigger the debounced fetch when filters change
     useEffect(() => {
         debouncedFetchAnnonces();
     }, [filter]);
-    console.log("annocnces : " + JSON.stringify(annonces));
+
+    if (loading) {
+        return <div className="text-center mt-10 text-lg">Chargement des annonces...</div>;
+    }
+
+    if (error) {
+        return <div className="text-center mt-10 text-lg text-red-600">{error}</div>;
+    }
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
@@ -110,13 +139,22 @@ const AnnonceList = () => {
                             </thead>
                             <tbody>
                             {annonces.map((annonce, index) => (
-                                <tr key={annonce.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                                <tr
+                                    key={annonce.id}
+                                    className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
+                                >
                                     <td className="border-t px-4 py-2">{annonce.id}</td>
                                     <td className="border-t px-4 py-2">{annonce.poids}</td>
                                     <td className="border-t px-4 py-2">{annonce.prix}</td>
-                                    <td className="border-t px-4 py-2">{annonce.voyage?.dateDepart || 'Voyage not available'}</td> {/* Updated for dateDepart */}
-                                    <td className="border-t px-4 py-2">{annonce.paysDepart?.nom}</td>
-                                    <td className="border-t px-4 py-2">{annonce.paysDestination?.nom}</td>
+                                    <td className="border-t px-4 py-2">
+                                        {annonce.voyage?.dateDepart || 'Voyage not available'}
+                                    </td>
+                                    <td className="border-t px-4 py-2">
+                                        {annonce.paysDepart?.nom || 'N/A'}
+                                    </td>
+                                    <td className="border-t px-4 py-2">
+                                        {annonce.paysDestination?.nom || 'N/A'}
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>
