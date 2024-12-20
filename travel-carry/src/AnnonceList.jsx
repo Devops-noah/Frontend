@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import debounce from 'lodash/debounce';
 
 const AnnonceList = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -8,7 +9,7 @@ const AnnonceList = () => {
         dateDepart: '',
         prixMax: '',
         poidsMin: '',
-        destination: '',
+        destinationNom: '',
     });
 
     const handleFilterChange = (e) => {
@@ -19,7 +20,8 @@ const AnnonceList = () => {
         }));
     };
 
-    const fetchAnnonces = async () => {
+    // Debounced fetch function to avoid rapid calls
+    const debouncedFetchAnnonces = debounce(async () => {
         const filteredRequestBody = {};
         for (const key in filter) {
             if (filter[key]) filteredRequestBody[key] = filter[key];
@@ -34,11 +36,12 @@ const AnnonceList = () => {
             console.error('Error fetching annonces:', err);
             setError('Failed to fetch annonces');
         }
-    };
+    }, 300); // Adjust the debounce delay as needed
 
     useEffect(() => {
-        fetchAnnonces();
+        debouncedFetchAnnonces();
     }, [filter]);
+    console.log("annocnces : " + JSON.stringify(annonces));
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
@@ -59,14 +62,6 @@ const AnnonceList = () => {
                     />
                     <input
                         type="number"
-                        name="prixMax"
-                        value={filter.prixMax}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Prix maximum"
-                    />
-                    <input
-                        type="number"
                         name="poidsMin"
                         value={filter.poidsMin}
                         onChange={handleFilterChange}
@@ -74,15 +69,23 @@ const AnnonceList = () => {
                         placeholder="Poids minimum"
                     />
                     <input
+                        type="number"
+                        name="prixMax"
+                        value={filter.prixMax}
+                        onChange={handleFilterChange}
+                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
+                        placeholder="Prix maximum"
+                    />
+                    <input
                         type="text"
-                        name="destination"
-                        value={filter.destination}
+                        name="destinationNom"
+                        value={filter.destinationNom}
                         onChange={handleFilterChange}
                         className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
                         placeholder="Destination"
                     />
                     <button
-                        onClick={fetchAnnonces}
+                        onClick={debouncedFetchAnnonces}
                         className="bg-blue-500 text-white rounded-md p-2 w-full md:w-auto md:px-6 hover:bg-blue-600 transition"
                     >
                         Filtres
@@ -100,7 +103,7 @@ const AnnonceList = () => {
                                 <th className="px-4 py-3 font-semibold text-left">ID</th>
                                 <th className="px-4 py-3 font-semibold text-left">Poids (kg)</th>
                                 <th className="px-4 py-3 font-semibold text-left">Prix ($)</th>
-                                <th className="px-4 py-3 font-semibold text-left">Date de Création</th>
+                                <th className="px-4 py-3 font-semibold text-left">Date de Départ</th>
                                 <th className="px-4 py-3 font-semibold text-left">Pays de Départ</th>
                                 <th className="px-4 py-3 font-semibold text-left">Pays de Destination</th>
                             </tr>
@@ -111,7 +114,7 @@ const AnnonceList = () => {
                                     <td className="border-t px-4 py-2">{annonce.id}</td>
                                     <td className="border-t px-4 py-2">{annonce.poids}</td>
                                     <td className="border-t px-4 py-2">{annonce.prix}</td>
-                                    <td className="border-t px-4 py-2">{annonce.dateCreation || 'Not specified'}</td>
+                                    <td className="border-t px-4 py-2">{annonce.voyage?.dateDepart || 'Voyage not available'}</td> {/* Updated for dateDepart */}
                                     <td className="border-t px-4 py-2">{annonce.paysDepart?.nom}</td>
                                     <td className="border-t px-4 py-2">{annonce.paysDestination?.nom}</td>
                                 </tr>

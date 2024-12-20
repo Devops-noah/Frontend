@@ -7,7 +7,8 @@ const Header = () => {
 
     // Vérifiez si l'utilisateur est connecté (en regardant le token dans le localStorage)
     const isAuthenticated = !!localStorage.getItem("token");
-    console.log("test: ", isAuthenticated)
+    console.log("test: ", isAuthenticated);
+
     // Charger le nom de l'utilisateur depuis le localStorage
     useEffect(() => {
         if (isAuthenticated) {
