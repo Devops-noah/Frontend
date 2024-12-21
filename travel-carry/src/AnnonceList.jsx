@@ -22,26 +22,6 @@ const AnnonceList = () => {
         }));
     };
 
-    // Debounced fetch function for filtered annonces
-    const debouncedFetchAnnonces = debounce(async () => {
-        const filteredRequestBody = {};
-        for (const key in filter) {
-            if (filter[key]) filteredRequestBody[key] = filter[key];
-        }
-
-        try {
-            const response = await axios.post(
-                'http://localhost:8080/api/annonces/filter',
-                filteredRequestBody,
-                { headers: { 'Content-Type': 'application/json' } }
-            );
-            setAnnonces(response.data);
-        } catch (err) {
-            console.error('Error fetching filtered annonces:', err);
-            setError('Failed to fetch annonces');
-        }
-    }, 300); // Adjust the debounce delay as needed
-
     // Fetch all annonces on component load
     const fetchAnnonces = async () => {
         try {
@@ -59,10 +39,6 @@ const AnnonceList = () => {
         fetchAnnonces();
     }, []);
 
-    // Trigger the debounced fetch when filters change
-    useEffect(() => {
-        debouncedFetchAnnonces();
-    }, [filter]);
 
     if (loading) {
         return <div className="text-center mt-10 text-lg">Chargement des annonces...</div>;
@@ -78,48 +54,6 @@ const AnnonceList = () => {
 
             <div className="w-1/2 mx-auto">
                 <h2 className="text-2xl font-semibold text-center text-blue-600 mb-6">Filter Annonces</h2>
-
-                {/* Filter Section */}
-                <div className="flex flex-wrap items-center gap-3 mb-6 bg-white p-4 rounded-lg shadow">
-                    <input
-                        type="date"
-                        name="dateDepart"
-                        value={filter.dateDepart}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Date de départ"
-                    />
-                    <input
-                        type="number"
-                        name="poidsMin"
-                        value={filter.poidsMin}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Poids minimum"
-                    />
-                    <input
-                        type="number"
-                        name="prixMax"
-                        value={filter.prixMax}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Prix maximum"
-                    />
-                    <input
-                        type="text"
-                        name="destinationNom"
-                        value={filter.destinationNom}
-                        onChange={handleFilterChange}
-                        className="border border-gray-300 rounded-md p-2 w-full md:w-1/5"
-                        placeholder="Destination"
-                    />
-                    <button
-                        onClick={debouncedFetchAnnonces}
-                        className="bg-blue-500 text-white rounded-md p-2 w-full md:w-auto md:px-6 hover:bg-blue-600 transition"
-                    >
-                        Filtres
-                    </button>
-                </div>
 
                 <h2 className="text-2xl font-semibold text-center text-blue-600 mb-4">Available Annonces</h2>
                 {annonces.length === 0 ? (
