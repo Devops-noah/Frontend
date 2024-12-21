@@ -9,6 +9,8 @@ import ColisDetails from "./colis/ColisDetails";
 import AnnonceList from "./AnnonceList";
 import CreateAnnonce from "./CreateAnnonce";
 import { UserProvider } from "./context/UserContext";
+import Footer from "./Footer";
+import "./App.css"; // Assurez-vous de gérer les styles de base ici
 
 function App() {
     // Vérifie si l'utilisateur est connecté
@@ -17,56 +19,51 @@ function App() {
     return (
         <UserProvider>
             <Router>
-                <Header />
-                <div className="container">
-                    <Routes>
-                        {/* Routes publiques */}
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<SignUp />} />
+                {/* Structure principale avec Flexbox */}
+                <div className="app-root">
+                    <Header />
+                    <main className="content">
+                        <Routes>
+                            {/* Routes publiques */}
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<SignUp />} />
+                            <Route path="/annonces" element={<AnnonceList />} /> {/* Non protégé */}
 
-                        {/* Routes protégées */}
-                        <Route
-                            path="/notations"
-                            element={
-                                isAuthenticated ? (
-                                    <NotationsPage />
-                                ) : (
-                                    <Navigate to="/login" replace />
-                                )
-                            }
-                        />
-                        <Route
-                            path="/colis/details"
-                            element={
-                                isAuthenticated ? (
-                                    <ColisDetails />
-                                ) : (
-                                    <Navigate to="/login" replace />
-                                )
-                            }
-                        />
-                        <Route
-                            path="/annonces"
-                            element={
-                                isAuthenticated ? (
-                                    <AnnonceList />
-                                ) : (
-                                    <Navigate to="/login" replace />
-                                )
-                            }
-                        />
-                        <Route
-                            path="/create-annonce"
-                            element={
-                                isAuthenticated ? (
-                                    <CreateAnnonce />
-                                ) : (
-                                    <Navigate to="/login" replace />
-                                )
-                            }
-                        />
-                    </Routes>
+                            {/* Routes protégées */}
+                            <Route
+                                path="/notations"
+                                element={
+                                    isAuthenticated ? (
+                                        <NotationsPage />
+                                    ) : (
+                                        <Navigate to="/login" replace />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/colis/details"
+                                element={
+                                    isAuthenticated ? (
+                                        <ColisDetails />
+                                    ) : (
+                                        <Navigate to="/login" replace />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/create-annonce"
+                                element={
+                                    isAuthenticated ? (
+                                        <CreateAnnonce />
+                                    ) : (
+                                        <Navigate to="/login" replace />
+                                    )
+                                }
+                            />
+                        </Routes>
+                    </main>
+                    <Footer />
                 </div>
             </Router>
         </UserProvider>

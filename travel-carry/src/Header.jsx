@@ -1,48 +1,56 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "./assets/logo.png"; // Assurez-vous que le chemin est correct
 
 const Header = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
 
-    // Vérifiez si l'utilisateur est connecté (en regardant le token dans le localStorage)
     const isAuthenticated = !!localStorage.getItem("token");
-    console.log("test: ", isAuthenticated);
 
-    // Charger le nom de l'utilisateur depuis le localStorage
     useEffect(() => {
         if (isAuthenticated) {
             const storedUserName = localStorage.getItem("userName");
             if (storedUserName) {
-                // Capitaliser la première lettre du nom de l'utilisateur
                 const formattedName = storedUserName
-                    .replace(/"/g, "") // Supprimer les guillemets
-                    .replace(/^./, (char) => char.toUpperCase()); // Capitaliser la première lettre
+                    .replace(/"/g, "")
+                    .replace(/^./, (char) => char.toUpperCase());
                 setUserName(formattedName);
             }
         }
     }, [isAuthenticated]);
 
-    // Fonction pour gérer la déconnexion
     const handleLogout = () => {
-        localStorage.removeItem("token"); // Supprimez le token
-        localStorage.removeItem("userName"); // Supprimez le nom de l'utilisateur
-        setUserName(""); // Effacer l'état du nom
-        navigate("/login"); // Redirigez vers la page de connexion
+        localStorage.removeItem("token");
+        localStorage.removeItem("userName");
+        setUserName("");
+        navigate("/login");
     };
 
     return (
         <header className="flex justify-between items-center p-4 bg-blue-500 text-white">
-            <div className="text-2xl font-bold">Travel Carry</div>
-            <nav className="flex items-center">
-                {/* Si l'utilisateur est connecté et que son nom est disponible */}
+            <div className="flex items-center">
+                <img
+                    src={logo}
+                    alt="Logo"
+                    className="h-10 w-10 mr-2"
+                    style={{
+                        borderRadius: "50%",
+                        border: "2px solid white",
+                    }}
+                />
+                <h1 className="text-2xl font-bold">
+                    <span style={{ color: "#ffffff" }}>Travel</span>{" "}
+                    <span style={{ color: "#004080" }}>Carry</span>
+                </h1>
+            </div>
+
+            <nav className="flex items-center space-x-4">
                 {isAuthenticated && userName && (
-                    <span className="mr-4 text-white font-semibold">
-                        Bienvenue, {userName}
-                    </span>
+                    <span className="text-white font-semibold">Bienvenue, {userName}</span>
                 )}
+
                 {isAuthenticated ? (
-                    // Bouton pour la déconnexion si l'utilisateur est connecté
                     <button
                         onClick={handleLogout}
                         className="px-4 py-2 bg-white text-blue-500 font-semibold rounded hover:bg-gray-100"
@@ -50,12 +58,50 @@ const Header = () => {
                         Déconnexion
                     </button>
                 ) : (
-                    // Bouton pour la connexion si l'utilisateur n'est pas connecté
-                    <Link to="/login">
-                        <button className="px-4 py-2 bg-white text-blue-500 font-semibold rounded hover:bg-gray-100">
-                            Connexion
-                        </button>
-                    </Link>
+                    <>
+                        <Link to="/login">
+                            <button
+                                className="px-4 py-2 font-semibold rounded"
+                                style={{
+                                    backgroundColor: "transparent",
+                                    color: "white",
+                                    border: "2px solid white",
+                                    transition: "background-color 0.3s, color 0.3s",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = "white";
+                                    e.target.style.color = "#004080";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = "transparent";
+                                    e.target.style.color = "white";
+                                }}
+                            >
+                                Connexion
+                            </button>
+                        </Link>
+                        <Link to="/register">
+                            <button
+                                className="px-4 py-2 font-semibold rounded"
+                                style={{
+                                    backgroundColor: "transparent",
+                                    color: "white",
+                                    border: "2px solid white",
+                                    transition: "background-color 0.3s, color 0.3s",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = "white";
+                                    e.target.style.color = "#004080";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = "transparent";
+                                    e.target.style.color = "white";
+                                }}
+                            >
+                                Inscription
+                            </button>
+                        </Link>
+                    </>
                 )}
             </nav>
         </header>

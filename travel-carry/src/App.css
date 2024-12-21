@@ -1,39 +1,18 @@
-.App {
-  text-align: center;
+/* Assurez-vous que le body et html prennent toute la hauteur */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.header {
-  background-color: #007bff; /* Couleur bleue pour le header */
-  height: 64px; /* Hauteur du header */
+/* Configuration principale de l'application */
+#app-root {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  color: white;
-  position: fixed; /* Fixer le header en haut */
-  top: 0;
-  width: 100%;
-  z-index: 1000;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
+/* Le contenu principal doit s'étirer pour pousser le footer en bas */
 .container {
-  margin-top: 64px; /* Marge pour laisser de l'espace sous le header */
-  padding: 16px;
-  min-height: calc(100vh - 64px); /* S'assure que la hauteur minimale de la page ne chevauche pas le header */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.form-container {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-  width: 100%;
-  max-width: 400px; /* Limiter la largeur du formulaire */
-}
-
-.App-link {
-  color: #61dafb;
+  flex: 1;
 }
