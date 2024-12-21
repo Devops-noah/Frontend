@@ -20,9 +20,9 @@ function App() {
         <UserProvider>
             <Router>
                 {/* Structure principale avec Flexbox */}
-                <div className="app-root">
+                <div className="flex flex-col min-h-screen">
                     <Header />
-                    <main className="content">
+                    <main className="flex-grow pb-20">
                         <Routes>
                             {/* Routes publiques */}
                             <Route path="/" element={<HomePage />} />

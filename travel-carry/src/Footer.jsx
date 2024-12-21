@@ -1,17 +1,16 @@
 import React from 'react';
-import './Footer.css';
-import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa'; // Icons for social media
+import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa';
 
 const Footer = () => {
     return (
-        <footer className="footer bg-blue-500 text-white p-6">
+        <footer className="bg-blue-500 text-white p-6 fixed bottom-0 left-0 w-full">
             <div className="container mx-auto text-center">
-                {/* Logo et description */}
+                {/* Logo and description */}
                 <p className="mb-4 text-lg font-semibold">
-                    © 2024 <span style={{ color: "#004080", fontWeight: "bold" }}>Travel Carry</span>. Tous droits réservés.
+                    © 2024 <span className="text-blue-800 font-bold">Travel Carry</span>. Tous droits réservés.
                 </p>
 
-                {/* Réseaux sociaux */}
+                {/* Social media icons */}
                 <div className="flex justify-center space-x-6 mb-4">
                     <a
                         href="https://www.instagram.com"
@@ -42,7 +41,7 @@ const Footer = () => {
                     </a>
                 </div>
 
-                {/* Texte d'assurance */}
+                {/* Assurance text */}
                 <p className="text-sm font-light">
                     Travel Carry assure la sécurité et la fiabilité de vos envois à travers le monde. Transportez vos colis avec confiance !
                 </p>

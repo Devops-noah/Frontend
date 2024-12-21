@@ -1,103 +1,196 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import debounce from 'lodash/debounce';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const AnnonceList = () => {
+const AnnoncesPage = () => {
     const [annonces, setAnnonces] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [filter, setFilter] = useState({
-        dateDepart: '',
-        prixMax: '',
-        poidsMin: '',
-        destinationNom: '',
+    const [filteredAnnonces, setFilteredAnnonces] = useState([]);
+    const [filters, setFilters] = useState({
+        dateDepart: "",
+        dateArrivee: "",
+        paysDepart: "",
+        paysDestination: "",
     });
+    const [currentPage, setCurrentPage] = useState(1);
+    const annoncesPerPage = 8;
+
+    // Fetch all annonces
+    useEffect(() => {
+        axios.get("http://localhost:8080/api/annonces").then((response) => {
+            setAnnonces(response.data);
+            setFilteredAnnonces(response.data);
+        });
+    }, []);
 
     // Handle filter changes
     const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        setFilter((prevFilter) => ({
-            ...prevFilter,
-            [name]: value,
-        }));
+        setFilters({
+            ...filters,
+            [e.target.name]: e.target.value,
+        });
     };
 
-    // Fetch all annonces on component load
-    const fetchAnnonces = async () => {
-        try {
-            const response = await axios.get('http://localhost:8080/api/annonces');
-            setAnnonces(response.data);
-        } catch (err) {
-            console.error('Erreur lors de la récupération des annonces:', err);
-            setError('Impossible de récupérer les annonces.');
-        } finally {
-            setLoading(false);
-        }
+    // Apply filters
+    const handleFilter = () => {
+        const filtered = annonces.filter((annonce) => {
+            return (
+                (!filters.dateDepart ||
+                    new Date(annonce.dateDepart) >= new Date(filters.dateDepart)) &&
+                (!filters.dateArrivee ||
+                    new Date(annonce.dateArrivee) <= new Date(filters.dateArrivee)) &&
+                (!filters.paysDepart ||
+                    annonce.paysDepart.nom
+                        .toLowerCase()
+                        .includes(filters.paysDepart.toLowerCase())) &&
+                (!filters.paysDestination ||
+                    annonce.paysDestination.nom
+                        .toLowerCase()
+                        .includes(filters.paysDestination.toLowerCase()))
+            );
+        });
+        setFilteredAnnonces(filtered);
+        setCurrentPage(1); // Reset to first page
     };
 
-    useEffect(() => {
-        fetchAnnonces();
-    }, []);
+    // Clear filters
+    const clearFilters = () => {
+        setFilters({
+            dateDepart: "",
+            dateArrivee: "",
+            paysDepart: "",
+            paysDestination: "",
+        });
+        setFilteredAnnonces(annonces); // Reset to show all annonces
+        setCurrentPage(1); // Reset to first page
+    };
 
+    // Pagination logic
+    const indexOfLastAnnonce = currentPage * annoncesPerPage;
+    const indexOfFirstAnnonce = indexOfLastAnnonce - annoncesPerPage;
+    const currentAnnonces = filteredAnnonces.slice(
+        indexOfFirstAnnonce,
+        indexOfLastAnnonce
+    );
 
-    if (loading) {
-        return <div className="text-center mt-10 text-lg">Chargement des annonces...</div>;
-    }
-
-    if (error) {
-        return <div className="text-center mt-10 text-lg text-red-600">{error}</div>;
-    }
+    const totalPages = Math.ceil(filteredAnnonces.length / annoncesPerPage);
 
     return (
-        <div className="p-6 bg-gray-100 min-h-screen">
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-
-            <div className="w-1/2 mx-auto">
-                <h2 className="text-2xl font-semibold text-center text-blue-600 mb-6">Filter Annonces</h2>
-
-                <h2 className="text-2xl font-semibold text-center text-blue-600 mb-4">Available Annonces</h2>
-                {annonces.length === 0 ? (
-                    <p className="text-center text-gray-600">No annonces available.</p>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full bg-white rounded-lg shadow">
-                            <thead>
-                            <tr className="bg-blue-600 text-white">
-                                <th className="px-4 py-3 font-semibold text-left">ID</th>
-                                <th className="px-4 py-3 font-semibold text-left">Poids (kg)</th>
-                                <th className="px-4 py-3 font-semibold text-left">Prix ($)</th>
-                                <th className="px-4 py-3 font-semibold text-left">Date de Départ</th>
-                                <th className="px-4 py-3 font-semibold text-left">Pays de Départ</th>
-                                <th className="px-4 py-3 font-semibold text-left">Pays de Destination</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {annonces.map((annonce, index) => (
-                                <tr
-                                    key={annonce.id}
-                                    className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
-                                >
-                                    <td className="border-t px-4 py-2">{annonce.id}</td>
-                                    <td className="border-t px-4 py-2">{annonce.poids}</td>
-                                    <td className="border-t px-4 py-2">{annonce.prix}</td>
-                                    <td className="border-t px-4 py-2">
-                                        {annonce.voyage?.dateDepart || 'Voyage not available'}
-                                    </td>
-                                    <td className="border-t px-4 py-2">
-                                        {annonce.paysDepart?.nom || 'N/A'}
-                                    </td>
-                                    <td className="border-t px-4 py-2">
-                                        {annonce.paysDestination?.nom || 'N/A'}
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
+        <div className="min-h-screen bg-gray-100 py-8">
+            <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-8">
+                {/* Sidebar - Filters */}
+                <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-bold mb-4">Filter Annonces</h2>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-gray-700">Date Depart:</label>
+                            <input
+                                type="date"
+                                name="dateDepart"
+                                value={filters.dateDepart}
+                                onChange={handleFilterChange}
+                                className="w-full p-2 border rounded-lg"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700">Date Arrivee:</label>
+                            <input
+                                type="date"
+                                name="dateArrivee"
+                                value={filters.dateArrivee}
+                                onChange={handleFilterChange}
+                                className="w-full p-2 border rounded-lg"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700">Pays Depart:</label>
+                            <input
+                                type="text"
+                                name="paysDepart"
+                                value={filters.paysDepart}
+                                onChange={handleFilterChange}
+                                className="w-full p-2 border rounded-lg"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700">Pays Destination:</label>
+                            <input
+                                type="text"
+                                name="paysDestination"
+                                value={filters.paysDestination}
+                                onChange={handleFilterChange}
+                                className="w-full p-2 border rounded-lg"
+                            />
+                        </div>
+                        <div className="mt-6 flex justify-between">
+                            <button
+                                onClick={handleFilter}
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
+                            >
+                                Filter
+                            </button>
+                            <button
+                                onClick={clearFilters}
+                                className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg"
+                            >
+                                Clear Filters
+                            </button>
+                        </div>
                     </div>
-                )}
+                </div>
+
+                {/* Right Section - Annonces List */}
+                <div className="lg:col-span-3 bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-2xl font-bold mb-6">Annonces</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
+                        {currentAnnonces.map((annonce, index) => (
+                            <div
+                                key={index}
+                                className="bg-white p-6 rounded-lg shadow-md relative"
+                            >
+                                <div className="absolute top-4 right-4 text-gray-500 text-sm">
+                                    Published: {new Date(annonce.datePublication).toLocaleDateString()}
+                                </div>
+                                <div className="flex justify-between">
+                                    <div>
+                                        <h3 className="text-lg font-bold mb-2">
+                                            Date Depart: {new Date(annonce.dateDepart).toLocaleDateString()}
+                                        </h3>
+                                        <p className="text-gray-700">
+                                            Date Arrivee: {new Date(annonce.dateArrivee).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold mb-2">
+                                            From: {annonce.paysDepart.nom}
+                                        </h3>
+                                        <p className="text-gray-700">
+                                            To: {annonce.paysDestination.nom}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="mt-8 flex justify-center gap-4">
+                        {Array.from({ length: totalPages }).map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentPage(index + 1)}
+                                className={`${
+                                    currentPage === index + 1
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-300"
+                                } hover:bg-blue-600 py-2 px-4 rounded-lg font-bold`}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
-export default AnnonceList;
+export default AnnoncesPage;
