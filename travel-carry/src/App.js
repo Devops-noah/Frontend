@@ -8,6 +8,7 @@ import NotationsPage from "./NotationsPage"; // Import de la page Notations
 import ColisDetails from "./colis/ColisDetails"; // Import du composant ColisDetails
 import AnnonceList from "./AnnonceList"; // Ajout pour conserver la fonctionnalité d'AnnonceList
 import { UserProvider } from "./context/UserContext";
+import CreateAnnonce from "./CreateAnnonce";
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                         <Route path="/notations" element={<NotationsPage />} /> {/* Route Notations */}
                         <Route path="/colis/details" element={<ColisDetails />} /> {/* Nouvelle route */}
                         <Route path="/annonces" element={<AnnonceList />} /> {/* Intégration d'AnnonceList */}
+                        <Route path="/create-annonce" element={<CreateAnnonce />} />
                     </Routes>
                 </div>
             </Router>

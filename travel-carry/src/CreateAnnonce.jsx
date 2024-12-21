@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const AnnonceForm = () => {
+const CreateAnnonce = () => {
     const [formData, setFormData] = useState({
         description: '',
         poids: '',
@@ -118,4 +118,4 @@ const AnnonceForm = () => {
     );
 };
 
-export default AnnonceForm;
+export default CreateAnnonce;
