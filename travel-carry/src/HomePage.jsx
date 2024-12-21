@@ -63,14 +63,9 @@ export default function HomePage() {
                 </>
             ) : (
                 <>
-                    {/* Message si l'utilisateur n'est pas connecté */}
-                    <h2 style={{color: "red", fontWeight: "bold"}}>
-                        Veuillez vous connecter pour accéder à cette page.
-                    </h2>
-
                     <div className="min-h-screen bg-gray-100 py-8">
                         <div className="max-w-6xl mx-auto px-4">
-                            <h2 className="text-2xl font-bold mb-6">Recent Annonces</h2>
+                            <h2 className="text-2xl font-bold mb-6">Dernières annonces publiées</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {recentAnnonces.map((annonce, index) => (
                                     <div
@@ -113,7 +108,7 @@ export default function HomePage() {
                                     onClick={() => navigate("/annonces")}
                                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
                                 >
-                                    See All the Annonces
+                                    Voir toutes les annonces
                                 </button>
                             </div>
                         </div>
