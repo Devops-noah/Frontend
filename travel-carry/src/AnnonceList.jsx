@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const AnnoncesPage = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -12,6 +13,7 @@ const AnnoncesPage = () => {
     });
     const [currentPage, setCurrentPage] = useState(1);
     const annoncesPerPage = 8;
+    const navigate = useNavigate();
 
     // Fetch all annonces
     useEffect(() => {
@@ -145,6 +147,7 @@ const AnnoncesPage = () => {
                             <div
                                 key={index}
                                 className="bg-white p-6 rounded-lg shadow-md relative"
+                                onClick={() => navigate(`/annonces/${annonce.id}`)} // Redirect to AnnonceDetail
                             >
                                 <div className="absolute top-4 right-4 text-gray-500 text-sm">
                                     Published: {new Date(annonce.datePublication).toLocaleDateString()}

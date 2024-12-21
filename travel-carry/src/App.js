@@ -10,7 +10,8 @@ import AnnonceList from "./AnnonceList";
 import CreateAnnonce from "./CreateAnnonce";
 import { UserProvider } from "./context/UserContext";
 import Footer from "./Footer";
-import "./App.css"; // Assurez-vous de gérer les styles de base ici
+import "./App.css";
+import AnnonceDetail from "./AnnonceDetail";
 
 function App() {
     // Vérifie si l'utilisateur est connecté
@@ -56,6 +57,16 @@ function App() {
                                 element={
                                     isAuthenticated ? (
                                         <CreateAnnonce />
+                                    ) : (
+                                        <Navigate to="/login" replace />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/annonces/:id"
+                                element={
+                                    isAuthenticated ? (
+                                        <AnnonceDetail />
                                     ) : (
                                         <Navigate to="/login" replace />
                                     )

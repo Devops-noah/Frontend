@@ -75,7 +75,8 @@ export default function HomePage() {
                                 {recentAnnonces.map((annonce, index) => (
                                     <div
                                         key={index}
-                                        className="bg-white p-6 rounded-lg shadow-md relative"
+                                        className="bg-white p-6 rounded-lg shadow-md relative cursor-pointer hover:shadow-lg transition"
+                                        onClick={() => navigate(`/annonces/${annonce.id}`)} // Redirect to AnnonceDetail
                                     >
                                         {/* Date Publication */}
                                         <div className="absolute top-4 right-4 text-gray-500 text-sm">
