@@ -1,18 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
         email: "",
         motDePasse: "",
     });
-    const [showPassword, setShowPassword] = useState(false); // État pour basculer la visibilité du mot de passe
+    const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
-    // Gestion des changements dans les champs du formulaire
+    // Check if user is already logged in
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate("/"); // Redirect to home or dashboard if already logged in
+        }
+    }, [navigate]);
+
+    // Handle input changes in the form
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -21,7 +29,7 @@ const LoginPage = () => {
         });
     };
 
-    // Gestion de la soumission du formulaire
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage("");
@@ -44,10 +52,12 @@ const LoginPage = () => {
             const decodedToken = jwtDecode(token);
             console.log("Decoded Token:", JSON.stringify(decodedToken.sub));
 
-            // Si la requête est réussie
-            localStorage.setItem("token", token); // Stocker le token JWT
+            // Store token in localStorage
+            localStorage.setItem("token", token);
             localStorage.setItem("userName", JSON.stringify(decodedToken.sub));
-            navigate("/"); // Redirection vers la liste des annonces
+
+            // Redirect to homepage or user dashboard after successful login
+            navigate("/"); // Redirect to homepage or another page after login
         } catch (error) {
             if (error.response) {
                 setErrorMessage(error.response.data.message || "Identifiants incorrects.");
@@ -84,7 +94,7 @@ const LoginPage = () => {
                     {/* Mot de passe */}
                     <div className="mb-4 relative">
                         <input
-                            type={showPassword ? "text" : "password"} // Afficher ou masquer le mot de passe
+                            type={showPassword ? "text" : "password"} // Toggle password visibility
                             id="motDePasse"
                             name="motDePasse"
                             value={formData.motDePasse}
@@ -95,15 +105,15 @@ const LoginPage = () => {
                         />
                         <button
                             type="button"
-                            onClick={() => setShowPassword(!showPassword)} // Basculer la visibilité
+                            onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
                             className="absolute right-2 top-2 text-gray-500 hover:text-gray-700 focus:outline-none"
                             aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                         >
-                            {showPassword ? "👁️" : "🙈"} {/* Icône pour afficher/masquer */}
+                            {showPassword ? "👁️" : "🙈"}
                         </button>
                     </div>
 
-                    {/* Bouton de connexion */}
+                    {/* Login button */}
                     <button
                         type="submit"
                         className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 font-semibold"
@@ -112,7 +122,7 @@ const LoginPage = () => {
                     </button>
                 </form>
 
-                {/* Lien pour rediriger vers la page d'inscription */}
+                {/* Link to registration page */}
                 <div className="mt-4 text-center">
                     <p className="text-gray-600">
                         Pas encore de compte ?{" "}

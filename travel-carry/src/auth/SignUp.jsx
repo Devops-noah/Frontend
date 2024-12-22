@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const SignUp = () => {
@@ -8,12 +9,20 @@ const SignUp = () => {
         type: "",
         email: "",
         motDePasse: "",
-       // confirmPassword: "",
         telephone: "",
         adresse: "",
     });
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const navigate = useNavigate();
+
+    // Check if user is already logged in
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate("/"); // Redirect to home if already logged in
+        }
+    }, [navigate]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -24,8 +33,6 @@ const SignUp = () => {
         e.preventDefault();
         setErrorMessage("");
         setSuccessMessage("");
-
-        console.log("Form data before submitting:", formData); // Log formData to check if 'password' is not empty
 
         try {
             // API call to register the user
@@ -38,8 +45,6 @@ const SignUp = () => {
                 telephone: formData.telephone,
                 adresse: formData.adresse,
             });
-
-            console.log("response : ", response);
 
             setSuccessMessage("Inscription réussie ! Vous pouvez vous connecter.");
             setFormData({
@@ -59,7 +64,6 @@ const SignUp = () => {
             }
         }
     };
-
 
     return (
         <div
@@ -154,9 +158,6 @@ const SignUp = () => {
                         />
                     </div>
 
-                    {/* Confirmer mot de passe */}
-
-
                     {/* Téléphone */}
                     <div className="mb-4">
                         <label className="block text-gray-700 font-semibold mb-2">Téléphone</label>
@@ -185,7 +186,7 @@ const SignUp = () => {
                         />
                     </div>
 
-                    {/* Bouton d'inscription */}
+                    {/* Sign Up Button */}
                     <button
                         type="submit"
                         className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 font-semibold"
@@ -193,7 +194,7 @@ const SignUp = () => {
                         S'inscrire
                     </button>
 
-                    {/* Lien pour se connecter */}
+                    {/* Link to login */}
                     <p className="text-center mt-4">
                         <a href="/login" className="text-blue-500 hover:underline">
                             Avez-vous déjà un compte ? Connectez-vous

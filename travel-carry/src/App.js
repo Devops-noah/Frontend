@@ -32,26 +32,7 @@ function App() {
                             <Route path="/annonces" element={<AnnonceList />} /> {/* Non protégé */}
 
                             {/* Routes protégées */}
-                            <Route
-                                path="/notations"
-                                element={
-                                    isAuthenticated ? (
-                                        <NotationsPage />
-                                    ) : (
-                                        <Navigate to="/login" replace />
-                                    )
-                                }
-                            />
-                            <Route
-                                path="/colis/details"
-                                element={
-                                    isAuthenticated ? (
-                                        <ColisDetails />
-                                    ) : (
-                                        <Navigate to="/login" replace />
-                                    )
-                                }
-                            />
+
                             <Route
                                 path="/create-annonce"
                                 element={
@@ -67,6 +48,26 @@ function App() {
                                 element={
                                     isAuthenticated ? (
                                         <AnnonceDetail />
+                                    ) : (
+                                        <Navigate to="/login" replace />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/notations"
+                                element={
+                                    isAuthenticated ? (
+                                        <NotationsPage />
+                                    ) : (
+                                        <Navigate to="/login" replace />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/colis/details"
+                                element={
+                                    isAuthenticated ? (
+                                        <ColisDetails />
                                     ) : (
                                         <Navigate to="/login" replace />
                                     )

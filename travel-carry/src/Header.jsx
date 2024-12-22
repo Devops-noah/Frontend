@@ -6,6 +6,12 @@ const Header = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
 
+
+    // Handle logo click to navigate to home page
+    const handleLogoClick = () => {
+        navigate("/"); // Redirect to the homepage
+    };
+
     const isAuthenticated = !!localStorage.getItem("token");
 
     useEffect(() => {
@@ -37,11 +43,13 @@ const Header = () => {
                     style={{
                         borderRadius: "50%",
                         border: "2px solid white",
+                        cursor: "pointer"
                     }}
+                    onClick={handleLogoClick}
                 />
                 <h1 className="text-2xl font-bold">
-                    <span style={{ color: "#ffffff" }}>Travel</span>{" "}
-                    <span style={{ color: "#004080" }}>Carry</span>
+                    <span style={{ color: "#ffffff", cursor: "pointer" }} onClick={handleLogoClick}>Travel</span>{" "}
+                    <span style={{ color: "#004080", cursor: "pointer" }} onClick={handleLogoClick}>Carry</span>
                 </h1>
             </div>
 
