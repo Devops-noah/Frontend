@@ -1,18 +1,29 @@
-/* Assurez-vous que le body et html prennent toute la hauteur */
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* Configuration principale de l'application */
-#app-root {
-  display: flex;
-  flex-direction: column;
+.homepage-carousel {
+  position: relative;
   min-height: 100vh;
+  overflow: hidden;
 }
 
-/* Le contenu principal doit s'étirer pour pousser le footer en bas */
-.container {
-  flex: 1;
+.homepage-carousel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 400%; /* Largeur pour 4 images */
+  height: 100%;
+  background: url('./assets/photo1.jpg') no-repeat center/cover,
+  url('./assets/photo2.jpg') no-repeat center/cover,
+  url('./assets/photo3.jpg') no-repeat center/cover,
+  url('./assets/photo4.jpg') no-repeat center/cover;
+  animation: slideBackground 20s linear infinite;
+  z-index: -1; /* Mettre derrière le contenu */
+}
+
+/* Animation pour le défilement */
+@keyframes slideBackground {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-100%); }
+  50% { transform: translateX(-200%); }
+  75% { transform: translateX(-300%); }
+  100% { transform: translateX(0); }
 }

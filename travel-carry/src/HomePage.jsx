@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function HomePage() {
@@ -30,91 +29,113 @@ export default function HomePage() {
     }, []);
 
     return (
-        <div style={{ textAlign: "center", marginTop: "50px" }}>
-            {isAuthenticated ? (
-                <>
-                    {/* Afficher la page si l'utilisateur est connecté */}
-                    <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>Bienvenue sur TravelCarry</h1>
-                    <Link to="/notations">
-                        <button
-                            style={{
-                                marginTop: "20px",
-                                padding: "10px 20px",
-                                fontSize: "1rem",
-                                fontWeight: "bold",
-                                backgroundColor: "#4CAF50",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                            }}
-                        >
-                            Notations
-                        </button>
-                    </Link>
-                    <div style={{ marginTop: "20px" }}>
-                        <Link
-                            to="/colis/details"
-                            className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                            Détails du colis
+        <div className="homepage-carousel">
+            <div style={{ textAlign: "center", marginTop: "50px" }}>
+                {isAuthenticated ? (
+                    <>
+                        {/* Afficher la page si l'utilisateur est connecté */}
+                        <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>
+                            Bienvenue sur TravelCarry
+                        </h1>
+                        <Link to="/notations">
+                            <button
+                                style={{
+                                    marginTop: "20px",
+                                    padding: "10px 20px",
+                                    fontSize: "1rem",
+                                    fontWeight: "bold",
+                                    backgroundColor: "#4CAF50",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Notations
+                            </button>
                         </Link>
-                    </div>
-                </>
-            ) : (
-                <>
-                    <div className="min-h-screen bg-gray-100 py-8">
-                        <div className="max-w-6xl mx-auto px-4">
-                            <h2 className="text-2xl font-bold mb-6">Dernières annonces publiées</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {recentAnnonces.map((annonce, index) => (
-                                    <div
-                                        key={index}
-                                        className="bg-white p-6 rounded-lg shadow-md relative cursor-pointer hover:shadow-lg transition"
-                                        onClick={() => navigate(`/annonces/${annonce.id}`)} // Redirect to AnnonceDetail
-                                    >
-                                        {/* Date Publication */}
-                                        <div className="absolute top-4 right-4 text-gray-500 text-sm">
-                                            Published: {new Date(annonce.datePublication).toLocaleDateString()}
-                                        </div>
-                                        {/* Main Content */}
-                                        <div className="flex justify-between">
-                                            {/* Left Section */}
-                                            <div>
-                                                <h3 className="text-lg font-bold mb-2">
-                                                    Date Depart: {new Date(annonce.dateDepart).toLocaleDateString()}
-                                                </h3>
-                                                <p className="text-gray-700">
-                                                    Date Arrivee: {new Date(annonce.dateArrivee).toLocaleDateString()}
-                                                </p>
+                        <div style={{ marginTop: "20px" }}>
+                            <Link
+                                to="/colis/details"
+                                className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                Détails du colis
+                            </Link>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="min-h-screen bg-transparent py-8">
+                            <div className="max-w-6xl mx-auto px-4">
+                                <h2 className="text-2xl font-bold mb-6">
+                                    Dernières annonces publiées
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {recentAnnonces.map((annonce, index) => (
+                                        <div
+                                            key={index}
+                                            className="bg-blue-500 text-white p-4 rounded-lg shadow-md relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition"
+                                            onClick={() =>
+                                                navigate(`/annonces/${annonce.id}`)
+                                            } // Redirect to AnnonceDetail
+                                        >
+                                            {/* Date Publication */}
+                                            <div className="absolute top-1 left-2 text-gray-200 text-xs">
+                                                Publiée le :{" "}
+                                                {new Date(
+                                                    annonce.datePublication
+                                                ).toLocaleDateString()}
                                             </div>
-                                            {/* Right Section */}
-                                            <div>
-                                                <h3 className="text-lg font-bold mb-2">
-                                                    From: {annonce.paysDepart.nom}
-                                                </h3>
-                                                <p className="text-gray-700">
-                                                    To: {annonce.paysDestination.nom}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
 
-                            {/* "See All" Button */}
-                            <div className="mt-8 flex justify-center">
-                                <button
-                                    onClick={() => navigate("/annonces")}
-                                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
-                                >
-                                    Voir toutes les annonces
-                                </button>
+                                            {/* Section gauche : Dates */}
+                                            <div className="flex flex-col space-y-2">
+                                                <h3 className="text-sm font-bold flex items-center">
+                                                    <span className="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+                                                    Date Départ :{" "}
+                                                    {new Date(
+                                                        annonce.dateDepart
+                                                    ).toLocaleDateString()}
+                                                </h3>
+                                                <p className="text-sm font-bold flex items-center">
+                                                    <span className="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+                                                    Date Arrivée :{" "}
+                                                    {new Date(
+                                                        annonce.dateArrivee
+                                                    ).toLocaleDateString()}
+                                                </p>
+                                            </div>
+
+                                            {/* Section droite : Pays */}
+                                            <div className="flex flex-col space-y-2 text-right">
+                                                <h3 className="text-sm font-bold flex items-center">
+                                                    <span className="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+                                                    Départ :{" "}
+                                                    {annonce.paysDepart.nom}
+                                                </h3>
+                                                <p className="text-sm font-bold flex items-center">
+                                                    <span className="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
+                                                    Destination :{" "}
+                                                    {annonce.paysDestination.nom}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* "See All" Button */}
+                                <div className="mt-8 flex justify-center">
+                                    <button
+                                        onClick={() => navigate("/annonces")}
+                                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
+                                    >
+                                        cliquer pour voir toutes les annonces
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </>
-            )}
+                    </>
+                )}
+            </div>
         </div>
     );
 }

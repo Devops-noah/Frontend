@@ -77,10 +77,10 @@ const AnnoncesPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 py-8">
-            <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="max-w-6xl mx-auto px-5 grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Sidebar - Filters */}
                 <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-4">Filter Annonces</h2>
+                    <h2 className="text-xl font-bold mb-4">Filter les annonces</h2>
                     <div className="space-y-4">
                         <div>
                             <label className="block text-gray-700">Date Depart:</label>
@@ -125,7 +125,7 @@ const AnnoncesPage = () => {
                         <div className="mt-6 flex justify-between">
                             <button
                                 onClick={handleFilter}
-                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
+                                className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg"
                             >
                                 Filter
                             </button>
@@ -133,7 +133,7 @@ const AnnoncesPage = () => {
                                 onClick={clearFilters}
                                 className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg"
                             >
-                                Clear Filters
+                                Supprimer
                             </button>
                         </div>
                     </div>
@@ -146,32 +146,36 @@ const AnnoncesPage = () => {
                         {currentAnnonces.map((annonce, index) => (
                             <div
                                 key={index}
-                                className="bg-white p-6 rounded-lg shadow-md relative"
+                                className="bg-blue-500 text-white p-4 rounded-lg shadow-md relative flex justify-between items-center"
                                 onClick={() => navigate(`/annonces/${annonce.id}`)} // Redirect to AnnonceDetail
                             >
-                                <div className="absolute top-4 right-4 text-gray-500 text-sm">
-                                    Published: {new Date(annonce.datePublication).toLocaleDateString()}
+                                {/* Section gauche : Dates */}
+                                <div>
+                                    <h3 className="text-sm font-bold">
+                                        Date Départ {new Date(annonce.dateDepart).toLocaleDateString()}
+                                    </h3>
+                                    <p className="text-sm font-bold">
+                                        Date Arrivée  {new Date(annonce.dateArrivee).toLocaleDateString()}
+                                    </p>
                                 </div>
-                                <div className="flex justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-bold mb-2">
-                                            Date Depart: {new Date(annonce.dateDepart).toLocaleDateString()}
-                                        </h3>
-                                        <p className="text-gray-700">
-                                            Date Arrivee: {new Date(annonce.dateArrivee).toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold mb-2">
-                                            From: {annonce.paysDepart.nom}
-                                        </h3>
-                                        <p className="text-gray-700">
-                                            To: {annonce.paysDestination.nom}
-                                        </p>
-                                    </div>
+
+                                {/* Section droite : Pays */}
+                                <div className="text-right">
+                                    <h3 className="text-sm font-bold mb-2">
+                                         Départ {annonce.paysDepart.nom}
+                                    </h3>
+                                    <p className="text-sm font-bold">
+                                        Déstination {annonce.paysDestination.nom}
+                                    </p>
+                                </div>
+
+                                {/* Date de publication */}
+                                <div className="absolute top-1 left-2 text-gray-200 text-xs">
+                                    Publiée le : {new Date(annonce.datePublication).toLocaleDateString()}
                                 </div>
                             </div>
                         ))}
+
                     </div>
 
                     {/* Pagination */}
