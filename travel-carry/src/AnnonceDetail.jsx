@@ -73,7 +73,7 @@ const AnnonceDetail = () => {
                             {new Date(annonce.dateDepart).toLocaleDateString()}
                         </p>
                         <p className="text-gray-700">
-                            <strong>Pays Depart:</strong> {annonce.paysDepart.nom}
+                            <strong>Pays Depart:</strong> {annonce.paysDepart}
                         </p>
                     </div>
 
@@ -88,7 +88,7 @@ const AnnonceDetail = () => {
                         </p>
                         <p className="text-gray-700">
                             <strong>Pays Destination:</strong>{" "}
-                            {annonce.paysDestination.nom}
+                            {annonce.paysDestination}
                         </p>
                     </div>
                 </div>

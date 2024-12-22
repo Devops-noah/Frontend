@@ -18,6 +18,7 @@ const AnnoncesPage = () => {
     // Fetch all annonces
     useEffect(() => {
         axios.get("http://localhost:8080/api/annonces").then((response) => {
+            console.log("annonces list: " + JSON.stringify(response))
             setAnnonces(response.data);
             setFilteredAnnonces(response.data);
         });
@@ -40,11 +41,11 @@ const AnnoncesPage = () => {
                 (!filters.dateArrivee ||
                     new Date(annonce.dateArrivee) <= new Date(filters.dateArrivee)) &&
                 (!filters.paysDepart ||
-                    annonce.paysDepart.nom
+                    annonce.paysDepart
                         .toLowerCase()
                         .includes(filters.paysDepart.toLowerCase())) &&
                 (!filters.paysDestination ||
-                    annonce.paysDestination.nom
+                    annonce.paysDestination
                         .toLowerCase()
                         .includes(filters.paysDestination.toLowerCase()))
             );
@@ -162,10 +163,10 @@ const AnnoncesPage = () => {
                                 {/* Section droite : Pays */}
                                 <div className="text-right">
                                     <h3 className="text-sm font-bold mb-2">
-                                         Départ {annonce.paysDepart.nom}
+                                         Départ {annonce.paysDepart}
                                     </h3>
                                     <p className="text-sm font-bold">
-                                        Déstination {annonce.paysDestination.nom}
+                                        Déstination {annonce.paysDestination}
                                     </p>
                                 </div>
 
