@@ -34,7 +34,7 @@ function App() {
                             {/* Routes protégées */}
 
                             <Route
-                                path="/create-annonce"
+                                path="/create-annonce/:id"
                                 element={
                                     isAuthenticated ? (
                                         <CreateAnnonce />

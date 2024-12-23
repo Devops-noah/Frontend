@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TravelAnimation from "./TravelAnimation"
 
 const CreateAnnonce = () => {
     const [userType, setUserType] = useState(null);
     const [formData, setFormData] = useState({
-        dateDepart: "",
-        dateArrivee: "",
         datePublication: "",
         poidsDisponible: "",
         voyageId: "",
         paysDepart: "",
         paysDestination: "",
+        dateDepart: "",
+        dateArrivee: "",
     });
-    const [voyages, setVoyages] = useState([]);
-    const [pays, setPays] = useState([]);
-    const navigate = useNavigate();
-
+    const [voyage, setVoyage] = useState(null);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const { id } = useParams();
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -43,29 +43,39 @@ const CreateAnnonce = () => {
                     setTimeout(() => navigate("/"), 5000);
                 } else {
                     setUserType(user.type);
-                    fetchInitialData(token);
+                    fetchVoyageData(token);
                 }
             })
             .catch(() => {
                 navigate("/");
             });
-    }, [navigate]);
+    }, [navigate, id]);
 
-    const fetchInitialData = async (token) => {
+    const fetchVoyageData = async (token) => {
+        if (!id) {
+            toast.error("Voyage ID is missing!", { position: toast.POSITION.TOP_CENTER });
+            return;
+        }
+
         try {
-            const [voyagesResponse, paysResponse] = await Promise.all([
-                axios.get("http://localhost:8080/api/voyages", {
-                    headers: { Authorization: `Bearer ${token}` },
-                }),
-                axios.get("http://localhost:8080/api/pays", {
-                    headers: { Authorization: `Bearer ${token}` },
-                }),
-            ]);
-            setVoyages(voyagesResponse.data);
-            setPays(paysResponse.data);
+            const response = await axios.get(`http://localhost:8080/api/voyages/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const voyageData = response.data;
+            setVoyage(voyageData);
+
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                voyageId: voyageData.id,
+                paysDepart: voyageData.paysDepart?.nom || "",
+                paysDestination: voyageData.paysDestination?.nom || "",
+                dateDepart: voyageData.dateDepart || "",
+                dateArrivee: voyageData.dateArrivee || "",
+            }));
         } catch (error) {
-            console.error("Failed to fetch initial data:", error);
-            toast.error("Failed to load data. Please try again later.", {
+            console.error("Failed to fetch voyage data:", error);
+            toast.error("Failed to load voyage data. Please try again later.", {
                 position: toast.POSITION.TOP_CENTER,
             });
         }
@@ -73,11 +83,21 @@ const CreateAnnonce = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const { voyageId, poidsDisponible, datePublication } = formData;
+
+        if (!voyageId || !poidsDisponible || !datePublication) {
+            toast.error("Please fill in all required fields.", {
+                position: toast.POSITION.TOP_CENTER,
+            });
+            return;
+        }
+
         const token = localStorage.getItem("token");
         if (!token) {
             setError("You must be logged in to create an annonce.");
@@ -86,8 +106,8 @@ const CreateAnnonce = () => {
         }
 
         try {
-            const response = await axios.post(
-                "http://localhost:8080/api/annonces",
+            await axios.post(
+                `http://localhost:8080/api/annonces/${voyageId}`,
                 formData,
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -131,40 +151,22 @@ const CreateAnnonce = () => {
                                 required
                             />
                         </div>
+                        {/* Travel Animation Component */}
+                        {voyage && (
+                            <div className="mt-8">
+                                <TravelAnimation
+                                    paysDepart={voyage.paysDepart?.nom}
+                                    paysDestination={voyage.paysDestination?.nom}
+                                    dateDepart={new Date(voyage.dateDepart).toLocaleDateString()}
+                                    dateArrivee={new Date(voyage.dateArrivee).toLocaleDateString()}
+                                />
+                            </div>
+                        )}
 
-                        <div>
-                            <label htmlFor="dateDepart" className="block text-sm font-medium text-gray-700">
-                                Departure Date
-                            </label>
-                            <input
-                                id="dateDepart"
-                                type="date"
-                                name="dateDepart"
-                                value={formData.dateDepart}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded mt-1"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="dateArrivee" className="block text-sm font-medium text-gray-700">
-                                Arrival Date
-                            </label>
-                            <input
-                                id="dateArrivee"
-                                type="date"
-                                name="dateArrivee"
-                                value={formData.dateArrivee}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded mt-1"
-                                required
-                            />
-                        </div>
 
                         <div>
                             <label htmlFor="poidsDisponible" className="block text-sm font-medium text-gray-700">
-                                Available Weight (kg)
+                                Weight Available (kg)
                             </label>
                             <input
                                 id="poidsDisponible"
@@ -172,82 +174,19 @@ const CreateAnnonce = () => {
                                 name="poidsDisponible"
                                 value={formData.poidsDisponible}
                                 onChange={handleInputChange}
-                                placeholder="Enter weight"
                                 className="w-full p-2 border border-gray-300 rounded mt-1"
                                 required
                             />
                         </div>
 
-                        <div>
-                            <label htmlFor="voyageId" className="block text-sm font-medium text-gray-700">
-                                Voyage
-                            </label>
-                            <select
-                                id="voyageId"
-                                name="voyageId"
-                                value={formData.voyageId}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded mt-1"
-                                required
-                            >
-                                <option value="">Select a Voyage</option>
-                                {voyages.map((voyage) => (
-                                    <option key={voyage.id} value={voyage.id}>
-                                        Voyage {voyage.id}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label htmlFor="paysDepart" className="block text-sm font-medium text-gray-700">
-                                Departure Country
-                            </label>
-                            <select
-                                id="paysDepart"
-                                name="paysDepart"
-                                value={formData.paysDepart}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded mt-1"
-                                required
-                            >
-                                <option value="">Select Departure Country</option>
-                                {pays.map((pay) => (
-                                    <option key={pay.id} value={pay.nom}>
-                                        {pay.nom}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label htmlFor="paysDestination" className="block text-sm font-medium text-gray-700">
-                                Destination Country
-                            </label>
-                            <select
-                                id="paysDestination"
-                                name="paysDestination"
-                                value={formData.paysDestination}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded mt-1"
-                                required
-                            >
-                                <option value="">Select Destination Country</option>
-                                {pays.map((pay) => (
-                                    <option key={pay.id} value={pay.nom}>
-                                        {pay.nom}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
                         <button
                             type="submit"
-                            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+                            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
                         >
-                            Create Annonce
+                            Submit
                         </button>
                     </form>
+
                 </div>
             </div>
         </>

@@ -102,7 +102,7 @@ const AnnonceDetail = () => {
                         <strong>Poids Disponible:</strong> {annonce.poidsDisponible} kg
                     </p>
                     <p className="text-gray-700">
-                        <strong>Voyageur:</strong> {annonce.voyageur?.email || "N/A"}
+                        <strong>Voyageur:</strong> {annonce.voyageurNom || "N/A"}
                     </p>
                 </div>
 

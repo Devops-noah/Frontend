@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import TravelAnimation from './TravelAnimation'; // Import the TravelAnimation component
 
-const AnnoncesPage = () => {
+const AnnoncesList = () => {
     const [annonces, setAnnonces] = useState([]);
     const [filteredAnnonces, setFilteredAnnonces] = useState([]);
     const [filters, setFilters] = useState({
@@ -18,7 +19,7 @@ const AnnoncesPage = () => {
     // Fetch all annonces
     useEffect(() => {
         axios.get("http://localhost:8080/api/annonces").then((response) => {
-            console.log("annonces list: " + JSON.stringify(response))
+            console.log("annonces list: " + JSON.stringify(response));
             setAnnonces(response.data);
             setFilteredAnnonces(response.data);
         });
@@ -147,36 +148,23 @@ const AnnoncesPage = () => {
                         {currentAnnonces.map((annonce, index) => (
                             <div
                                 key={index}
-                                className="bg-blue-500 text-white p-4 rounded-lg shadow-md relative flex justify-between items-center"
+                                className="bg-blue-300 p-4 relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition"
                                 onClick={() => navigate(`/annonces/${annonce.id}`)} // Redirect to AnnonceDetail
                             >
-                                {/* Section gauche : Dates */}
-                                <div>
-                                    <h3 className="text-sm font-bold">
-                                        Date Départ {new Date(annonce.dateDepart).toLocaleDateString()}
-                                    </h3>
-                                    <p className="text-sm font-bold">
-                                        Date Arrivée  {new Date(annonce.dateArrivee).toLocaleDateString()}
-                                    </p>
-                                </div>
-
-                                {/* Section droite : Pays */}
-                                <div className="text-right">
-                                    <h3 className="text-sm font-bold mb-2">
-                                         Départ {annonce.paysDepart}
-                                    </h3>
-                                    <p className="text-sm font-bold">
-                                        Déstination {annonce.paysDestination}
-                                    </p>
-                                </div>
+                                {/* Flight animation for each annonce */}
+                                <TravelAnimation
+                                    paysDepart={annonce.paysDepart}
+                                    paysDestination={annonce.paysDestination}
+                                    dateDepart={new Date(annonce.dateDepart).toLocaleDateString()}
+                                    dateArrivee={new Date(annonce.dateArrivee).toLocaleDateString()}
+                                />
 
                                 {/* Date de publication */}
-                                <div className="absolute top-1 left-2 text-gray-200 text-xs">
+                                <div className="absolute top-1 left-2 text-white text-xs" style={{ background: 'repeating-radial-gradient(black, transparent 100px)' }}>
                                     Publiée le : {new Date(annonce.datePublication).toLocaleDateString()}
                                 </div>
                             </div>
                         ))}
-
                     </div>
 
                     {/* Pagination */}
@@ -201,4 +189,4 @@ const AnnoncesPage = () => {
     );
 };
 
-export default AnnoncesPage;
+export default AnnoncesList;

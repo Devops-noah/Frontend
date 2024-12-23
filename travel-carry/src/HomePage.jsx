@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import TravelAnimation from './TravelAnimation'; // Import the TravelAnimation component
 
 export default function HomePage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -75,7 +76,7 @@ export default function HomePage() {
                     </>
                 )}
 
-                {/* Recent Annonces Section */}
+                {/* Flight Animation for each annonce */}
                 <div className="min-h-screen bg-transparent py-8">
                     <div className="max-w-6xl mx-auto px-4">
                         <h2 className="text-2xl font-bold mb-6">
@@ -85,48 +86,16 @@ export default function HomePage() {
                             {recentAnnonces.map((annonce) => (
                                 <div
                                     key={annonce.id}
-                                    className="bg-blue-500 text-white p-4 rounded-lg shadow-md relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition"
+                                    className="text-red-950 p-4 font-bold relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition bg-blue-300 rounded-xl"
                                     onClick={() => handleAnnonceClick(annonce.id)}
                                 >
-                                    {/* Date Publication */}
-                                    <div className="absolute top-1 left-2 text-gray-200 text-xs">
-                                        Publiée le :{" "}
-                                        {new Date(
-                                            annonce.datePublication
-                                        ).toLocaleDateString()}
-                                    </div>
-
-                                    {/* Section gauche : Dates */}
-                                    <div className="flex flex-col space-y-2">
-                                        <h3 className="text-sm font-bold flex items-center">
-                                            <span className="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
-                                            Date Départ :{" "}
-                                            {new Date(
-                                                annonce.dateDepart
-                                            ).toLocaleDateString()}
-                                        </h3>
-                                        <p className="text-sm font-bold flex items-center">
-                                            <span className="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
-                                            Date Arrivée :{" "}
-                                            {new Date(
-                                                annonce.dateArrivee
-                                            ).toLocaleDateString()}
-                                        </p>
-                                    </div>
-
-                                    {/* Section droite : Pays */}
-                                    <div className="flex flex-col space-y-2 text-right">
-                                        <h3 className="text-sm font-bold flex items-center">
-                                            <span className="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
-                                            Départ :{" "}
-                                            {annonce.paysDepart.nom}
-                                        </h3>
-                                        <p className="text-sm font-bold flex items-center">
-                                            <span className="inline-block w-2 h-2 bg-white rounded-full mr-2"></span>
-                                            Destination :{" "}
-                                            {annonce.paysDestination.nom}
-                                        </p>
-                                    </div>
+                                    {/* Flight animation for each annonce */}
+                                    <TravelAnimation
+                                        paysDepart={annonce.paysDepart}
+                                        paysDestination={annonce.paysDestination}
+                                        dateDepart={new Date(annonce.dateDepart).toLocaleDateString()}
+                                        dateArrivee={new Date(annonce.dateArrivee).toLocaleDateString()}
+                                    />
                                 </div>
                             ))}
                         </div>
