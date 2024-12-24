@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function UserProfile() {
     const [profile, setProfile] = useState(null); // State to store user profile
     const [loading, setLoading] = useState(true); // State to show loading indicator
     const [error, setError] = useState(null); // State to handle errors
+    const navigate = useNavigate(); // Use navigate hook to navigate to different routes
 
     useEffect(() => {
         // Fetch the user profile based on authentication
@@ -48,6 +50,7 @@ export default function UserProfile() {
         return <p className="text-center py-5 text-red-500">Error: {error}</p>;
     }
 
+
     return (
         <section className="bg-gray-100 py-5">
             <div className="container mx-auto">
@@ -67,15 +70,33 @@ export default function UserProfile() {
                             <div className="flex justify-center gap-2">
                                 {profile.type === "voyageur" ? (
                                     <>
-                                        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                                            Mes annonces
+                                        <button
+                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                            onClick={() => {
+                                                // Check if there is any annonce
+                                                if (profile.annonces && profile.annonces.length > 0) {
+                                                    const voyageId = profile.annonces[0].voyageId; // Access the first annonce's voyageId
+                                                    navigate(`/create-annonce/${voyageId}`);
+                                                } else {
+                                                    // Handle case where no annonces exist
+                                                    alert("No available voyage to create annonce.");
+                                                }
+                                            }}
+                                        >
+                                            Create Annonce
                                         </button>
-                                        <button className="border border-gray-300 px-4 py-2 rounded hover:bg-gray-100">
+                                        <button
+                                            className="border border-gray-300 px-4 py-2 rounded hover:bg-gray-100"
+                                            onClick={() => navigate("/create-voyage")}
+                                        >
                                             Mes voyages
                                         </button>
                                     </>
                                 ) : profile.type === "expediteur" ? (
-                                    <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                    <button
+                                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                                        onClick={() => navigate("/colis/details")}
+                                    >
                                         Mes colis
                                     </button>
                                 ) : null}
