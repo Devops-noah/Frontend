@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "./assets/logo.png"; // Assurez-vous que le chemin est correct
+import logo from "../assets/logo.png"; // Assurez-vous que le chemin est correct
+import { FaUserCircle } from "react-icons/fa"; // User icon for the profile
 
 const Header = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
-
 
     // Handle logo click to navigate to home page
     const handleLogoClick = () => {
@@ -59,12 +59,19 @@ const Header = () => {
                 )}
 
                 {isAuthenticated ? (
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-white text-blue-500 font-semibold rounded hover:bg-gray-100"
-                    >
-                        Déconnexion
-                    </button>
+                    <div className="flex items-center gap-4">
+                        {/* Profile Icon */}
+                        <Link to="/user-profile">
+                            <FaUserCircle className="text-red-950 text-4xl cursor-pointer" />
+                        </Link>
+
+                        <button
+                            onClick={handleLogout}
+                            className="px-4 py-2 bg-white text-blue-500 font-semibold rounded hover:bg-gray-100"
+                        >
+                            Déconnexion
+                        </button>
+                    </div>
                 ) : (
                     <>
                         <Link to="/login">

@@ -1,17 +1,18 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Header from "./Header";
-import HomePage from "./HomePage";
+import Header from "./pages/Header";
+import HomePage from "./pages/HomePage";
 import Login from "./auth/Login";
 import SignUp from "./auth/SignUp";
 import NotationsPage from "./NotationsPage";
 import ColisDetails from "./colis/ColisDetails";
-import AnnonceList from "./AnnonceList";
-import CreateAnnonce from "./CreateAnnonce";
+import AnnonceList from "./annonces/AnnonceList";
+import CreateAnnonce from "./annonces/CreateAnnonce";
 import { UserProvider } from "./context/UserContext";
-import Footer from "./Footer";
+import Footer from "./pages/Footer";
 import "./App.css";
-import AnnonceDetail from "./AnnonceDetail";
+import AnnonceDetail from "./annonces/AnnonceDetail";
+import UserProfile from "./userProfile/UserProfile";
 
 function App() {
     // Vérifie si l'utilisateur est connecté
@@ -68,6 +69,16 @@ function App() {
                                 element={
                                     isAuthenticated ? (
                                         <ColisDetails />
+                                    ) : (
+                                        <Navigate to="/login" replace />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/user-profile"
+                                element={
+                                    isAuthenticated ? (
+                                        <UserProfile />
                                     ) : (
                                         <Navigate to="/login" replace />
                                     )

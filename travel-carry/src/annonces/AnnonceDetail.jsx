@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const AnnonceDetail = () => {
@@ -7,11 +7,14 @@ const AnnonceDetail = () => {
     const [annonce, setAnnonce] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [userType, setUserType] = useState(""); // State to hold the user's type
+    const navigate = useNavigate();
 
     // Fetch the single annonce
     useEffect(() => {
         const token = localStorage.getItem("token"); // Retrieve the JWT token from localStorage
-
+        const storedUserType = localStorage.getItem("userType"); // Retrieve the user type from localStorage
+        setUserType(storedUserType); // Set the user type (expediteur or voyageur)
         axios
             .get(`http://localhost:8080/api/annonces/${id}`, {
                 headers: {
@@ -20,9 +23,8 @@ const AnnonceDetail = () => {
             })
             .then((response) => {
                 setAnnonce(response.data);
-                console.log("response annocne details: " + JSON.stringify(response))
-                setLoading(false);
                 console.log("Annonce fetched successfully: ", response.data);
+                setLoading(false);
             })
             .catch((err) => {
                 setError("Failed to fetch annonce. Please try again later.");
@@ -46,6 +48,8 @@ const AnnonceDetail = () => {
             </div>
         );
     }
+
+    console.log("User type:", userType);
 
     return (
         <div className="min-h-screen bg-gray-100 py-8">
@@ -106,8 +110,16 @@ const AnnonceDetail = () => {
                     </p>
                 </div>
 
-                {/* Back Button */}
-                <div className="mt-8">
+                {/* Button Section */}
+                <div className="mt-8 flex justify-between">
+                    {userType === "expediteur" && (
+                        <button
+                            onClick={() => navigate(`/colis/details`)} // Navigate to the colis details page
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"
+                        >
+                            Details Colis
+                        </button>
+                    )}
                     <button
                         onClick={() => window.history.back()}
                         className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"

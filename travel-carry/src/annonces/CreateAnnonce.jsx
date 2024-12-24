@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TravelAnimation from "./TravelAnimation"
+import TravelAnimation from "../TravelAnimation"
 
 const CreateAnnonce = () => {
     const [userType, setUserType] = useState(null);
@@ -194,3 +194,5 @@ const CreateAnnonce = () => {
 };
 
 export default CreateAnnonce;
+
+

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import TravelAnimation from './TravelAnimation'; // Import the TravelAnimation component
+import TravelAnimation from '../TravelAnimation'; // Import the TravelAnimation component
 
 export default function HomePage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -65,14 +65,6 @@ export default function HomePage() {
                                 Notations
                             </button>
                         </Link>
-                        <div style={{ marginTop: "20px" }}>
-                            <Link
-                                to="/colis/details"
-                                className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            >
-                                Détails du colis
-                            </Link>
-                        </div>
                     </>
                 )}
 

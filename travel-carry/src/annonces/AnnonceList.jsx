@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import TravelAnimation from './TravelAnimation'; // Import the TravelAnimation component
+import TravelAnimation from '../TravelAnimation'; // Import the TravelAnimation component
 
 const AnnoncesList = () => {
     const [annonces, setAnnonces] = useState([]);

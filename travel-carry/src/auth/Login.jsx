@@ -45,8 +45,10 @@ const LoginPage = () => {
                 }
             );
 
+            console.log("response data from login: " + JSON.stringify(response))
             // Get the token
             const token = response.data.token;
+            const userType = response.data.userType;
 
             // Decode the token to extract user info
             const decodedToken = jwtDecode(token);
@@ -55,6 +57,10 @@ const LoginPage = () => {
             // Store token in localStorage
             localStorage.setItem("token", token);
             localStorage.setItem("userName", JSON.stringify(decodedToken.sub));
+            localStorage.setItem("userType", userType); // Store userType
+            console.log("Login successful!");
+            console.log("User Type: ", response.data.userType);
+
 
             // Redirect to homepage or user dashboard after successful login
             navigate("/"); // Redirect to homepage or another page after login
