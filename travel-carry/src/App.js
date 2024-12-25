@@ -13,6 +13,7 @@ import Footer from "./pages/Footer";
 import "./App.css";
 import AnnonceDetail from "./annonces/AnnonceDetail";
 import UserProfile from "./userProfile/UserProfile";
+import CreateVoyage from "./voyages/CreateVoyage";
 
 function App() {
     // Vérifie si l'utilisateur est connecté
@@ -33,7 +34,16 @@ function App() {
                             <Route path="/annonces" element={<AnnonceList />} /> {/* Non protégé */}
 
                             {/* Routes protégées */}
-
+                            <Route
+                                path="/create-voyage"
+                                element={
+                                    isAuthenticated ? (
+                                        <CreateVoyage />
+                                    ) : (
+                                        <Navigate to="/login" replace />
+                                    )
+                                }
+                            />
                             <Route
                                 path="/create-annonce/:id"
                                 element={
