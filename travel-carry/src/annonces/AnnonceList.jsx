@@ -20,7 +20,7 @@ const AnnoncesList = () => {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [showDeleteAllConfirmation, setShowDeleteAllConfirmation] = useState(false);
     const [deleteAnnonceId, setDeleteAnnonceId] = useState(null);
-    const [selectedAnnonces, setSelectedAnnonces] = useState([]); // New state for selected annonces
+    //const [selectedAnnonces, setSelectedAnnonces] = useState([]); // New state for selected annonces
     const navigate = useNavigate();
 
     const userType = localStorage.getItem("userType"); // Get user type from local storage

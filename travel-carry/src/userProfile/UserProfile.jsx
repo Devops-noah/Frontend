@@ -15,6 +15,12 @@ export default function UserProfile() {
     const [profileType, setProfileType] = useState(""); // To store profile type (voyageur or expediteur)
     const [modalVisible, setModalVisible] = useState(false);
     const [currentVoyage, setCurrentVoyage] = useState(null);
+    const [deleteVoyageId, setDeleteVoyageId] = useState(null);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(1); // Current page number
+    const [voyagesPerPage] = useState(2); // Number of voyages per page
+    const [totalPages, setTotalPages] = useState(1); // Total number of pages
 
     useEffect(() => {
         // Fetch the user profile based on authentication
@@ -56,7 +62,7 @@ export default function UserProfile() {
             const token = localStorage.getItem("token");
             if (token) {
                 const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode token to extract profile type
-                console.log("decodedToken: " + JSON.stringify(decodedToken));
+
                 setProfileType(decodedToken.sub); // Assume profileType is part of the decoded token
             }
         };
@@ -65,21 +71,20 @@ export default function UserProfile() {
             try {
                 const token = localStorage.getItem("token"); // Get token from localStorage
                 const userEmail = token ? JSON.parse(atob(token.split('.')[1])).sub : ""; // Extract email from token
-                console.log("userEmail", userEmail)
+
                 const response = await axios.get("http://localhost:8080/api/voyages", {
                     headers: {
                         Authorization: `Bearer ${token}`, // Add the token to the headers
                     },
                 });
 
-                console.log("Fetched voyages:", response.data);
-
                 // Filter voyages where the voyageur email matches the logged-in user's email
                 const userVoyages = response.data.filter(
                     (voyage) => voyage.voyageurEmail === userEmail
                 );
-                console.log('user voyages', userVoyages)
+
                 setVoyages(userVoyages);
+                setTotalPages(Math.ceil(userVoyages.length / voyagesPerPage)); // Calculate total pages based on filtered voyages
             } catch (error) {
                 console.error("Error fetching voyages:", error);
                 setErrorMessage("Failed to load voyages. Please try again later.");
@@ -88,8 +93,7 @@ export default function UserProfile() {
 
         fetchProfileType(); // Get profile type from localStorage
         fetchVoyages(); // Fetch voyages
-    }, []);
-console.log("voyages: " + JSON.stringify(voyages));
+    }, [currentPage]);
 
     const handleEdit = (voyage) => {
         // Format the date as yyyy-MM-dd
@@ -105,21 +109,32 @@ console.log("voyages: " + JSON.stringify(voyages));
         setModalVisible(true); // Open the modal
     };
 
-
-    const handleDelete = (id) => {
-        console.log(`Delete voyage with id: ${id}`);
-        setVoyages(voyages.filter((voyage) => voyage.id !== id));
+    // Open delete confirmation
+    const openDeleteConfirmation = (voyageId) => {
+        setDeleteVoyageId(voyageId);
+        setShowDeleteConfirmation(true);
     };
 
     const handleCloseModal = () => {
         setModalVisible(false);
     };
 
+    // Handle input changes in the modal
+    const handleInputChange = (field, value) => {
+        setCurrentVoyage({ ...currentVoyage, [field]: value });
+    };
+
     const handleUpdateVoyage = async () => {
         try {
             const token = localStorage.getItem("token");
-            const updatedVoyage = { ...currentVoyage };
-            console.log("current voyage: " + currentVoyage.id)
+            const updatedVoyage = {
+                voyage: {
+                    dateDepart: currentVoyage.dateDepart,
+                    dateArrivee: currentVoyage.dateArrivee,
+                },
+                paysDepart: currentVoyage.paysDepartNom,
+                paysDestination: currentVoyage.paysDestinationNom,
+            };
 
             // Send PUT request to update the voyage
             await axios.put(`http://localhost:8080/api/voyages/update/${currentVoyage.id}`, updatedVoyage, {
@@ -137,6 +152,28 @@ console.log("voyages: " + JSON.stringify(voyages));
         }
     };
 
+    // Handle delete
+    const handleDelete = () => {
+        axios
+            .delete(`http://localhost:8080/api/voyages/delete/${deleteVoyageId}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with your actual token key
+                },
+            })
+            .then(() => {
+                console.log("Voyage deleted successfully");
+                setVoyages((prev) => prev.filter((a) => a.id !== deleteVoyageId));
+                setShowDeleteConfirmation(false);
+            })
+            .catch((error) => console.error("Error deleting voyage:", error));
+    };
+
+    // Pagination logic
+    const indexOfLastVoyage = currentPage * voyagesPerPage;
+    const indexOfFirstVoyage = indexOfLastVoyage - voyagesPerPage;
+    const currentVoyages = voyages.slice(indexOfFirstVoyage, indexOfLastVoyage);
+    console.log("current voyages: " + JSON.stringify(currentVoyages));
+
     if (loading) {
         return <p className="text-center py-5">Loading...</p>;
     }
@@ -145,7 +182,6 @@ console.log("voyages: " + JSON.stringify(voyages));
         return <p className="text-center py-5 text-red-500">Error: {error}</p>;
     }
 
-console.log("profile hi: ", JSON.stringify(profile))
     return (
         <section className="bg-gray-100 py-5">
             <div className="container mx-auto">
@@ -255,7 +291,7 @@ console.log("profile hi: ", JSON.stringify(profile))
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {voyages.map((voyage) => (
+                                    {currentVoyages.map((voyage) => (
                                         <tr key={voyage.id} className="border-t border-gray-200 hover:bg-gray-50">
                                             <td className="px-4 py-2">
                                                 {new Date(voyage.dateDepart).toLocaleDateString()}
@@ -270,13 +306,16 @@ console.log("profile hi: ", JSON.stringify(profile))
                                                     className="text-blue-600 hover:text-blue-800"
                                                     onClick={() => handleEdit(voyage)}
                                                 >
-                                                    <FaEdit size={18} />
+                                                    <FaEdit size={18}/>
                                                 </button>
                                                 <button
                                                     className="text-red-600 hover:text-red-800"
-                                                    onClick={() => handleDelete(voyage.id)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        openDeleteConfirmation(voyage.id);
+                                                    }}
                                                 >
-                                                    <FaTrash size={18} />
+                                                    <FaTrash size={18}/>
                                                 </button>
                                             </td>
                                         </tr>
@@ -288,10 +327,57 @@ console.log("profile hi: ", JSON.stringify(profile))
                             <p className="text-gray-600">No voyages found for your account.</p>
                         )}
                     </div>
+                    <div className="flex justify-center mt-4">
+                        <button
+                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md mr-2"
+                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </button>
+                        <span className="px-4 py-2 text-gray-700">
+                            {console.log("current page value: " + currentPage + " and " + totalPages)}
+                                    Page {currentPage} of {totalPages}
+                                </span>
+                        <button
+                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md ml-2"
+                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
+
+
             )}
             {profileType === "expediteur" && (
                 <p className="text-gray-600">Voyages are not available for expediteur profile.</p>
+            )}
+
+            {/* Modal for delete confirmation */}
+            {
+                showDeleteConfirmation && (
+                    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-10">
+                        <div className="bg-white p-8 rounded-lg shadow-md max-w-sm w-full">
+                            <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>
+                            <p>Êtes-vous sûr de vouloir supprimer cette voyage?</p>
+                            <div className="mt-4 flex justify-between">
+                                <button
+                                    onClick={() => setShowDeleteConfirmation(false)}
+                                    className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg"
+                        >
+                            Annuler
+                        </button>
+                        <button
+                            onClick={handleDelete}
+                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+                        >
+                            Supprimer
+                        </button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* Modal for Editing Voyage */}
@@ -328,25 +414,39 @@ console.log("profile hi: ", JSON.stringify(profile))
                                 <label htmlFor="paysDepart" className="block text-sm font-medium text-gray-700">
                                     Pays Depart
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     id="paysDepart"
                                     value={currentVoyage.paysDepartNom}
-                                    onChange={(e) => setCurrentVoyage({ ...currentVoyage, paysDepartNom: e.target.value })}
+                                    onChange={(e) =>
+                                        handleInputChange("paysDepartNom", e.target.value)
+                                    }
                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
+                                >
+                                    {voyages.map((voyage) => (
+                                        <option key={voyage.id} value={voyage.paysDepartNom}>
+                                            {voyage.paysDepartNom}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="mb-4">
                                 <label htmlFor="paysDestination" className="block text-sm font-medium text-gray-700">
                                     Pays Destination
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     id="paysDestination"
                                     value={currentVoyage.paysDestinationNom}
-                                    onChange={(e) => setCurrentVoyage({ ...currentVoyage, paysDestinationNom: e.target.value })}
+                                    onChange={(e) =>
+                                        handleInputChange("paysDestinationNom", e.target.value)
+                                    }
                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
+                                >
+                                    {voyages.map((voyage) => (
+                                        <option key={voyage.id} value={voyage.paysDestinationNom}>
+                                            {voyage.paysDestinationNom}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="flex justify-end space-x-4">
                                 <button
