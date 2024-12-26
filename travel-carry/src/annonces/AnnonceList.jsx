@@ -306,17 +306,30 @@ const AnnoncesList = () => {
                             </div>
                         ))}
                     </div>
-
-                    {/* Button to delete all annonces */}
-                    <button
+                    {
+                        userType !== "voyageur" ? (
+                        <button
                         onClick={(e) => {
-                            e.stopPropagation();
-                            openDeleteAllConfirmation(annonces);
-                        }}
-                        className="mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
-                    >
-                        Supprimer Annonces
-                    </button>
+                        e.stopPropagation();
+                        openDeleteAllConfirmation(annonces);
+                    }}
+                    className=" hidden mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
+                >
+                    Supprimer Annonces
+                </button>
+                        ) : (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        openDeleteAllConfirmation(annonces);
+                    }}
+                    className="mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
+                >
+                    Supprimer Annonces
+                </button>
+                        )
+                    }
+
                     {/* Pagination */}
                     <div className="mt-6 flex justify-between items-center">
                         <button
