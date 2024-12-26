@@ -174,6 +174,8 @@ const AnnoncesList = () => {
             .catch((error) => console.error("Error deleting all annonces:", error));
     };
 
+    console.log("currentAnnonce: ", JSON.stringify(currentAnnonces))
+
     return (
         <div className="min-h-screen bg-gray-100 py-8">
             <div className="max-w-6xl mx-auto px-5 grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -254,26 +256,53 @@ const AnnoncesList = () => {
                                     dateDepart={new Date(annonce.dateDepart).toLocaleDateString()}
                                     dateArrivee={new Date(annonce.dateArrivee).toLocaleDateString()}
                                 />
-                                <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            openUpdateModal(annonce);
-                                        }}
-                                        className="text-green-950 hover:text-blue-500"
-                                    >
-                                        <FaEdit/>
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            openDeleteConfirmation(annonce.id);
-                                        }}
-                                        className="text-red-700 hover:text-red-500"
-                                    >
-                                        <FaTrashAlt/>
-                                    </button>
-                                </div>
+                                {
+                                    userType !== "voyageur" ? (
+                                        <div className="hidden absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openUpdateModal(annonce);
+                                                }}
+                                                className="text-green-950 hover:text-blue-500"
+                                            >
+                                                <FaEdit/>
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openDeleteConfirmation(annonce.id);
+                                                }}
+                                                className="text-red-700 hover:text-red-500"
+                                            >
+                                                <FaTrashAlt/>
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openUpdateModal(annonce);
+                                                }}
+                                                className="text-green-950 hover:text-blue-500"
+                                            >
+                                                <FaEdit/>
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openDeleteConfirmation(annonce.id);
+                                                }}
+                                                className="text-red-700 hover:text-red-500"
+                                            >
+                                                <FaTrashAlt/>
+                                            </button>
+                                        </div>
+                                    )
+                                }
+
                             </div>
                         ))}
                     </div>

@@ -32,6 +32,7 @@ export default function HomePage() {
 
     const handleAnnonceClick = (id) => {
         const token = localStorage.getItem("token");
+        console.log("token homepage: ", token)
         if (token) {
             navigate(`/annonces/${id}`); // Redirect to the detail page if authenticated
         } else {
