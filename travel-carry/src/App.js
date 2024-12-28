@@ -14,10 +14,22 @@ import "./App.css";
 import AnnonceDetail from "./annonces/AnnonceDetail";
 import UserProfile from "./userProfile/UserProfile";
 import CreateVoyage from "./voyages/CreateVoyage";
+import DashboardLayout from "./admin/components/DashboardLayout";
+import AdminUsers from "./admin/pages/AdminUsers";
+import AdminAnnonces from "./admin/pages/AdminAnnonces";
 
 function App() {
     // Vérifie si l'utilisateur est connecté
     const isAuthenticated = !!localStorage.getItem("token");
+   // const userRole = localStorage.getItem("role"); // Assuming the user's role is stored in localStorage
+    const userType = localStorage.getItem("userType"); // Assuming userType is also stored in localStorage
+
+    const ProtectedRoute = ({ children }) => {
+        if (!isAuthenticated || userType !== "admin") {
+            return <Navigate to="/" replace />;
+        }
+        return children;
+    };
 
     return (
         <UserProvider>
@@ -94,6 +106,35 @@ function App() {
                                     )
                                 }
                             />
+
+                            {/* Admin Route */}
+                            <Route
+                                path="/admin"
+                                element={
+                                    isAuthenticated && userType === "admin" ? (
+                                        <DashboardLayout />
+                                    ) : (
+                                        <Navigate to="/" replace /> // Redirect to home if not an admin
+                                    )
+                                }
+                            >
+                                <Route
+                                    path="users"
+                                    element={
+                                        <ProtectedRoute>
+                                            <AdminUsers />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="annonces"
+                                    element={
+                                        <ProtectedRoute>
+                                            <AdminAnnonces />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                            </Route>
                         </Routes>
                     </main>
                     <Footer />
