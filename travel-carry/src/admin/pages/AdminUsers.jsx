@@ -5,12 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 const AdminUsers = () => {
     const [users, setUsers] = useState([]);
-    const [notification, setNotification] = useState(null);
-
-    const showNotification = (message, type) => {
-        setNotification({ message, type });
-        setTimeout(() => setNotification(null), 3000); // Auto-hide after 3 seconds
-    };
 
     useEffect(() => {
         fetchUsers();

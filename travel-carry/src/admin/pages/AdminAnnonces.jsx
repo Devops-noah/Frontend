@@ -47,7 +47,7 @@ const AdminAnnonces = () => {
                 null,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            toast.success(`Annonce ${annonceId} suspended successfully!`);
+            toast.success(`Annonce ${annonceId} suspend successfully!`);
             fetchAnnonces(); // Refresh the list
         } catch (error) {
             console.error("Error suspending annonce:", error);
@@ -70,6 +70,7 @@ const AdminAnnonces = () => {
     };
 
     console.log("annonces: " + JSON.stringify(annonces))
+
     return (
         <div>
             <h2 className="text-3xl font-semibold mb-4">Annonces</h2>
@@ -101,6 +102,7 @@ const AdminAnnonces = () => {
                             >
                                 Suspend
                             </button>
+
                             <button
                                 className="bg-red-500 text-white py-1 px-4 rounded"
                                 onClick={() => deleteAnnonce(annonce.id)}
@@ -113,7 +115,7 @@ const AdminAnnonces = () => {
                 </tbody>
             </table>
             {/* Toast Notification Container */}
-            <ToastContainer />
+            <ToastContainer/>
         </div>
     );
 };
