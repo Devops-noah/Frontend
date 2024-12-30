@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaCheck, FaBan, FaTrash } from "react-icons/fa"; // Icons for actions
 
 const AdminAnnonces = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -57,7 +58,6 @@ const AdminAnnonces = () => {
         }
     };
 
-    // Open delete confirmation
     const openDeleteConfirmation = (annonceId) => {
         setDeleteAnnonceId(annonceId);
         setShowDeleteConfirmation(true);
@@ -78,25 +78,20 @@ const AdminAnnonces = () => {
         }
     };
 
-    console.log("annonces: " + JSON.stringify(annonces))
-
     const getRowClass = (annonce) => {
         if (annonce.approved && !annonce.suspended) {
             return "bg-green-400"; // Green for approved and not suspended
         }
         if (!annonce.approved && annonce.suspended) {
-            return "bg-yellow-500"; // red for not approved
+            return "bg-yellow-500"; // Yellow for not approved and suspended
         }
-        // if (annonce.approved || annonce.suspended) {
-        //     return "bg-yellow-500"; // Orange for both approved and suspended
-        // }
         return "bg-white"; // Default white if no condition matched
     };
 
     return (
-        <div>
+        <div className="overflow-x-auto">
             <h2 className="text-3xl font-semibold mb-4">Annonces</h2>
-            <table className="min-w-full bg-white border border-gray-300 rounded">
+            <table className="table-auto min-w-full bg-white border border-gray-300 rounded">
                 <thead>
                 <tr>
                     <th className="p-4 border">ID</th>
@@ -111,36 +106,37 @@ const AdminAnnonces = () => {
                         <td className="p-4 border">{annonce.id}</td>
                         <td className="p-4 border">{annonce.datePublication}</td>
                         <td className="p-4 border">{annonce.poidsDisponible}</td>
-                        <td className="p-4 border">
+                        <td className="p-4 border flex flex-wrap gap-2 justify-center">
+                            {/* Approve Button */}
                             <button
-                                className="bg-green-500 text-white py-1 px-4 rounded mr-2"
+                                className="bg-green-500 text-white py-1 px-4 rounded flex items-center gap-1"
                                 onClick={() => approveAnnonce(annonce.id)}
                             >
-                                Approve
+                                <FaCheck className="text-sm" />
+                                <span className="hidden sm:inline">Approve</span>
                             </button>
+                            {/* Suspend Button */}
                             <button
-                                className="bg-yellow-500 text-white py-1 px-4 rounded mr-2"
+                                className="bg-yellow-500 text-white py-1 px-4 rounded flex items-center gap-1"
                                 onClick={() => suspendAnnonce(annonce.id)}
                             >
-                                Suspend
+                                <FaBan className="text-sm" />
+                                <span className="hidden sm:inline">Suspend</span>
                             </button>
-
+                            {/* Delete Button */}
                             <button
-                                className="bg-red-500 text-white py-1 px-4 rounded"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    openDeleteConfirmation(annonce.id);
-                                }}
+                                className="bg-red-500 text-white py-1 px-4 rounded flex items-center gap-1"
+                                onClick={() => openDeleteConfirmation(annonce.id)}
                             >
-                                Delete
+                                <FaTrash className="text-sm" />
+                                <span className="hidden sm:inline">Delete</span>
                             </button>
                         </td>
                     </tr>
                 ))}
                 </tbody>
             </table>
-            {/* Toast Notification Container */}
-            <ToastContainer/>
+            <ToastContainer />
 
             {/* Modal for delete confirmation */}
             {showDeleteConfirmation && (
@@ -166,7 +162,6 @@ const AdminAnnonces = () => {
                 </div>
             )}
         </div>
-
     );
 };
 

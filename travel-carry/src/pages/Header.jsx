@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png"; // Assurez-vous que le chemin est correct
-import { FaUserCircle } from "react-icons/fa"; // User icon for the profile
+import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa"; // Icons for user and menu
 
 const Header = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
-
-    // Handle logo click to navigate to home page
-    const handleLogoClick = () => {
-        navigate("/"); // Redirect to the homepage
-    };
+    const [menuOpen, setMenuOpen] = useState(false); // State for hamburger menu
 
     const isAuthenticated = !!localStorage.getItem("token");
+
+    const handleLogoClick = () => navigate("/");
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -33,92 +31,72 @@ const Header = () => {
         navigate("/login");
     };
 
+    const toggleMenu = () => setMenuOpen(!menuOpen);
+
     return (
-        <header className="flex justify-between items-center p-4 bg-blue-500 text-white">
-            <div className="flex items-center">
-                <img
-                    src={logo}
-                    alt="Logo"
-                    className="h-10 w-10 mr-2"
-                    style={{
-                        borderRadius: "50%",
-                        border: "2px solid white",
-                        cursor: "pointer"
-                    }}
-                    onClick={handleLogoClick}
-                />
-                <h1 className="text-2xl font-bold">
-                    <span style={{ color: "#ffffff", cursor: "pointer" }} onClick={handleLogoClick}>Travel</span>{" "}
-                    <span style={{ color: "#004080", cursor: "pointer" }} onClick={handleLogoClick}>Carry</span>
-                </h1>
+        <header className="bg-blue-500 text-white">
+            <div className="flex justify-between items-center p-4">
+                {/* Logo Section */}
+                <div className="flex items-center">
+                    <img
+                        src={logo}
+                        alt="Logo"
+                        className="h-10 w-10 mr-2 cursor-pointer rounded-full border-2 border-white"
+                        onClick={handleLogoClick}
+                    />
+                    <h1
+                        className="text-2xl font-bold cursor-pointer"
+                        onClick={handleLogoClick}
+                    >
+                        <span style={{ color: "#ffffff" }}>Travel</span>{" "}
+                        <span style={{ color: "#004080" }}>Carry</span>
+                    </h1>
+                </div>
+
+                {/* Hamburger Menu for Mobile */}
+                <div className="md:hidden">
+                    <button onClick={toggleMenu} className="text-white text-3xl">
+                        {menuOpen ? <FaTimes /> : <FaBars />}
+                    </button>
+                </div>
+
+                {/* Navigation Links */}
+                <nav
+                    className={`${
+                        menuOpen ? "flex" : "hidden"
+                    } md:flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 absolute md:static top-16 left-0 md:top-auto md:left-auto w-full md:w-auto bg-blue-500 md:bg-transparent z-10 md:z-auto p-4 md:p-0`}
+                >
+                    {isAuthenticated && userName && (
+                        <span className="text-white font-semibold">Bienvenue, {userName}</span>
+                    )}
+                    {isAuthenticated ? (
+                        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                            <Link to="/user-profile">
+                                <FaUserCircle className="text-4xl cursor-pointer text-yellow-400" />
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="px-4 py-2 bg-white text-blue-500 font-semibold rounded hover:bg-gray-100"
+                            >
+                                Déconnexion
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                            <Link to="/login">
+                                <button className="px-4 py-2 font-semibold rounded border-2 border-white text-white hover:bg-white hover:text-blue-500">
+                                    Connexion
+                                </button>
+                            </Link>
+                            <Link to="/register">
+                                <button className="px-4 py-2 font-semibold rounded border-2 border-white text-white hover:bg-white hover:text-blue-500">
+                                    Inscription
+                                </button>
+                            </Link>
+                        </div>
+                    )}
+                </nav>
             </div>
-
-            <nav className="flex items-center space-x-4">
-                {isAuthenticated && userName && (
-                    <span className="text-white font-semibold">Bienvenue, {userName}</span>
-                )}
-
-                {isAuthenticated ? (
-                    <div className="flex items-center gap-4">
-                        {/* Profile Icon */}
-                        <Link to="/user-profile">
-                            <FaUserCircle className="text-red-950 text-4xl cursor-pointer" />
-                        </Link>
-
-                        <button
-                            onClick={handleLogout}
-                            className="px-4 py-2 bg-white text-blue-500 font-semibold rounded hover:bg-gray-100"
-                        >
-                            Déconnexion
-                        </button>
-                    </div>
-                ) : (
-                    <>
-                        <Link to="/login">
-                            <button
-                                className="px-4 py-2 font-semibold rounded"
-                                style={{
-                                    backgroundColor: "transparent",
-                                    color: "white",
-                                    border: "2px solid white",
-                                    transition: "background-color 0.3s, color 0.3s",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = "white";
-                                    e.target.style.color = "#004080";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = "transparent";
-                                    e.target.style.color = "white";
-                                }}
-                            >
-                                Connexion
-                            </button>
-                        </Link>
-                        <Link to="/register">
-                            <button
-                                className="px-4 py-2 font-semibold rounded"
-                                style={{
-                                    backgroundColor: "transparent",
-                                    color: "white",
-                                    border: "2px solid white",
-                                    transition: "background-color 0.3s, color 0.3s",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = "white";
-                                    e.target.style.color = "#004080";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = "transparent";
-                                    e.target.style.color = "white";
-                                }}
-                            >
-                                Inscription
-                            </button>
-                        </Link>
-                    </>
-                )}
-            </nav>
         </header>
     );
 };
