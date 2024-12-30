@@ -9,6 +9,7 @@ export default function UserProfile() {
     const [error, setError] = useState(null); // State to handle errors
     const navigate = useNavigate(); // Use navigate hook to navigate to different routes
 
+    console.log("navigate: ", navigate)
     // Get voyages
     const [voyages, setVoyages] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");

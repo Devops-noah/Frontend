@@ -54,6 +54,14 @@ const AdminUsers = () => {
         }
     };
 
+    console.log("users: " + JSON.stringify(users))
+    const getRowClass = (user) => {
+        if (!user.enabled) {
+            return "bg-red-400"; // Red for suspended
+        }
+        return "bg-white"; // Default white if no condition matched
+    };
+
     return (
         <div>
             <h2 className="text-3xl font-semibold mb-4">Users</h2>
@@ -73,7 +81,7 @@ const AdminUsers = () => {
                 </thead>
                 <tbody>
                 {users.map(user => (
-                    <tr key={user.id}>
+                    <tr key={user.id} className={getRowClass(user)}>
                         <td className="p-4 border">{user.id}</td>
                         <td className="p-4 border">{user.nom}</td>
                         <td className="p-4 border">{user.prenom}</td>

@@ -5,6 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 const AdminAnnonces = () => {
     const [annonces, setAnnonces] = useState([]);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [deleteAnnonceId, setDeleteAnnonceId] = useState(null);
 
     useEffect(() => {
         fetchAnnonces();
@@ -55,21 +57,41 @@ const AdminAnnonces = () => {
         }
     };
 
-    const deleteAnnonce = async (annonceId) => {
+    // Open delete confirmation
+    const openDeleteConfirmation = (annonceId) => {
+        setDeleteAnnonceId(annonceId);
+        setShowDeleteConfirmation(true);
+    };
+
+    const deleteAnnonce = async () => {
         const token = localStorage.getItem("token");
         try {
-            await axios.delete(`http://localhost:8080/api/admin/annonces/delete/${annonceId}`, {
+            await axios.delete(`http://localhost:8080/api/admin/annonces/delete/${deleteAnnonceId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            toast.success(`Annonce ${annonceId} deleted successfully!`);
+            toast.success(`Annonce ${deleteAnnonceId} deleted successfully!`);
             fetchAnnonces(); // Refresh the list
+            setShowDeleteConfirmation(false);
         } catch (error) {
             console.error("Error deleting annonce:", error);
-            toast.error(`Failed to delete annonce ${annonceId}`);
+            toast.error(`Failed to delete annonce ${deleteAnnonceId}`);
         }
     };
 
     console.log("annonces: " + JSON.stringify(annonces))
+
+    const getRowClass = (annonce) => {
+        if (annonce.approved && !annonce.suspended) {
+            return "bg-green-400"; // Green for approved and not suspended
+        }
+        if (!annonce.approved && annonce.suspended) {
+            return "bg-yellow-500"; // red for not approved
+        }
+        // if (annonce.approved || annonce.suspended) {
+        //     return "bg-yellow-500"; // Orange for both approved and suspended
+        // }
+        return "bg-white"; // Default white if no condition matched
+    };
 
     return (
         <div>
@@ -85,7 +107,7 @@ const AdminAnnonces = () => {
                 </thead>
                 <tbody>
                 {annonces.map((annonce) => (
-                    <tr key={annonce.id}>
+                    <tr key={annonce.id} className={getRowClass(annonce)}>
                         <td className="p-4 border">{annonce.id}</td>
                         <td className="p-4 border">{annonce.datePublication}</td>
                         <td className="p-4 border">{annonce.poidsDisponible}</td>
@@ -105,7 +127,10 @@ const AdminAnnonces = () => {
 
                             <button
                                 className="bg-red-500 text-white py-1 px-4 rounded"
-                                onClick={() => deleteAnnonce(annonce.id)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    openDeleteConfirmation(annonce.id);
+                                }}
                             >
                                 Delete
                             </button>
@@ -116,7 +141,32 @@ const AdminAnnonces = () => {
             </table>
             {/* Toast Notification Container */}
             <ToastContainer/>
+
+            {/* Modal for delete confirmation */}
+            {showDeleteConfirmation && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-10">
+                    <div className="bg-white p-8 rounded-lg shadow-md max-w-sm w-full">
+                        <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>
+                        <p>Êtes-vous sûr de vouloir supprimer cette annonce?</p>
+                        <div className="mt-4 flex justify-between">
+                            <button
+                                onClick={() => setShowDeleteConfirmation(false)}
+                                className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={deleteAnnonce}
+                                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+                            >
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
+
     );
 };
 
