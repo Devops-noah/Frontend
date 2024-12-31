@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-const ColisDetails = () => {
+const ColisDetails = ({ annonceId }) => {
     const [formData, setFormData] = useState({
         poids: "",
         longueur: "",
@@ -21,7 +22,7 @@ const ColisDetails = () => {
     };
 
     // Gestion de la soumission du formulaire
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Validation des champs obligatoires
@@ -31,8 +32,43 @@ const ColisDetails = () => {
             return;
         }
 
-        // Simuler la soumission avec un message de succès
-        setFeedback("Les informations de votre colis ont été enregistrées avec succès !");
+        try {
+            // Préparez les données à envoyer
+            const requestData = {
+                poids: formData.poids,
+                dimensions: {
+                    longueur: formData.longueur,
+                    largeur: formData.largeur,
+                    hauteur: formData.hauteur,
+                },
+                nature: formData.nature,
+                categorie: formData.categorie,
+                datePriseEnCharge: formData.datePriseEnCharge,
+                plageHoraire: formData.plageHoraire,
+                expediteurId: localStorage.getItem("userId"), // Récupérer l'utilisateur connecté
+                annonceId: annonceId, // Annonce liée à la demande
+            };
+
+            // Envoyez les données au backend
+            const response = await axios.post("http://localhost:8080/api/information_colis", requestData);
+            setFeedback("Les informations de votre colis ont été envoyées avec succès !");
+            console.log("Réponse du serveur :", response.data);
+
+            // Réinitialisez le formulaire après succès
+            setFormData({
+                poids: "",
+                longueur: "",
+                largeur: "",
+                hauteur: "",
+                nature: "",
+                categorie: "",
+                datePriseEnCharge: "",
+                plageHoraire: "",
+            });
+        } catch (error) {
+            console.error("Erreur lors de l'envoi de la demande :", error);
+            setFeedback("Une erreur s'est produite. Veuillez réessayer.");
+        }
     };
 
     return (
@@ -142,7 +178,7 @@ const ColisDetails = () => {
                     type="submit"
                     className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 font-semibold"
                 >
-                    Confirmer
+                    Envoyer ma demande
                 </button>
             </form>
         </div>

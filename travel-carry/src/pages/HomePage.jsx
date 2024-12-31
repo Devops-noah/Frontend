@@ -44,31 +44,48 @@ export default function HomePage() {
     };
 
     return (
-        <div className="homepage-carousel">
-            <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <div className="homepage-background">
+            <div style={{textAlign: "center", marginTop: "0px"}}>
                 {/* Welcome Message for Authenticated Users */}
                 {isAuthenticated && (
                     <>
-                        <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>
+                        <h1
+                            style={{
+                                fontSize: "2.5rem",
+                                fontWeight: "bold",
+                                fontFamily: "'Pacifico', cursive",
+                                color: "#0047AB", // Bleu apaisant pour le texte principal
+                                textShadow: `
+            2px 2px 0 #A1C4FD,   /* Ombre bleu clair */
+            -2px -2px 0 #FFD700, /* Ombre dorée */
+            1px -1px 0 #6CC1F2,  /* Ombre légère cyan */
+            -1px 1px 0 #FFECB3   /* Ombre douce crème */
+        `,
+                            }}
+                        >
                             Bienvenue sur TravelCarry
                         </h1>
+
+
                         <Link to="/notations">
                             <button
                                 style={{
-                                    marginTop: "20px",
+                                    marginTop: "20px", // Ajustez cette valeur pour contrôler l'espacement vertical
                                     padding: "10px 20px",
                                     fontSize: "1rem",
                                     fontWeight: "bold",
-                                    backgroundColor: "#4CAF50",
+                                    backgroundColor: "#FFC107", // Couleur jaune foncé (comme le bouton Déconnexion)
                                     color: "white",
                                     border: "none",
                                     borderRadius: "5px",
                                     cursor: "pointer",
+                                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Ajoute un effet d'ombre pour plus de style
                                 }}
                             >
-                                Notations
+                                Partagez votre avis 💬⭐
                             </button>
                         </Link>
+
                     </>
                 )}
 
