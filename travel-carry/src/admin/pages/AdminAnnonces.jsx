@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCheck, FaBan, FaTrash } from "react-icons/fa"; // Icons for actions
+import { format } from "date-fns";
 
 const AdminAnnonces = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -104,7 +105,7 @@ const AdminAnnonces = () => {
                 {annonces.map((annonce) => (
                     <tr key={annonce.id} className={getRowClass(annonce)}>
                         <td className="p-4 border">{annonce.id}</td>
-                        <td className="p-4 border">{annonce.datePublication}</td>
+                        <td className="p-4 border">{format(annonce.datePublication, "dd/MM/yyyy" )}</td>
                         <td className="p-4 border">{annonce.poidsDisponible}</td>
                         <td className="p-4 border flex flex-wrap gap-2 justify-center">
                             {/* Approve Button */}

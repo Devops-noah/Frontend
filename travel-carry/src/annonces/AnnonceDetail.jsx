@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { format } from "date-fns";
 
 const AnnonceDetail = () => {
     const { id } = useParams(); // Get the annonce ID from the URL
@@ -61,7 +62,7 @@ const AnnonceDetail = () => {
                     </h1>
                     <p className="text-gray-500 text-sm">
                         Published on:{" "}
-                        {new Date(annonce.datePublication).toLocaleDateString()}
+                        {format(annonce.datePublication, "dd-MM-yyyy")}
                     </p>
                 </div>
 
@@ -74,7 +75,7 @@ const AnnonceDetail = () => {
                         </h2>
                         <p className="text-gray-700">
                             <strong>Date Depart:</strong>{" "}
-                            {new Date(annonce.dateDepart).toLocaleDateString()}
+                            {format(annonce.dateDepart, "dd-MM-yyyy")}
                         </p>
                         <p className="text-gray-700">
                             <strong>Pays Depart:</strong> {annonce.paysDepart}
@@ -88,7 +89,7 @@ const AnnonceDetail = () => {
                         </h2>
                         <p className="text-gray-700">
                             <strong>Date Arrivee:</strong>{" "}
-                            {new Date(annonce.dateArrivee).toLocaleDateString()}
+                            {format(annonce.dateArrivee, "dd-MM-yyyy")}
                         </p>
                         <p className="text-gray-700">
                             <strong>Pays Destination:</strong>{" "}

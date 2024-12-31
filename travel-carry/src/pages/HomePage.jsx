@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import TravelAnimation from '../TravelAnimation'; // Import the TravelAnimation component
+import { format } from "date-fns";
 
 export default function HomePage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,8 +20,10 @@ export default function HomePage() {
             .get("http://localhost:8080/api/annonces")
             .then((response) => {
                 const sortedAnnonces = response.data.sort((a, b) => {
-                    const dateA = new Date(a.datePublication);
-                    const dateB = new Date(b.datePublication);
+                    //const dateA = new Date(a.datePublication);
+                    const dateA = format(a.datePublication, "dd-MM-yyyy")
+                    //const dateB = new Date(b.datePublication);
+                    const dateB = format(a.datePublication, "dd-MM-yyyy")
                     return dateB - dateA; // Sort by most recent
                 });
                 setRecentAnnonces(sortedAnnonces.slice(0, 4));
@@ -86,8 +89,8 @@ export default function HomePage() {
                                     <TravelAnimation
                                         paysDepart={annonce.paysDepart}
                                         paysDestination={annonce.paysDestination}
-                                        dateDepart={new Date(annonce.dateDepart).toLocaleDateString()}
-                                        dateArrivee={new Date(annonce.dateArrivee).toLocaleDateString()}
+                                        dateDepart={format(annonce.dateDepart, "dd-MM-yyyy")}
+                                        dateArrivee={format(annonce.dateArrivee, "dd-MM-yyyy")}
                                     />
                                 </div>
                             ))}

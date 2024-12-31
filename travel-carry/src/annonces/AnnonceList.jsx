@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; // Import React Icons
 import TravelAnimation from "../TravelAnimation";
+import { format } from "date-fns";
 
 const AnnoncesList = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -47,9 +48,9 @@ const AnnoncesList = () => {
         const filtered = annonces.filter((annonce) => {
             return (
                 (!filters.dateDepart ||
-                    new Date(annonce.dateDepart) >= new Date(filters.dateDepart)) &&
+                    format(annonce.dateDepart, "dd-MM-yyyy") >= format(filters.dateDepart, "dd-MM-yyyy")) &&
                 (!filters.dateArrivee ||
-                    new Date(annonce.dateArrivee) <= new Date(filters.dateArrivee)) &&
+                    format(annonce.dateArrivee, "dd-MM-yyyy") >= format(filters.dateArrivee, "dd-MM-yyyy")) &&
                 (!filters.paysDepart ||
                     annonce.paysDepart
                         .toLowerCase()
@@ -253,8 +254,8 @@ const AnnoncesList = () => {
                                 <TravelAnimation
                                     paysDepart={annonce.paysDepart}
                                     paysDestination={annonce.paysDestination}
-                                    dateDepart={new Date(annonce.dateDepart).toLocaleDateString()}
-                                    dateArrivee={new Date(annonce.dateArrivee).toLocaleDateString()}
+                                    dateDepart={format(annonce.dateDepart, "dd-MM-yyyy")}
+                                    dateArrivee={format(annonce.dateArrivee, "dd-MM-yyyy")}
                                 />
                                 {
                                     userType !== "voyageur" ? (
