@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TravelAnimation from "../TravelAnimation"
+import TravelAnimation from "../TravelAnimation";
 
 const CreateAnnonce = () => {
     const [userType, setUserType] = useState(null);
@@ -17,6 +17,7 @@ const CreateAnnonce = () => {
         dateArrivee: "",
     });
     const [voyage, setVoyage] = useState(null);
+    const [voyages, setVoyages] = useState([]); // List of all voyages for the dropdown
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -43,7 +44,8 @@ const CreateAnnonce = () => {
                     setTimeout(() => navigate("/"), 5000);
                 } else {
                     setUserType(user.type);
-                    fetchVoyageData(token);
+                    fetchVoyageData(token, id);
+                    fetchAllVoyages(token); // Fetch all voyages for dropdown
                 }
             })
             .catch(() => {
@@ -51,14 +53,9 @@ const CreateAnnonce = () => {
             });
     }, [navigate, id]);
 
-    const fetchVoyageData = async (token) => {
-        if (!id) {
-            toast.error("Voyage ID is missing!", { position: toast.POSITION.TOP_CENTER });
-            return;
-        }
-
+    const fetchVoyageData = async (token, voyageId) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/voyages/${id}`, {
+            const response = await axios.get(`http://localhost:8080/api/voyages/${voyageId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -81,9 +78,43 @@ const CreateAnnonce = () => {
         }
     };
 
+    const fetchAllVoyages = async (token) => {
+        try {
+            // Fetch all voyages
+            const response = await axios.get("http://localhost:8080/api/voyages", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            // Decode the email from the token
+            const userEmail = JSON.parse(atob(token.split(".")[1])).sub; // Assuming `sub` contains the email
+
+            // Filter voyages where the `voyage.voyageurEmail` matches the logged-in user's email
+            const userVoyages = response.data.filter((voyage) => voyage.voyageurEmail === userEmail);
+
+            setVoyages(userVoyages);
+        } catch (error) {
+            console.error("Failed to fetch voyages:", error);
+            toast.error("Failed to load voyages. Please try again later.", {
+                position: toast.POSITION.TOP_CENTER,
+            });
+        }
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    };
+
+    const handleVoyageChange = (e) => {
+        const selectedVoyageId = e.target.value;
+        if (selectedVoyageId === "") {
+            // Do nothing and stay on the current page
+            return;
+        } else {
+            // Update URL with the selected voyage ID
+            navigate(`/create-annonce/${selectedVoyageId}`);
+        }
+
     };
 
     const handleSubmit = async (e) => {
@@ -137,6 +168,40 @@ const CreateAnnonce = () => {
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Voyage Selection Dropdown */}
+                        <div>
+                            <label htmlFor="voyageId" className="block mb-2 text-md font-medium text-gray-700">
+                                Select Voyage
+                            </label>
+                            <select
+                                id="voyageId"
+                                name="voyageId"
+                                value={id}
+                                onChange={handleVoyageChange}
+                                className="block w-full border border-gray-300 rounded-md bg-green-50 text-center text-gray-700 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                required
+                            >
+                                <option value="">-- Select a Voyage --</option>
+                                {voyages.map((voyage) => (
+                                    <option key={voyage.id} value={voyage.id}>
+                                        {voyage.paysDepartNom} ➡️ {voyage.paysDestinationNom} &nbsp; &nbsp; |  &nbsp; &nbsp;{new Date(voyage.dateDepart).toLocaleDateString()}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Travel Animation Component */}
+                        {voyage && (
+                            <div className="mt-8">
+                                <TravelAnimation
+                                    paysDepart={voyage.paysDepart?.nom}
+                                    paysDestination={voyage.paysDestination?.nom}
+                                    dateDepart={new Date(voyage.dateDepart).toLocaleDateString()}
+                                    dateArrivee={new Date(voyage.dateArrivee).toLocaleDateString()}
+                                />
+                            </div>
+                        )}
+
                         <div>
                             <label htmlFor="datePublication" className="block text-sm font-medium text-gray-700">
                                 Publication Date
@@ -151,18 +216,6 @@ const CreateAnnonce = () => {
                                 required
                             />
                         </div>
-                        {/* Travel Animation Component */}
-                        {voyage && (
-                            <div className="mt-8">
-                                <TravelAnimation
-                                    paysDepart={voyage.paysDepart?.nom}
-                                    paysDestination={voyage.paysDestination?.nom}
-                                    dateDepart={new Date(voyage.dateDepart).toLocaleDateString()}
-                                    dateArrivee={new Date(voyage.dateArrivee).toLocaleDateString()}
-                                />
-                            </div>
-                        )}
-
 
                         <div>
                             <label htmlFor="poidsDisponible" className="block text-sm font-medium text-gray-700">
@@ -186,7 +239,6 @@ const CreateAnnonce = () => {
                             Submit
                         </button>
                     </form>
-
                 </div>
             </div>
         </>
@@ -194,5 +246,3 @@ const CreateAnnonce = () => {
 };
 
 export default CreateAnnonce;
-
-

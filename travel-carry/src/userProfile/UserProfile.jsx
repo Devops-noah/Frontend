@@ -309,6 +309,7 @@ export default function UserProfile() {
                                     </tr>
                                     </thead>
                                     <tbody>
+                                    {console.log("currenttt: ", JSON.stringify(currentVoyages))}
                                     {currentVoyages.map((voyage) => (
                                         <tr key={voyage.id} className="border-t border-gray-200 hover:bg-gray-50">
                                             <td className="px-4 py-2">
