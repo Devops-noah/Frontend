@@ -33,6 +33,7 @@ const ColisDetails = ({ annonceId }) => {
         }
 
         try {
+            const token = localStorage.getItem("token"); // Get the stored token
             // Préparez les données à envoyer
             const requestData = {
                 poids: formData.poids,
@@ -45,12 +46,17 @@ const ColisDetails = ({ annonceId }) => {
                 categorie: formData.categorie,
                 datePriseEnCharge: formData.datePriseEnCharge,
                 plageHoraire: formData.plageHoraire,
-                expediteurId: localStorage.getItem("userId"), // Récupérer l'utilisateur connecté
+                //expediteurId: localStorage.getItem("userId"), // Récupérer l'utilisateur connecté
                 annonceId: annonceId, // Annonce liée à la demande
             };
 
             // Envoyez les données au backend
-            const response = await axios.post("http://localhost:8080/api/information_colis", requestData);
+            const response = await axios.post("http://localhost:8080/api/information_colis", requestData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Add the token in the headers
+                    }
+                });
             setFeedback("Les informations de votre colis ont été envoyées avec succès !");
             console.log("Réponse du serveur :", response.data);
 
