@@ -117,7 +117,7 @@ const AnnonceDetail = () => {
                             onClick={() => navigate(`/colis/details`)} // Navigate to the colis details page
                             className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"
                         >
-                            Details Colis
+                            Proposer colis
                         </button>
                     )}
                     <button

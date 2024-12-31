@@ -1,29 +1,7 @@
-.homepage-carousel {
+/* Style pour l'image de fond */
+.homepage-background {
   position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-}
-
-.homepage-carousel::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 400%; /* Largeur pour 4 images */
-  height: 100%;
-  background: url('./assets/photo1.jpg') no-repeat center/cover,
-  url('./assets/photo2.jpg') no-repeat center/cover,
-  url('./assets/photo3.jpg') no-repeat center/cover,
-  url('./assets/photo4.jpg') no-repeat center/cover;
-  animation: slideBackground 20s linear infinite;
-  z-index: -1; /* Mettre derrière le contenu */
-}
-
-/* Animation pour le défilement */
-@keyframes slideBackground {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-100%); }
-  50% { transform: translateX(-200%); }
-  75% { transform: translateX(-300%); }
-  100% { transform: translateX(0); }
+  min-height: 100vh; /* Prend toute la hauteur de l'écran */
+  background: url('./assets/photo1.jpg') no-repeat center center fixed; /* Remplacez par le chemin de votre image */
+  background-size: cover; /* L'image couvre tout le fond */
 }
