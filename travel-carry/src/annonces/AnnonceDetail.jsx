@@ -50,7 +50,7 @@ const AnnonceDetail = () => {
         );
     }
 
-    console.log("User type:", userType);
+    console.log("annonce id:", annonce.id);
 
     return (
         <div className="min-h-screen bg-gray-100 py-8">
@@ -115,7 +115,7 @@ const AnnonceDetail = () => {
                 <div className="mt-8 flex justify-between">
                     {userType === "expediteur" && (
                         <button
-                            onClick={() => navigate(`/colis/details`)} // Navigate to the colis details page
+                            onClick={() => navigate(`/colis/details/${annonce.id}`)} // Navigate to the colis details page
                             className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"
                         >
                             Proposer colis

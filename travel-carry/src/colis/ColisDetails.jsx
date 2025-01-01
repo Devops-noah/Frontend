@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
-const ColisDetails = ({ annonceId }) => {
+const ColisDetails = () => {
+    const { annonceId } = useParams(); // Retrieve annonceId from route parameters
     const [formData, setFormData] = useState({
         poids: "",
         longueur: "",
@@ -32,31 +34,46 @@ const ColisDetails = ({ annonceId }) => {
             return;
         }
 
+        // Vérifiez si annonceId est défini
+        if (!annonceId) {
+            console.error("Erreur : annonceId est introuvable !");
+            setFeedback("Erreur : L'ID de l'annonce est introuvable.");
+            return;
+        }
+        console.log("annonceId:", annonceId);
+
         try {
-            const token = localStorage.getItem("token"); // Get the stored token
-            // Préparez les données à envoyer
+            const token = localStorage.getItem("token");
+            console.log("Token:", token);
+
+            if (!token) {
+                setFeedback("Erreur : Vous devez être connecté pour envoyer une demande.");
+                return;
+            }
+
+            // Préparer les données à envoyer
             const requestData = {
                 poids: formData.poids,
-                dimensions: {
-                    longueur: formData.longueur,
-                    largeur: formData.largeur,
-                    hauteur: formData.hauteur,
-                },
+                longueur: formData.longueur,
+                largeur: formData.largeur,
+                hauteur: formData.hauteur,
                 nature: formData.nature,
                 categorie: formData.categorie,
                 datePriseEnCharge: formData.datePriseEnCharge,
                 plageHoraire: formData.plageHoraire,
-                //expediteurId: localStorage.getItem("userId"), // Récupérer l'utilisateur connecté
-                annonceId: annonceId, // Annonce liée à la demande
             };
 
-            // Envoyez les données au backend
-            const response = await axios.post("http://localhost:8080/api/information_colis", requestData,
+            // Envoyer les données au backend
+            const response = await axios.post(
+                `http://localhost:8080/api/information_colis/${annonceId}`,
+                requestData,
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`, // Add the token in the headers
-                    }
-                });
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
             setFeedback("Les informations de votre colis ont été envoyées avec succès !");
             console.log("Réponse du serveur :", response.data);
 
@@ -73,9 +90,14 @@ const ColisDetails = ({ annonceId }) => {
             });
         } catch (error) {
             console.error("Erreur lors de l'envoi de la demande :", error);
-            setFeedback("Une erreur s'est produite. Veuillez réessayer.");
+            if (error.response && error.response.data.message) {
+                setFeedback(error.response.data.message);
+            } else {
+                setFeedback("Une erreur s'est produite. Veuillez réessayer.");
+            }
         }
     };
+
 
     return (
         <div className="p-8 max-w-lg mx-auto bg-white shadow-lg rounded">

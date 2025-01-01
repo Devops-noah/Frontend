@@ -87,7 +87,7 @@ function App() {
                                 }
                             />
                             <Route
-                                path="/colis/details"
+                                path="/colis/details/:annonceId"
                                 element={
                                     isAuthenticated ? (
                                         <ColisDetails />
