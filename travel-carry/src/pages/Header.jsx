@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png"; // Assurez-vous que le chemin est correct
-import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa"; // Icons for user and menu
+import logo from "../assets/logo.png";
+import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import Notifications from "../notifications/Notifications";
+
+ // Import du composant Notifications
 
 const Header = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
-    const [menuOpen, setMenuOpen] = useState(false); // State for hamburger menu
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const isAuthenticated = !!localStorage.getItem("token");
+    const userType = localStorage.getItem("userType");
 
     const handleLogoClick = () => navigate("/");
 
@@ -27,6 +31,7 @@ const Header = () => {
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("userName");
+        localStorage.removeItem("userType");
         setUserName("");
         navigate("/login");
     };
@@ -68,6 +73,9 @@ const Header = () => {
                 >
                     {isAuthenticated && userName && (
                         <span className="text-white font-semibold">Bienvenue, {userName}</span>
+                    )}
+                    {isAuthenticated && userType === "voyageur" && (
+                        <Notifications /> // Affiche les notifications uniquement pour les voyageurs
                     )}
                     {isAuthenticated ? (
                         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
