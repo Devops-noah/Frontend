@@ -67,24 +67,7 @@ export default function HomePage() {
                         </h1>
 
 
-                        <Link to="/notations">
-                            <button
-                                style={{
-                                    marginTop: "20px", // Ajustez cette valeur pour contrôler l'espacement vertical
-                                    padding: "10px 20px",
-                                    fontSize: "1rem",
-                                    fontWeight: "bold",
-                                    backgroundColor: "#FFC107", // Couleur jaune foncé (comme le bouton Déconnexion)
-                                    color: "white",
-                                    border: "none",
-                                    borderRadius: "5px",
-                                    cursor: "pointer",
-                                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Ajoute un effet d'ombre pour plus de style
-                                }}
-                            >
-                                Partagez votre avis 💬⭐
-                            </button>
-                        </Link>
+
 
                     </>
                 )}
@@ -122,6 +105,27 @@ export default function HomePage() {
                                 Cliquer pour voir toutes les annonces
                             </button>
                         </div>
+
+                        <Link to="/notations">
+                            <button
+                                style={{
+                                    marginTop: "20px", // Ajustez cette valeur pour contrôler l'espacement vertical
+                                    padding: "10px 20px",
+                                    fontSize: "1rem",
+                                    fontWeight: "bold",
+                                    backgroundColor: "#3b82f6", // Couleur jaune foncé (comme le bouton Déconnexion)
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Ajoute un effet d'ombre pour plus de style
+                                }}
+                                onMouseOver={(e) => (e.target.style.backgroundColor = "#2563eb")} // Bleu plus foncé au survol
+                                onMouseOut={(e) => (e.target.style.backgroundColor = "#3b82f6")} // Retour au bleu clair
+                            >
+                                Partagez votre avis 💬⭐
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </div>
