@@ -22,6 +22,11 @@ export const UserProvider = ({ children }) => {
                 } catch (error) {
                     console.error("Erreur lors de la récupération des infos utilisateur :", error);
                     setIsAuthenticated(false);
+
+                    // Si l'erreur est liée à l'authentification (token expiré par exemple)
+                    if (error.response && error.response.status === 401) {
+                        logout();
+                    }
                 }
             }
         };
