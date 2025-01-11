@@ -14,14 +14,12 @@ import "./App.css";
 import AnnonceDetail from "./annonces/AnnonceDetail";
 import UserProfile from "./userProfile/UserProfile";
 import CreateVoyage from "./voyages/CreateVoyage";
-<<<<<<< HEAD
 import TransferCreation from "./transfertEnChaine/pagesEnchaine/TransferCreation";
 import TransferDetails from "./transfertEnChaine/pagesEnchaine/TransferDetails";
-=======
+
 import DashboardLayout from "./admin/components/DashboardLayout";
 import AdminUsers from "./admin/pages/AdminUsers";
 import AdminAnnonces from "./admin/pages/AdminAnnonces";
->>>>>>> e93b166bc5ffb6ce894d9b15924d7a0c8cb67d26
 
 function App() {
     // Vérifie si l'utilisateur est connecté
@@ -110,8 +108,6 @@ function App() {
                                 }
                             />
 
-<<<<<<< HEAD
-=======
                             {/* Admin Route */}
                             <Route
                                 path="/admin"

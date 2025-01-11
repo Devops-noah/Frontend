@@ -66,7 +66,6 @@ export default function HomePage() {
                         >
                             Bienvenue sur TravelCarry
                         </h1>
-<<<<<<< HEAD
                         <Link to="/notations">
                             <button
                                 style={{
@@ -109,10 +108,8 @@ export default function HomePage() {
                                 Chaine de Transfert
                             </button>
                         </Link>
-=======
 
 
->>>>>>> e93b166bc5ffb6ce894d9b15924d7a0c8cb67d26
 
 
                     </>
