@@ -17,12 +17,11 @@ import CreateVoyage from "./voyages/CreateVoyage";
 import DashboardLayout from "./admin/components/DashboardLayout";
 import AdminUsers from "./admin/pages/AdminUsers";
 import AdminAnnonces from "./admin/pages/AdminAnnonces";
+import BackgroundSlideshow from "./components/BackgroundSlideshow"; // Ajouté ici
 
 function App() {
-    // Vérifie si l'utilisateur est connecté
     const isAuthenticated = !!localStorage.getItem("token");
-   // const userRole = localStorage.getItem("role"); // Assuming the user's role is stored in localStorage
-    const userType = localStorage.getItem("userType"); // Assuming userType is also stored in localStorage
+    const userType = localStorage.getItem("userType");
 
     const ProtectedRoute = ({ children }) => {
         if (!isAuthenticated || userType !== "admin") {
@@ -34,18 +33,15 @@ function App() {
     return (
         <UserProvider>
             <Router>
-                {/* Structure principale avec Flexbox */}
                 <div className="flex flex-col min-h-screen">
+                    <BackgroundSlideshow /> {/* Ajouté ici */}
                     <Header />
                     <main className="flex-grow pb-20">
                         <Routes>
-                            {/* Routes publiques */}
                             <Route path="/" element={<HomePage />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<SignUp />} />
-                            <Route path="/annonces" element={<AnnonceList />} /> {/* Non protégé */}
-
-                            {/* Routes protégées */}
+                            <Route path="/annonces" element={<AnnonceList />} />
                             <Route
                                 path="/create-voyage"
                                 element={
@@ -106,15 +102,13 @@ function App() {
                                     )
                                 }
                             />
-
-                            {/* Admin Route */}
                             <Route
                                 path="/admin"
                                 element={
                                     isAuthenticated && userType === "admin" ? (
                                         <DashboardLayout />
                                     ) : (
-                                        <Navigate to="/" replace /> // Redirect to home if not an admin
+                                        <Navigate to="/" replace />
                                     )
                                 }
                             >

@@ -15,8 +15,8 @@ const TravelAnimation = ({ paysDepart, paysDestination, dateDepart, dateArrivee 
             {/* Airplane animation */}
             <motion.div
                 className="inline-block absolute top-1/2 transform -translate-y-1/2"
-                initial={{ left: "-10%" }}
-                animate={{ left: "90%" }}
+                initial={{left: "-10%"}}
+                animate={{left: "90%"}}
                 transition={{
                     duration: 10,
                     ease: "linear",
@@ -33,22 +33,26 @@ const TravelAnimation = ({ paysDepart, paysDestination, dateDepart, dateArrivee 
                 <svg width="0" height="0">
                     <defs>
                         <linearGradient id="ethiopianGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#006747" />  {/* Green */}
-                            <stop offset="50%" stopColor="#F9E800" />  {/* Yellow */}
-                            <stop offset="100%" stopColor="#D01C24" /> {/* Red */}
+                            <stop offset="0%" stopColor="#006747"/>
+                            {/* Green */}
+                            <stop offset="50%" stopColor="#F9E800"/>
+                            {/* Yellow */}
+                            <stop offset="100%" stopColor="#D01C24"/>
+                            {/* Red */}
                         </linearGradient>
                     </defs>
                 </svg>
             </motion.div>
 
             <div className="flex justify-between items-center absolute w-full top-0">
-                <span className="text-lg font-medium">{paysDepart}</span>
-                <span className="text-lg font-medium">{paysDestination}</span>
+                <span className="text-lg font-bold text-black">{paysDepart}</span>
+                <span className="text-lg font-bold text-black">{paysDestination}</span>
             </div>
 
+
             <div className="flex justify-between items-center absolute w-full bottom-0">
-                <span className="text-sm font-medium">{dateDepart}</span>
-                <span className="text-sm font-medium">{dateArrivee}</span>
+                <span className="text-sm font-bold text-black">{dateDepart}</span>
+                <span className="text-sm font-bold text-black">{dateArrivee}</span>
             </div>
         </div>
     );

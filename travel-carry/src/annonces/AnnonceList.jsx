@@ -185,7 +185,9 @@ const AnnoncesList = () => {
                     <h2 className="text-xl font-bold mb-4">Filter les annonces</h2>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-gray-700">Date Depart:</label>
+                            <label className="block text-black text-2xl font-extrabold uppercase tracking-wider">Date
+                                Depart:</label>
+
                             <input
                                 type="date"
                                 name="dateDepart"

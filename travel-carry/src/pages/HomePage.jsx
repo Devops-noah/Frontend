@@ -92,14 +92,14 @@ export default function HomePage() {
                 {/* Flight Animation for each annonce */}
                 <div className="min-h-screen bg-transparent py-8">
                     <div className="max-w-6xl mx-auto px-4">
-                        <h2 className="text-2xl font-bold mb-6">
+                        <h2 className="text-xl font-bold mb-2 text-5xl mb-2 text-white ">
                             Dernières annonces publiées
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {recentAnnonces.map((annonce) => (
                                 <div
                                     key={annonce.id}
-                                    className="text-red-950 p-4 font-bold relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition bg-blue-300 rounded-xl"
+                                    className="text-red-950 p-4 font-bold relative flex justify-between items-center gap-1 cursor-pointer hover:shadow-lg transition bg-blue-100 rounded-xl"
                                     onClick={() => handleAnnonceClick(annonce.id)}
                                 >
                                     {/* Flight animation for each annonce */}
