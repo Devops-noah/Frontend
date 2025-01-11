@@ -65,6 +65,33 @@ export default function HomePage() {
                                 Notations
                             </button>
                         </Link>
+                        {/* Add "Chaine de Transfert" Button */}
+                        <Link to="http://localhost:3000/create-transfer">
+                            <p style={{
+                                fontSize: "1.2rem",
+                                fontWeight: "bold",
+                                color: "black",
+                                marginTop: "20px"
+                            }}>
+                                Si vous souhaitez organiser un transfert en chaîne, cliquez sur "Chaine de Transfert" ci-dessous pour commencer.
+                            </p>
+                            <button
+                                style={{
+                                    padding: "10px 20px",
+                                    fontSize: "1rem",
+                                    fontWeight: "bold",
+                                    backgroundColor: "#3498db",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Chaine de Transfert
+                            </button>
+                        </Link>
+
+
                     </>
                 )}
 

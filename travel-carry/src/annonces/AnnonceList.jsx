@@ -241,42 +241,57 @@ const AnnoncesList = () => {
                 {/* Right Section - Annonces List */}
                 <div className="lg:col-span-3 bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold mb-6">Annonces</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
-                        {currentAnnonces.map((annonce, index) => (
-                            <div
-                                key={index}
-                                className="bg-blue-300 p-4 relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition"
-                                onClick={() => navigate(`/annonces/${annonce.id}`)} // Redirect to AnnonceDetail
+                    {currentAnnonces.length === 0 ? (
+                        <div className="text-center text-gray-600">
+                            <p className="mb-4">Aucune anoonce!
+                                Pas d'inquiétude, nous avons d'autres options pour vous !</p>
+                            <p className="mb-4">Découvrez le transfert en chaîne ou d'autres solutions adaptées.</p>
+                            <a
+                                href="http://localhost:3000/create-transfer"
+                                className="text-white bg-blue-500 hover:bg-blue-600 font-bold py-3 px-6 rounded-lg"
                             >
-                                <TravelAnimation
-                                    paysDepart={annonce.paysDepart}
-                                    paysDestination={annonce.paysDestination}
-                                    dateDepart={new Date(annonce.dateDepart).toLocaleDateString()}
-                                    dateArrivee={new Date(annonce.dateArrivee).toLocaleDateString()}
-                                />
-                                <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            openUpdateModal(annonce);
-                                        }}
-                                        className="text-green-950 hover:text-blue-500"
-                                    >
-                                        <FaEdit/>
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            openDeleteConfirmation(annonce.id);
-                                        }}
-                                        className="text-red-700 hover:text-red-500"
-                                    >
-                                        <FaTrashAlt/>
-                                    </button>
+                                Accéder au Transfert en Chaîne
+                            </a>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
+                            {currentAnnonces.map((annonce, index) => (
+                                <div
+                                    key={index}
+                                    className="bg-blue-300 p-4 relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition"
+                                    onClick={() => navigate(`/annonces/${annonce.id}`)}
+                                >
+                                    <TravelAnimation
+                                        paysDepart={annonce.paysDepart}
+                                        paysDestination={annonce.paysDestination}
+                                        dateDepart={new Date(annonce.dateDepart).toLocaleDateString()}
+                                        dateArrivee={new Date(annonce.dateArrivee).toLocaleDateString()}
+                                    />
+                                    <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openUpdateModal(annonce);
+                                            }}
+                                            className="text-green-950 hover:text-blue-500"
+                                        >
+                                            <FaEdit />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDeleteConfirmation(annonce.id);
+                                            }}
+                                            className="text-red-700 hover:text-red-500"
+                                        >
+                                            <FaTrashAlt />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
+
 
                     {/* Button to delete all annonces */}
                     <button

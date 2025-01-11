@@ -14,6 +14,8 @@ import "./App.css";
 import AnnonceDetail from "./annonces/AnnonceDetail";
 import UserProfile from "./userProfile/UserProfile";
 import CreateVoyage from "./voyages/CreateVoyage";
+import TransferCreation from "./transfertEnChaine/pagesEnchaine/TransferCreation";
+import TransferDetails from "./transfertEnChaine/pagesEnchaine/TransferDetails";
 
 function App() {
     // Vérifie si l'utilisateur est connecté
@@ -22,18 +24,16 @@ function App() {
     return (
         <UserProvider>
             <Router>
-                {/* Structure principale avec Flexbox */}
                 <div className="flex flex-col min-h-screen">
                     <Header />
                     <main className="flex-grow pb-20">
                         <Routes>
-                            {/* Routes publiques */}
                             <Route path="/" element={<HomePage />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<SignUp />} />
-                            <Route path="/annonces" element={<AnnonceList />} /> {/* Non protégé */}
-
-                            {/* Routes protégées */}
+                            <Route path="/annonces" element={<AnnonceList />} />
+                            <Route path="//create-transfer" element={<TransferCreation />} />
+                            <Route path="/transfert-details" element={<TransferDetails />} />
                             <Route
                                 path="/create-voyage"
                                 element={
@@ -94,6 +94,7 @@ function App() {
                                     )
                                 }
                             />
+
                         </Routes>
                     </main>
                     <Footer />
