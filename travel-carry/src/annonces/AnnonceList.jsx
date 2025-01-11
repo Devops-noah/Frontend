@@ -93,6 +93,9 @@ const AnnoncesList = () => {
         setShowUpdateModal(true);
     };
 
+    const token = localStorage.getItem('token');
+    const decodedToken = JSON.parse(atob(token.split('.')[1]));
+
     // Handle update
     const handleUpdate = () => {
         const updatedAnnonce = { ...selectedAnnonce };
@@ -257,8 +260,9 @@ const AnnoncesList = () => {
                                     dateDepart={format(annonce.dateDepart, "dd-MM-yyyy")}
                                     dateArrivee={format(annonce.dateArrivee, "dd-MM-yyyy")}
                                 />
+                                {console.log("voyageur email: " + annonce.voyageurEmail)}
                                 {
-                                    userType !== "voyageur" ? (
+                                    userType !== "voyageur" && decodedToken.sub !== annonce.voyageurEmail ? (
                                         <div className="hidden absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
                                             <button
                                                 onClick={(e) => {
