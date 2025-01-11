@@ -44,7 +44,6 @@ export default function HomePage() {
     };
 
     return (
-        <div className="homepage-carousel">
         <div className="homepage-background">
             <div style={{textAlign: "center", marginTop: "0px"}}>
                 {/* Welcome Message for Authenticated Users */}
@@ -66,6 +65,7 @@ export default function HomePage() {
                         >
                             Bienvenue sur TravelCarry
                         </h1>
+<<<<<<< HEAD
                         <Link to="/notations">
                             <button
                                 style={{
@@ -108,8 +108,10 @@ export default function HomePage() {
                                 Chaine de Transfert
                             </button>
                         </Link>
+=======
 
 
+>>>>>>> e93b166bc5ffb6ce894d9b15924d7a0c8cb67d26
 
 
                     </>
@@ -172,7 +174,6 @@ export default function HomePage() {
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     );
 }
