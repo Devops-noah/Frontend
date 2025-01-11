@@ -44,6 +44,7 @@ export default function HomePage() {
     };
 
     return (
+        <div className="homepage-carousel">
         <div className="homepage-background">
             <div style={{textAlign: "center", marginTop: "0px"}}>
                 {/* Welcome Message for Authenticated Users */}
@@ -125,6 +126,7 @@ export default function HomePage() {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     );
 }
