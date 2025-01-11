@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { format } from "date-fns";
 
 const AnnonceDetail = () => {
     const { id } = useParams(); // Get the annonce ID from the URL
@@ -49,7 +50,7 @@ const AnnonceDetail = () => {
         );
     }
 
-    console.log("User type:", userType);
+    console.log("annonce id:", annonce.id);
 
     return (
         <div className="min-h-screen bg-gray-100 py-8">
@@ -61,7 +62,7 @@ const AnnonceDetail = () => {
                     </h1>
                     <p className="text-gray-500 text-sm">
                         Published on:{" "}
-                        {new Date(annonce.datePublication).toLocaleDateString()}
+                        {format(annonce.datePublication, "dd-MM-yyyy")}
                     </p>
                 </div>
 
@@ -74,7 +75,7 @@ const AnnonceDetail = () => {
                         </h2>
                         <p className="text-gray-700">
                             <strong>Date Depart:</strong>{" "}
-                            {new Date(annonce.dateDepart).toLocaleDateString()}
+                            {format(annonce.dateDepart, "dd-MM-yyyy")}
                         </p>
                         <p className="text-gray-700">
                             <strong>Pays Depart:</strong> {annonce.paysDepart}
@@ -88,7 +89,7 @@ const AnnonceDetail = () => {
                         </h2>
                         <p className="text-gray-700">
                             <strong>Date Arrivee:</strong>{" "}
-                            {new Date(annonce.dateArrivee).toLocaleDateString()}
+                            {format(annonce.dateArrivee, "dd-MM-yyyy")}
                         </p>
                         <p className="text-gray-700">
                             <strong>Pays Destination:</strong>{" "}
@@ -114,10 +115,10 @@ const AnnonceDetail = () => {
                 <div className="mt-8 flex justify-between">
                     {userType === "expediteur" && (
                         <button
-                            onClick={() => navigate(`/colis/details`)} // Navigate to the colis details page
+                            onClick={() => navigate(`/colis/details/${annonce.id}`)} // Navigate to the colis details page
                             className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"
                         >
-                            Details Colis
+                            Proposer colis
                         </button>
                     )}
                     <button

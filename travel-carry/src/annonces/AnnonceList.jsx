@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; // Import React Icons
 import TravelAnimation from "../TravelAnimation";
+import { format } from "date-fns";
 
 const AnnoncesList = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -47,9 +48,9 @@ const AnnoncesList = () => {
         const filtered = annonces.filter((annonce) => {
             return (
                 (!filters.dateDepart ||
-                    new Date(annonce.dateDepart) >= new Date(filters.dateDepart)) &&
+                    format(annonce.dateDepart, "dd-MM-yyyy") >= format(filters.dateDepart, "dd-MM-yyyy")) &&
                 (!filters.dateArrivee ||
-                    new Date(annonce.dateArrivee) <= new Date(filters.dateArrivee)) &&
+                    format(annonce.dateArrivee, "dd-MM-yyyy") >= format(filters.dateArrivee, "dd-MM-yyyy")) &&
                 (!filters.paysDepart ||
                     annonce.paysDepart
                         .toLowerCase()
@@ -174,6 +175,8 @@ const AnnoncesList = () => {
             .catch((error) => console.error("Error deleting all annonces:", error));
     };
 
+    console.log("currentAnnonce: ", JSON.stringify(currentAnnonces))
+
     return (
         <div className="min-h-screen bg-gray-100 py-8">
             <div className="max-w-6xl mx-auto px-5 grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -250,6 +253,7 @@ const AnnoncesList = () => {
                                 href="http://localhost:3000/create-transfer"
                                 className="text-white bg-blue-500 hover:bg-blue-600 font-bold py-3 px-6 rounded-lg"
                             >
+<<<<<<< HEAD
                                 Accéder au Transfert en Chaîne
                             </a>
                         </div>
@@ -295,14 +299,88 @@ const AnnoncesList = () => {
 
                     {/* Button to delete all annonces */}
                     <button
+=======
+                                <TravelAnimation
+                                    paysDepart={annonce.paysDepart}
+                                    paysDestination={annonce.paysDestination}
+                                    dateDepart={format(annonce.dateDepart, "dd-MM-yyyy")}
+                                    dateArrivee={format(annonce.dateArrivee, "dd-MM-yyyy")}
+                                />
+                                {
+                                    userType !== "voyageur" ? (
+                                        <div className="hidden absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openUpdateModal(annonce);
+                                                }}
+                                                className="text-green-950 hover:text-blue-500"
+                                            >
+                                                <FaEdit/>
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openDeleteConfirmation(annonce.id);
+                                                }}
+                                                className="text-red-700 hover:text-red-500"
+                                            >
+                                                <FaTrashAlt/>
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openUpdateModal(annonce);
+                                                }}
+                                                className="text-green-950 hover:text-blue-500"
+                                            >
+                                                <FaEdit/>
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openDeleteConfirmation(annonce.id);
+                                                }}
+                                                className="text-red-700 hover:text-red-500"
+                                            >
+                                                <FaTrashAlt/>
+                                            </button>
+                                        </div>
+                                    )
+                                }
+
+                            </div>
+                        ))}
+                    </div>
+                    {
+                        userType !== "voyageur" ? (
+                        <button
+>>>>>>> e93b166bc5ffb6ce894d9b15924d7a0c8cb67d26
                         onClick={(e) => {
-                            e.stopPropagation();
-                            openDeleteAllConfirmation(annonces);
-                        }}
-                        className="mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
-                    >
-                        Supprimer Annonces
-                    </button>
+                        e.stopPropagation();
+                        openDeleteAllConfirmation(annonces);
+                    }}
+                    className=" hidden mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
+                >
+                    Supprimer Annonces
+                </button>
+                        ) : (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        openDeleteAllConfirmation(annonces);
+                    }}
+                    className="mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
+                >
+                    Supprimer Annonces
+                </button>
+                        )
+                    }
+
                     {/* Pagination */}
                     <div className="mt-6 flex justify-between items-center">
                         <button

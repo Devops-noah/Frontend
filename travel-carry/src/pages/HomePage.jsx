@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import TravelAnimation from '../TravelAnimation'; // Import the TravelAnimation component
+import { format } from "date-fns";
 
 export default function HomePage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,8 +20,10 @@ export default function HomePage() {
             .get("http://localhost:8080/api/annonces")
             .then((response) => {
                 const sortedAnnonces = response.data.sort((a, b) => {
-                    const dateA = new Date(a.datePublication);
-                    const dateB = new Date(b.datePublication);
+                    //const dateA = new Date(a.datePublication);
+                    const dateA = format(a.datePublication, "dd-MM-yyyy")
+                    //const dateB = new Date(b.datePublication);
+                    const dateB = format(a.datePublication, "dd-MM-yyyy")
                     return dateB - dateA; // Sort by most recent
                 });
                 setRecentAnnonces(sortedAnnonces.slice(0, 4));
@@ -32,6 +35,7 @@ export default function HomePage() {
 
     const handleAnnonceClick = (id) => {
         const token = localStorage.getItem("token");
+        console.log("token homepage: ", token)
         if (token) {
             navigate(`/annonces/${id}`); // Redirect to the detail page if authenticated
         } else {
@@ -40,14 +44,28 @@ export default function HomePage() {
     };
 
     return (
-        <div className="homepage-carousel">
-            <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <div className="homepage-background">
+            <div style={{textAlign: "center", marginTop: "0px"}}>
                 {/* Welcome Message for Authenticated Users */}
                 {isAuthenticated && (
                     <>
-                        <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>
+                        <h1
+                            style={{
+                                fontSize: "2.5rem",
+                                fontWeight: "bold",
+                                fontFamily: "'Pacifico', cursive",
+                                color: "#0047AB", // Bleu apaisant pour le texte principal
+                                textShadow: `
+            2px 2px 0 #A1C4FD,   /* Ombre bleu clair */
+            -2px -2px 0 #FFD700, /* Ombre dorée */
+            1px -1px 0 #6CC1F2,  /* Ombre légère cyan */
+            -1px 1px 0 #FFECB3   /* Ombre douce crème */
+        `,
+                            }}
+                        >
                             Bienvenue sur TravelCarry
                         </h1>
+<<<<<<< HEAD
                         <Link to="/notations">
                             <button
                                 style={{
@@ -90,6 +108,10 @@ export default function HomePage() {
                                 Chaine de Transfert
                             </button>
                         </Link>
+=======
+
+
+>>>>>>> e93b166bc5ffb6ce894d9b15924d7a0c8cb67d26
 
 
                     </>
@@ -112,8 +134,8 @@ export default function HomePage() {
                                     <TravelAnimation
                                         paysDepart={annonce.paysDepart}
                                         paysDestination={annonce.paysDestination}
-                                        dateDepart={new Date(annonce.dateDepart).toLocaleDateString()}
-                                        dateArrivee={new Date(annonce.dateArrivee).toLocaleDateString()}
+                                        dateDepart={format(annonce.dateDepart, "dd-MM-yyyy")}
+                                        dateArrivee={format(annonce.dateArrivee, "dd-MM-yyyy")}
                                     />
                                 </div>
                             ))}
@@ -128,6 +150,27 @@ export default function HomePage() {
                                 Cliquer pour voir toutes les annonces
                             </button>
                         </div>
+
+                        <Link to="/notations">
+                            <button
+                                style={{
+                                    marginTop: "20px", // Ajustez cette valeur pour contrôler l'espacement vertical
+                                    padding: "10px 20px",
+                                    fontSize: "1rem",
+                                    fontWeight: "bold",
+                                    backgroundColor: "#3b82f6", // Couleur jaune foncé (comme le bouton Déconnexion)
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Ajoute un effet d'ombre pour plus de style
+                                }}
+                                onMouseOver={(e) => (e.target.style.backgroundColor = "#2563eb")} // Bleu plus foncé au survol
+                                onMouseOut={(e) => (e.target.style.backgroundColor = "#3b82f6")} // Retour au bleu clair
+                            >
+                                Partagez votre avis 💬⭐
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -9,6 +9,7 @@ export default function UserProfile() {
     const [error, setError] = useState(null); // State to handle errors
     const navigate = useNavigate(); // Use navigate hook to navigate to different routes
 
+    console.log("navigate: ", navigate)
     // Get voyages
     const [voyages, setVoyages] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
@@ -46,6 +47,7 @@ export default function UserProfile() {
                 }
 
                 const data = await response.json();
+                console.log("data received: " + JSON.stringify(data));
                 setProfile(data); // Set profile data
             } catch (err) {
                 setError(err.message);
@@ -182,6 +184,8 @@ export default function UserProfile() {
         return <p className="text-center py-5 text-red-500">Error: {error}</p>;
     }
 
+    console.log("profile value: " + JSON.stringify(profile.type))
+
     return (
         <section className="bg-gray-100 py-5">
             <div className="container mx-auto">
@@ -197,7 +201,14 @@ export default function UserProfile() {
                             <p className="text-lg font-semibold">
                                 {profile.nom} {profile.prenom}
                             </p>
-                            <p className="text-gray-500 mb-4">{profile.type === "voyageur" ? "Voyageur" : "Expediteur"}</p>
+                            {/*<p className="text-gray-500 mb-4">{profile.type === "voyageur" ? "Voyageur" : "Expediteur"}</p>*/}
+                            <p className="text-gray-500 mb-4">
+                                {{
+                                    voyageur: "Voyageur",
+                                    expediteur: "Expediteur",
+                                    admin: "Admin",
+                                }[profile.type] || "Unknown"}
+                            </p>
                             <div className="flex justify-center gap-2">
                                 {profile.type === "voyageur" ? (
                                     <>
@@ -233,6 +244,13 @@ export default function UserProfile() {
                                         onClick={() => navigate("/colis/details")}
                                     >
                                         Mes colis
+                                    </button>
+                                ) : profile.type === "admin" ? (
+                                    <button
+                                        className="bg-violet-400 text-white px-4 py-2 rounded hover:bg-violet-900"
+                                        onClick={() => navigate("/admin/users")}
+                                    >
+                                        Admin Dashboard
                                     </button>
                                 ) : null}
                             </div>
@@ -291,6 +309,7 @@ export default function UserProfile() {
                                     </tr>
                                     </thead>
                                     <tbody>
+                                    {console.log("currenttt: ", JSON.stringify(currentVoyages))}
                                     {currentVoyages.map((voyage) => (
                                         <tr key={voyage.id} className="border-t border-gray-200 hover:bg-gray-50">
                                             <td className="px-4 py-2">
