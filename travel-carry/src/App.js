@@ -14,9 +14,14 @@ import "./App.css";
 import AnnonceDetail from "./annonces/AnnonceDetail";
 import UserProfile from "./userProfile/UserProfile";
 import CreateVoyage from "./voyages/CreateVoyage";
+<<<<<<< HEAD
+import TransferCreation from "./transfertEnChaine/pagesEnchaine/TransferCreation";
+import TransferDetails from "./transfertEnChaine/pagesEnchaine/TransferDetails";
+=======
 import DashboardLayout from "./admin/components/DashboardLayout";
 import AdminUsers from "./admin/pages/AdminUsers";
 import AdminAnnonces from "./admin/pages/AdminAnnonces";
+>>>>>>> e93b166bc5ffb6ce894d9b15924d7a0c8cb67d26
 
 function App() {
     // Vérifie si l'utilisateur est connecté
@@ -34,18 +39,16 @@ function App() {
     return (
         <UserProvider>
             <Router>
-                {/* Structure principale avec Flexbox */}
                 <div className="flex flex-col min-h-screen">
                     <Header />
                     <main className="flex-grow pb-20">
                         <Routes>
-                            {/* Routes publiques */}
                             <Route path="/" element={<HomePage />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<SignUp />} />
-                            <Route path="/annonces" element={<AnnonceList />} /> {/* Non protégé */}
-
-                            {/* Routes protégées */}
+                            <Route path="/annonces" element={<AnnonceList />} />
+                            <Route path="//create-transfer" element={<TransferCreation />} />
+                            <Route path="/transfert-details" element={<TransferDetails />} />
                             <Route
                                 path="/create-voyage"
                                 element={
@@ -107,6 +110,8 @@ function App() {
                                 }
                             />
 
+<<<<<<< HEAD
+=======
                             {/* Admin Route */}
                             <Route
                                 path="/admin"
@@ -135,6 +140,7 @@ function App() {
                                     }
                                 />
                             </Route>
+>>>>>>> e93b166bc5ffb6ce894d9b15924d7a0c8cb67d26
                         </Routes>
                     </main>
                     <Footer />
