@@ -9,6 +9,7 @@ const Notifications = () => {
 
     useEffect(() => {
         // Récupérer les notifications non lues pour le voyageur
+        //hawa a modifier ici 
         axios.get("http://localhost:8080/api/notifications/unread/{voyageurId}", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -37,6 +38,7 @@ const Notifications = () => {
         axios.put(`http://localhost:8080/api/demandes/${demandeId}/status`, { status: "REFUSE" })
             .then(() => alert("Demande refusée"))
             .catch((error) => console.error("Erreur lors du rejet"));
+        
     };
 
     return (
