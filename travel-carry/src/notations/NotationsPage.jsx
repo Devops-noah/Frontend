@@ -113,7 +113,7 @@ const NotationsPage = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:8080/notations/create", newNotation, {
+            const response = await axios.post("http://localhost:8080/api/notations/create", newNotation, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },

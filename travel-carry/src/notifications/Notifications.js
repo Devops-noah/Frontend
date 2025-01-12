@@ -24,6 +24,7 @@ const Notifications = () => {
     const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
     const handleNotificationClick = (notification) => {
+        console.log("notification collis: ", notification)
         setSelectedNotification(notification);  // Afficher les détails de la demande
         toggleDropdown();  // Fermer le dropdown
     };
