@@ -1,7 +1,0 @@
-/* Style pour l'image de fond */
-.homepage-background {
-  position: relative;
-  min-height: 100vh; /* Prend toute la hauteur de l'écran */
-  background: url('./assets/photo1.jpg') no-repeat center center fixed; /* Remplacez par le chemin de votre image */
-  background-size: cover; /* L'image couvre tout le fond */
-}

@@ -10,7 +10,7 @@ export default function HomePage() {
     const [recentAnnonces, setRecentAnnonces] = useState([]);
     const [recentNotations, setRecentNotations] = useState([]);
     const [averageRating, setAverageRating] = useState(0);
-    const { user } = useUserContext();
+    const {user} = useUserContext();
     const navigate = useNavigate();
     const [hasRedirected, setHasRedirected] = useState(false);
 
@@ -94,8 +94,8 @@ export default function HomePage() {
     console.log("recent notations: " + JSON.stringify(recentNotations));
 
     return (
-        <div className="homepage-background min-h-screen" style={{ paddingBottom: "64px", paddingTop: "10px" }}>
-            <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <div className="homepage-background min-h-screen" style={{paddingBottom: "64px", paddingTop: "10px"}}>
+            <div style={{textAlign: "center", marginTop: "20px"}}>
                 {isAuthenticated && (
                     <h1
                         style={{
@@ -111,8 +111,8 @@ export default function HomePage() {
 
                 {/* Button for "Chaine de Transfert" */}
                 <Link to="http://localhost:3000/create-transfer">
-                    <div style={{ marginTop: "20px", textAlign: "center" }}>
-                        <p style={{ fontSize: "1.2rem", fontWeight: "bold", color: "black" }}>
+                    <div style={{marginTop: "20px", textAlign: "center"}}>
+                        <p style={{fontSize: "1.2rem", fontWeight: "bold", color: "black"}}>
                             Si vous souhaitez organiser un transfert en chaîne, cliquez ci-dessous :
                         </p>
                         <button
