@@ -39,7 +39,7 @@ export default function HomePage() {
     // Fetch recent notations and calculate average rating
     useEffect(() => {
         axios
-            .get("http://localhost:8080/notations")
+            .get("http://localhost:8080/api/notations/last-three")
             .then((response) => {
                 const sortedNotations = response.data.sort((a, b) => {
                     const dateA = new Date(a.datePublication);
@@ -90,6 +90,8 @@ export default function HomePage() {
             </>
         );
     };
+
+    console.log("recent notations: " + JSON.stringify(recentNotations));
 
     return (
         <div className="homepage-background min-h-screen" style={{ paddingBottom: "64px", paddingTop: "10px" }}>
