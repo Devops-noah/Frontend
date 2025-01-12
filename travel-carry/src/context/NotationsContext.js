@@ -13,7 +13,7 @@ export const NotationsProvider = ({ children }) => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get("http://localhost:8080/notations");
+                const response = await axios.get("http://localhost:8080/api/notations/get-notations");
                 if (!Array.isArray(response.data)) {
                     throw new Error("Données reçues invalides");
                 }

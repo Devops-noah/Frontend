@@ -180,9 +180,9 @@ export default function HomePage() {
                     </p>
                 </div>
 
-                <div className="py-8">
+                <div className="container py-8 mx-auto px-4">
                     <h2 className="text-2xl font-bold mb-6">Avis récents</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mx-4">
                         {recentNotations.map((notation, index) => (
                             <div
                                 key={index}
