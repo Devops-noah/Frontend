@@ -26,6 +26,15 @@ const AnnoncesList = () => {
 
     const userType = localStorage.getItem("userType"); // Get user type from local storage
 
+    const token = localStorage.getItem("token");
+    let decodedToken = null;
+    if (token) {
+        decodedToken = JSON.parse(atob(token.split('.')[1]));
+        // Use the decoded token here
+    } else {
+        console.log("Token not found in localStorage.");
+        // Handle the case when the token is not available
+    }
     // Fetch all annonces
     useEffect(() => {
         axios.get("http://localhost:8080/api/annonces").then((response) => {
@@ -107,7 +116,7 @@ const AnnoncesList = () => {
                 `http://localhost:8080/api/annonces/update/${selectedAnnonce.id}`,
                 updatedAnnonce, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with your actual token key
+                        Authorization: `Bearer ${token}`, // Replace with your actual token key
                     },
                 }
             )
@@ -144,7 +153,7 @@ const AnnoncesList = () => {
         axios
             .delete(`http://localhost:8080/api/annonces/delete/${deleteAnnonceId}`, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with your actual token key
+                    Authorization: `Bearer ${token}`, // Replace with your actual token key
                 },
             })
             .then(() => {
@@ -163,7 +172,7 @@ const AnnoncesList = () => {
         axios
             .delete("http://localhost:8080/api/annonces/delete/all", {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then(() => {
@@ -176,6 +185,46 @@ const AnnoncesList = () => {
     };
 
     console.log("currentAnnonce: ", JSON.stringify(currentAnnonces))
+
+    const renderEditAndDeleteButton = (annonce) => {
+        console.log("annonce in edit button: " + JSON.stringify(annonce))
+        return (
+            <>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    openUpdateModal(annonce);
+                }}
+                className="text-green-950 hover:text-blue-500"
+            >
+                <FaEdit/>
+            </button>
+        <button
+            onClick={(e) => {
+                e.stopPropagation();
+                openDeleteConfirmation(annonce.id);
+            }}
+            className="text-red-700 hover:text-red-500"
+        >
+            <FaTrashAlt/>
+        </button>
+                </>
+    )
+    }
+
+    const rendreDeletAllButton = () => {
+        return (
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    openDeleteAllConfirmation(annonces);
+                }}
+                className="mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
+            >
+                Supprimer Annonces
+            </button>
+        )
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 py-8">
@@ -247,90 +296,51 @@ const AnnoncesList = () => {
                 <div className="lg:col-span-3 bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold mb-6">Annonces</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
-                        {currentAnnonces.map((annonce, index) => (
-                            <div
-                                key={index}
-                                className="bg-blue-300 p-4 relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition"
-                                onClick={() => navigate(`/annonces/${annonce.id}`)} // Redirect to AnnonceDetail
-                            >
-                                <TravelAnimation
-                                    paysDepart={annonce.paysDepart}
-                                    paysDestination={annonce.paysDestination}
-                                    dateDepart={format(annonce.dateDepart, "dd-MM-yyyy")}
-                                    dateArrivee={format(annonce.dateArrivee, "dd-MM-yyyy")}
-                                />
-                                {
-                                    userType !== "voyageur" ? (
-                                        <div className="hidden absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openUpdateModal(annonce);
-                                                }}
-                                                className="text-green-950 hover:text-blue-500"
-                                            >
-                                                <FaEdit/>
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openDeleteConfirmation(annonce.id);
-                                                }}
-                                                className="text-red-700 hover:text-red-500"
-                                            >
-                                                <FaTrashAlt/>
-                                            </button>
+                        {
+                            currentAnnonces
+                                .filter((annonce) => {
+                                    // Only include annonces for the connected voyageur if userType is "voyageur"
+                                    if (userType === "voyageur") {
+                                        return decodedToken?.sub === annonce.voyageurEmail;
+                                    }
+                                    return true; // Include all annonces for other user types
+                                })
+                                .map((annonce, index) => (
+                                    <div
+                                        key={index}
+                                        className="bg-blue-300 p-4 relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition"
+                                        onClick={() => navigate(`/annonces/${annonce.id}`)} // Redirect to AnnonceDetail
+                                    >
+                                        <TravelAnimation
+                                            paysDepart={annonce.paysDepart}
+                                            paysDestination={annonce.paysDestination}
+                                            dateDepart={format(annonce.dateDepart, "dd-MM-yyyy")}
+                                            dateArrivee={format(annonce.dateArrivee, "dd-MM-yyyy")}
+                                        />
+                                        <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
+                                            {
+                                                userType === "voyageur" && decodedToken?.sub === annonce.voyageurEmail
+                                                    ? (
+                                                        <>
+                                                            {renderEditAndDeleteButton(annonce)}
+                                                        </>
+                                                    )
+                                                    : null
+                                            }
                                         </div>
-                                    ) : (
-                                        <div
-                                            className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openUpdateModal(annonce);
-                                                }}
-                                                className="text-green-950 hover:text-blue-500"
-                                            >
-                                                <FaEdit/>
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openDeleteConfirmation(annonce.id);
-                                                }}
-                                                className="text-red-700 hover:text-red-500"
-                                            >
-                                                <FaTrashAlt/>
-                                            </button>
-                                        </div>
-                                    )
-                                }
+                                    </div>
+                                ))
+                        }
 
-                            </div>
-                        ))}
                     </div>
                     {
-                        userType !== "voyageur" ? (
-                        <button
-                        onClick={(e) => {
-                        e.stopPropagation();
-                        openDeleteAllConfirmation(annonces);
-                    }}
-                    className=" hidden mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
-                >
-                    Supprimer Annonces
-                </button>
-                        ) : (
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        openDeleteAllConfirmation(annonces);
-                    }}
-                    className="mt-3 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg"
-                >
-                    Supprimer Annonces
-                </button>
-                        )
+                        userType === "voyageur"
+                            ? (
+                                <>
+                                    {rendreDeletAllButton()}
+                                </>
+                            )
+                            : null
                     }
 
                     {/* Pagination */}
