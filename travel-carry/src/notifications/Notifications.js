@@ -99,7 +99,7 @@ const Notifications = () => {
 
             {selectedNotification && (
                 <div className="modal fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 shadow-lg rounded-lg w-1/2">
+                    <div className="bg-black p-6 shadow-lg rounded-lg w-1/2">
                         <h3 className="text-2xl font-bold mb-4">Détails de la demande</h3>
                         {selectedNotification?.demande?.informationColis ? (
                             <>
