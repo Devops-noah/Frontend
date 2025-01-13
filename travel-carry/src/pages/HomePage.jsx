@@ -133,7 +133,7 @@ export default function HomePage() {
                 </Link>
 
                 {/* Flight Animation for each annonce */}
-                <div className="min-h-screen bg-transparent py-8">
+                <div className="bg-transparent py-8">
                     <div className="max-w-6xl mx-auto px-4">
                         <h2 className="text-2xl font-bold mb-6">Dernières annonces publiées</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

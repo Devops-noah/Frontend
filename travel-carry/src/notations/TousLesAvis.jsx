@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
+import axios from "axios";
 
 export default function TousLesAvis() {
     const [notations, setNotations] = useState([]);
@@ -8,9 +9,13 @@ export default function TousLesAvis() {
 
     // Charger les données depuis localStorage au montage du composant
     useEffect(() => {
-        const storedNotations = JSON.parse(localStorage.getItem("notations")) || [];
-        setNotations(storedNotations);
-    }, []);
+        axios.get("http://localhost:8080/api/notations/get-notations").then((response) => {
+            setNotations(response.data);
+        });
+        // const storedNotations = JSON.parse(localStorage.getItem("notations")) || [];
+        // setNotations(storedNotations);
+    }, []);q
+    console.log("uuuuu: ", notations)
 
     // Mémorisation des notations triées et paginées
     const sortedAndPaginatedNotations = useMemo(() => {

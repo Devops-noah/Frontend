@@ -47,7 +47,7 @@ const Notifications = () => {
         
     };
 
-    //console.log("selected notificaion: " + JSON.stringify(notifications.map((notification) => notification.informationColis)))
+    console.log("selected notificaion: " + JSON.stringify(notifications))
     return (
         <div className="relative">
             <button onClick={toggleDropdown} className="text-white font-bold px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded">
