@@ -64,8 +64,8 @@ export default function TousLesAvis() {
                                     <p className="mb-2">
                                         {notation.commentaire ? (
                                             <>
-                                            <strong>Commentaire :</strong>
-                                            <span>{notation.commentaire}</span>
+                                                <strong>Commentaire :</strong>
+                                                <span>{notation.commentaire}</span>
                                             </>
                                         ) : (<span className="hidden"><strong>Commentaire :</strong>{" "}: {notation.commentaire}</span> )
                                         }
@@ -87,7 +87,7 @@ export default function TousLesAvis() {
                 {/* Pagination */}
                 {notations.length > notationsPerPage && (
                     <div className="mt-6 flex justify-between items-center">
-                    <button
+                        <button
                             onClick={() => setCurrentPage(currentPage - 1)}
                             disabled={currentPage === 1}
                             className={`py-2 px-4 rounded-lg transition-all duration-200 ${
