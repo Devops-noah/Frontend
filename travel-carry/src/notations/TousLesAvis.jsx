@@ -9,18 +9,18 @@ export default function TousLesAvis() {
 
     // Charger les données depuis localStorage au montage du composant
     useEffect(() => {
-        axios.get("http://localhost:8080/api/notations/get-notations").then((response) => {
+        axios.get("http://localhost:8080/api/notations/approved").then((response) => {
             setNotations(response.data);
         });
         // const storedNotations = JSON.parse(localStorage.getItem("notations")) || [];
         // setNotations(storedNotations);
-    }, []);q
+    }, []);
     console.log("uuuuu: ", notations)
 
     // Mémorisation des notations triées et paginées
     const sortedAndPaginatedNotations = useMemo(() => {
         const sortedNotations = [...notations].sort(
-            (a, b) => new Date(b.datePublication) - new Date(a.datePublication)
+            (a, b) => new Date(a.datePublication) - new Date(b.datePublication)
         );
 
         const indexOfLastNotation = currentPage * notationsPerPage;
@@ -53,7 +53,7 @@ export default function TousLesAvis() {
                                 <div
                                     key={notation.id} // Utilisation d'un ID unique
                                     className="p-6 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-200"
-                                    style={{ textAlign: "left" }}
+                                    style={{textAlign: "left"}}
                                 >
                                     <p className="mb-2">
                                         <strong>Note :</strong>{" "}
@@ -62,9 +62,15 @@ export default function TousLesAvis() {
                                         </span>
                                     </p>
                                     <p className="mb-2">
-                                        <strong>Commentaire :</strong>{" "}
-                                        {notation.commentaire || "Pas de commentaire"}
+                                        {notation.commentaire ? (
+                                            <>
+                                            <strong>Commentaire :</strong>
+                                            <span>{notation.commentaire}</span>
+                                            </>
+                                        ) : (<span className="hidden"><strong>Commentaire :</strong>{" "}: {notation.commentaire}</span> )
+                                        }
                                     </p>
+
                                     <p className="mb-2">
                                         <strong>Publié par :</strong>{" "}
                                         {notation.userName} {notation.userFirstName}
@@ -81,7 +87,7 @@ export default function TousLesAvis() {
                 {/* Pagination */}
                 {notations.length > notationsPerPage && (
                     <div className="mt-6 flex justify-between items-center">
-                        <button
+                    <button
                             onClick={() => setCurrentPage(currentPage - 1)}
                             disabled={currentPage === 1}
                             className={`py-2 px-4 rounded-lg transition-all duration-200 ${

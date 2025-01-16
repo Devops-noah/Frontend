@@ -39,12 +39,12 @@ export default function HomePage() {
     // Fetch recent notations and calculate average rating
     useEffect(() => {
         axios
-            .get("http://localhost:8080/api/notations/last-three")
+            .get("http://localhost:8080/api/notations/last-three-approved")
             .then((response) => {
                 const sortedNotations = response.data.sort((a, b) => {
-                    const dateA = new Date(a.datePublication);
-                    const dateB = new Date(b.datePublication);
-                    return dateB - dateA;
+                    const dateA = new Date(a.datePublication).getTime(); // Parse dates to timestamps
+                    const dateB = new Date(b.datePublication).getTime();
+                    return dateA - dateB; // Sort in descending order
                 });
                 setRecentNotations(sortedNotations.slice(0, 3));
 

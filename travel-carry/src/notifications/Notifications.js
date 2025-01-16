@@ -59,10 +59,6 @@ const Notifications = () => {
             .catch((error) => console.error("Erreur lors du rejet"));
     };
 
-<<<<<<< HEAD
-    console.log("selected notificaion: " + JSON.stringify(notifications))
-=======
->>>>>>> dc61cb5613b4762d260e834ad0dc3a51431c0a05
     return (
         <div className="relative">
             <button

@@ -8,12 +8,16 @@ export const NotationsProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const token = localStorage.getItem("token");
+
     useEffect(() => {
         const fetchNotations = async () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get("http://localhost:8080/api/notations/get-notations");
+                const response = await axios.get("http://localhost:8080/api/admin/notations/get-notations", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 if (!Array.isArray(response.data)) {
                     throw new Error("Données reçues invalides");
                 }

@@ -22,6 +22,7 @@ import AdminAnnonces from "./admin/pages/AdminAnnonces";
 import TousLesAvis from "./notations/TousLesAvis";
 import { useUserContext } from "./context/UserContext";
 import { NotationsProvider } from "./context/NotationsContext";
+import AdminNotationComments from "./admin/pages/AdminNotationComments";
 
 function App() {
     return (
@@ -72,6 +73,7 @@ function App() {
                                 >
                                     <Route path="users" element={<AdminUsers />} />
                                     <Route path="annonces" element={<AdminAnnonces />} />
+                                    <Route path="comments" element={<AdminNotationComments />} />
                                 </Route>
                             </Routes>
                         </main>
