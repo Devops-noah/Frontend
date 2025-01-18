@@ -39,12 +39,12 @@ export default function HomePage() {
     // Fetch recent notations and calculate average rating
     useEffect(() => {
         axios
-            .get("http://localhost:8080/api/notations/last-three")
+            .get("http://localhost:8080/api/notations/last-three-approved")
             .then((response) => {
                 const sortedNotations = response.data.sort((a, b) => {
-                    const dateA = new Date(a.datePublication);
-                    const dateB = new Date(b.datePublication);
-                    return dateB - dateA;
+                    const dateA = new Date(a.datePublication).getTime(); // Parse dates to timestamps
+                    const dateB = new Date(b.datePublication).getTime();
+                    return dateA - dateB; // Sort in descending order
                 });
                 setRecentNotations(sortedNotations.slice(0, 3));
 
@@ -110,7 +110,7 @@ export default function HomePage() {
                 )}
 
                 {/* Flight Animation for each annonce */}
-                <div className="min-h-screen bg-transparent py-8">
+                <div className="bg-transparent py-8">
                     <div className="max-w-6xl mx-auto px-4">
                         <h2 className="text-2xl font-bold mb-6">Dernières annonces publiées</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

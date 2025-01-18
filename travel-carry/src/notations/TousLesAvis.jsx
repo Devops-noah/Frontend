@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
+import axios from "axios";
 
 export default function TousLesAvis() {
     const [notations, setNotations] = useState([]);
@@ -8,14 +9,18 @@ export default function TousLesAvis() {
 
     // Charger les données depuis localStorage au montage du composant
     useEffect(() => {
-        const storedNotations = JSON.parse(localStorage.getItem("notations")) || [];
-        setNotations(storedNotations);
+        axios.get("http://localhost:8080/api/notations/approved").then((response) => {
+            setNotations(response.data);
+        });
+        // const storedNotations = JSON.parse(localStorage.getItem("notations")) || [];
+        // setNotations(storedNotations);
     }, []);
+    console.log("uuuuu: ", notations)
 
     // Mémorisation des notations triées et paginées
     const sortedAndPaginatedNotations = useMemo(() => {
         const sortedNotations = [...notations].sort(
-            (a, b) => new Date(b.datePublication) - new Date(a.datePublication)
+            (a, b) => new Date(a.datePublication) - new Date(b.datePublication)
         );
 
         const indexOfLastNotation = currentPage * notationsPerPage;
@@ -48,7 +53,7 @@ export default function TousLesAvis() {
                                 <div
                                     key={notation.id} // Utilisation d'un ID unique
                                     className="p-6 bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-200"
-                                    style={{ textAlign: "left" }}
+                                    style={{textAlign: "left"}}
                                 >
                                     <p className="mb-2">
                                         <strong>Note :</strong>{" "}
@@ -57,9 +62,15 @@ export default function TousLesAvis() {
                                         </span>
                                     </p>
                                     <p className="mb-2">
-                                        <strong>Commentaire :</strong>{" "}
-                                        {notation.commentaire || "Pas de commentaire"}
+                                        {notation.commentaire ? (
+                                            <>
+                                                <strong>Commentaire :</strong>
+                                                <span>{notation.commentaire}</span>
+                                            </>
+                                        ) : (<span className="hidden"><strong>Commentaire :</strong>{" "}: {notation.commentaire}</span> )
+                                        }
                                     </p>
+
                                     <p className="mb-2">
                                         <strong>Publié par :</strong>{" "}
                                         {notation.userName} {notation.userFirstName}

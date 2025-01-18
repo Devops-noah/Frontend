@@ -54,6 +54,16 @@ const Sidebar = () => {
                             {!isCollapsed && <span>Annonces</span>}
                         </Link>
                     </li>
+                    {/* Annonces Link */}
+                    <li>
+                        <Link
+                            to="/admin/comments"
+                            className="flex items-center p-4 hover:bg-gray-700 rounded"
+                        >
+                            <FaBullhorn className="mr-3 text-lg" />
+                            {!isCollapsed && <span>Commentaires de Notations</span>}
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </div>
