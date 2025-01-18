@@ -297,15 +297,19 @@ const AnnoncesList = () => {
                     <h2 className="text-2xl font-bold mb-6">Annonces</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
                         {
-                            currentAnnonces
-                                .filter((annonce) => {
-                                    // Only include annonces for the connected voyageur if userType is "voyageur"
-                                    if (userType === "voyageur") {
-                                        return decodedToken?.sub === annonce.voyageurEmail;
-                                    }
-                                    return true; // Include all annonces for other user types
-                                })
-                                .map((annonce, index) => (
+                            currentAnnonces.length === 0 ? (
+                                <div className="text-center text-gray-600 w-full flex flex-col items-center justify-center">
+                                    <p className="mb-4">Aucune annonce! Pas d'inquiétude, nous avons d'autres options pour vous !</p>
+                                    <p className="mb-4">Découvrez le transfert en chaîne ou d'autres solutions adaptées.</p>
+                                    <a
+                                        href="http://localhost:3000/create-transfer"
+                                        className="text-white bg-blue-500 hover:bg-blue-600 font-bold py-3 px-6 rounded-lg"
+                                    >
+                                        Accéder au Transfert en Chaîne
+                                    </a>
+                                </div>
+                            ) : (
+                                currentAnnonces.map((annonce, index) => (
                                     <div
                                         key={index}
                                         className="bg-blue-300 p-4 relative flex justify-between items-center gap-4 cursor-pointer hover:shadow-lg transition"
@@ -330,7 +334,9 @@ const AnnoncesList = () => {
                                         </div>
                                     </div>
                                 ))
+                            )
                         }
+
 
                     </div>
                     {

@@ -40,7 +40,9 @@ class TransferService {
             // Envoi de la requête avec le corps JSON
             const response = await fetch(`${API_BASE_URL}/enregistrer`, {
                 method: 'POST',
-
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(segmentsChoisis), // Corps de la requête
             });
 
