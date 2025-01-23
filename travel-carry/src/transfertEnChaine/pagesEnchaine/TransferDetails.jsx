@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './TransferDetails.css'; // Ajout du fichier CSS pour le style
 
 const TransferDetails = () => {
@@ -69,33 +69,29 @@ const TransferDetails = () => {
                                                     : 'Voyageur inconnu'}
                                             </strong>
                                         </p>
-
-                                        {/* Lien vers le détail de l'annonce */}
-                                        {segment.annonce && segment.annonce.id ? (
-                                            <Link
-                                                to={`/annonces/${segment.annonce.id}`}
-                                                className="btn btn-primary"
-                                            >
-                                                Voir Détail Annonce
-                                            </Link>
-                                        ) : (
-                                            <span className="no-annonce">
-                                                Aucune annonce associée
-                                            </span>
-                                        )}
                                     </div>
                                 </div>
                             </li>
                         ))}
                     </ul>
 
-                    {/* Bouton pour voir les détails de tous les segments */}
-                    <button
-                        className="btn btn-secondary voir-details-tous"
-                        onClick={voirDetailsTousSegments}
-                    >
-                        Voir Détails Annonces
-                    </button>
+                    {/* Boutons */}
+                    <div className="button-container">
+                        <button
+                            className="btn btn-secondary voir-details-tous"
+                            onClick={voirDetailsTousSegments}
+                        >
+                            Voir Détails Annonces
+                        </button>
+
+                        {/* Bouton de retour */}
+                        <button
+                            className="btn btn-secondary retour"
+                            onClick={() => navigate(-1)} // Retour à la page précédente
+                        >
+                            Retour
+                        </button>
+                    </div>
                 </div>
             ) : (
                 <p>Aucun segment trouvé pour cette chaîne.</p>

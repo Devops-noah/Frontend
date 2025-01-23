@@ -64,6 +64,8 @@ const AnnonceDetail = () => {
         <div className="min-h-screen bg-gray-100 py-8">
             <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
                 <h1 className="text-2xl font-bold text-gray-800">Détails des Annonces</h1>
+
+                {/* Affichage des annonces */}
                 {annonces.map((annonce, index) => (
                     <div key={index} className="mb-8">
                         {/* Header Section */}
@@ -117,26 +119,26 @@ const AnnonceDetail = () => {
                                 <strong>Voyageur:</strong> {annonce.voyageurNom || "N/A"}
                             </p>
                         </div>
-
-                        {/* Button Section */}
-                        <div className="mt-8 flex justify-between">
-                            {userType === "expediteur" && (
-                                <button
-                                    onClick={() => navigate(`/colis/details/${annonce.id}`)}
-                                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"
-                                >
-                                    Proposer colis
-                                </button>
-                            )}
-                            <button
-                                onClick={() => window.history.back()}
-                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
-                            >
-                                Back to Annonces
-                            </button>
-                        </div>
                     </div>
                 ))}
+
+                {/* Boutons */}
+                <div className="mt-8 flex justify-between">
+                    {userType === "expediteur" && annonces.length > 0 && (
+                        <button
+                            onClick={() => navigate(`/colis/details/${annonceIds.join(',')}`)}
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"
+                        >
+                            Proposer colis
+                        </button>
+                    )}
+                    <button
+                        onClick={() => navigate("/annonces")}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
+                    >
+                        Back to Annonces
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -3,7 +3,9 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const ColisDetails = () => {
-    const { annonceId } = useParams(); // Retrieve annonceId from route parameters
+    const { annonceId } = useParams(); // Récupère l'ID ou les IDs
+    const ids = annonceId.split(","); // Divise les IDs si plusieurs sont passés
+
     const [formData, setFormData] = useState({
         poids: "",
         longueur: "",
@@ -17,13 +19,31 @@ const ColisDetails = () => {
 
     const [feedback, setFeedback] = useState("");
 
+    // Validation de l'existence de annonceId
+    if (!annonceId) {
+        console.error("Erreur : annonceId est introuvable !");
+        setFeedback("Erreur : L'ID de l'annonce est introuvable.");
+        return;
+    }
+
+    // Affichage des valeurs de annonceId et token dans la console
+    console.log("annonceId:", annonceId); // Pour plusieurs IDs, on affiche chaque ID
+    ids.forEach(id => console.log("ID de l'annonce :", id));
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+        setFeedback("Erreur : Vous devez être connecté pour envoyer une demande.");
+        return;
+    }
+    console.log("Token:", token); // Affichage du token dans la console
+
     // Gestion des champs de formulaire
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    // Gestion de la soumission du formulaire
+    // Gestion de la soumission du formulaire pour un ou plusieurs IDs
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -34,23 +54,7 @@ const ColisDetails = () => {
             return;
         }
 
-        // Vérifiez si annonceId est défini
-        if (!annonceId) {
-            console.error("Erreur : annonceId est introuvable !");
-            setFeedback("Erreur : L'ID de l'annonce est introuvable.");
-            return;
-        }
-        console.log("annonceId:", annonceId);
-
         try {
-            const token = localStorage.getItem("token");
-            console.log("Token:", token);
-
-            if (!token) {
-                setFeedback("Erreur : Vous devez être connecté pour envoyer une demande.");
-                return;
-            }
-
             // Préparer les données à envoyer
             const requestData = {
                 poids: formData.poids,
@@ -63,21 +67,31 @@ const ColisDetails = () => {
                 plageHoraire: formData.plageHoraire,
             };
 
-            // Envoyer les données au backend
-            const response = await axios.post(
-                `http://localhost:8080/api/information_colis/${annonceId}`,
-                requestData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+            // Envoi pour chaque ID
+            const promises = ids.map(async (id) => {
+                const response = await axios.post(
+                    `http://localhost:8080/api/information_colis/${id}`,
+                    requestData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+                return response.data;
+            });
+
+            // Attente des réponses
+            const responses = await Promise.all(promises);
+
+            setFeedback(
+                "Les informations de votre colis ont été envoyées avec succès pour les annonces suivantes : " +
+                ids.join(", ")
             );
 
-            setFeedback("Les informations de votre colis ont été envoyées avec succès !");
-            console.log("Réponse du serveur :", response.data);
+            console.log("Réponses du serveur :", responses);
 
-            // Réinitialisez le formulaire après succès
+            // Réinitialiser le formulaire après succès
             setFormData({
                 poids: "",
                 longueur: "",
@@ -90,14 +104,11 @@ const ColisDetails = () => {
             });
         } catch (error) {
             console.error("Erreur lors de l'envoi de la demande :", error);
-            if (error.response && error.response.data.message) {
-                setFeedback(error.response.data.message);
-            } else {
-                setFeedback("Une erreur s'est produite. Veuillez réessayer.");
-            }
+            setFeedback(
+                "Une erreur s'est produite pour l'envoi de certains colis. Veuillez vérifier et réessayer."
+            );
         }
     };
-
 
     return (
         <div className="p-8 max-w-lg mx-auto bg-white shadow-lg rounded">

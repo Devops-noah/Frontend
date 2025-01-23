@@ -293,21 +293,25 @@ const AnnoncesList = () => {
                 </div>
 
                 {/* Right Section - Annonces List */}
+
                 <div className="lg:col-span-3 bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold mb-6">Annonces</h2>
+
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
                         {
                             currentAnnonces.length === 0 ? (
-                                <div className="text-center text-gray-600 w-full flex flex-col items-center justify-center">
-                                    <p className="mb-4">Aucune annonce! Pas d'inquiétude, nous avons d'autres options pour vous !</p>
-                                    <p className="mb-4">Découvrez le transfert en chaîne ou d'autres solutions adaptées.</p>
+                                <>
+                                    <div>Aucune annonce! Pas d'inquiétude, nous avons d'autres options pour vous !</div>
+                                    <div>Découvrez le transfert en chaîne ou d'autres solutions adaptées.</div>
                                     <a
                                         href="http://localhost:3000/create-transfer"
                                         className="text-white bg-blue-500 hover:bg-blue-600 font-bold py-3 px-6 rounded-lg"
                                     >
                                         Accéder au Transfert en Chaîne
                                     </a>
-                                </div>
+                                </>
+
+
                             ) : (
                                 currentAnnonces.map((annonce, index) => (
                                     <div
@@ -321,7 +325,8 @@ const AnnoncesList = () => {
                                             dateDepart={format(annonce.dateDepart, "dd-MM-yyyy")}
                                             dateArrivee={format(annonce.dateArrivee, "dd-MM-yyyy")}
                                         />
-                                        <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
+                                        <div
+                                            className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
                                             {
                                                 userType === "voyageur" && decodedToken?.sub === annonce.voyageurEmail
                                                     ? (
@@ -336,9 +341,8 @@ const AnnoncesList = () => {
                                 ))
                             )
                         }
-
-
                     </div>
+
                     {
                         userType === "voyageur"
                             ? (
@@ -359,8 +363,8 @@ const AnnoncesList = () => {
                             Prev
                         </button>
                         <span className="text-lg font-bold">
-                            Page {currentPage} of {totalPages}
-                        </span>
+            Page {currentPage} of {totalPages}
+        </span>
                         <button
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage === totalPages}
@@ -370,7 +374,9 @@ const AnnoncesList = () => {
                         </button>
                     </div>
                 </div>
+
             </div>
+
 
             {/* Modal for delete confirmation */}
             {showDeleteConfirmation && (
