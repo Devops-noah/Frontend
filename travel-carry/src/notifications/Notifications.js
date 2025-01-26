@@ -66,7 +66,7 @@ const Notifications = () => {
             })
             .catch((error) => console.error("Erreur lors du rejet"));
     };
-
+    console.log("hawwaaaaaaaaaaaaaaa: " ,JSON.stringify(notifications));
     return (
         <div className="relative">
             <button
@@ -86,15 +86,14 @@ const Notifications = () => {
                         <p className="text-gray-500">Aucune notification</p>
                     ) : (
                         notifications.map((notification) => {
-                            //modif ici de hawa
                             // Récupérer l'expéditeur ID de la notification
-                            const expediteurId = notification?.expediteur_id;
+                            const expediteurId = notification?.demande?.expediteurEmail;
                             console.log("expediteurId:", expediteurId);
                             // Faire une requête pour récupérer le nom de l'expéditeur (si nécessaire)
                             let expediteurNom = "";
                             if (expediteurId) {
                                 // Si vous avez déjà l'expéditeur avec l'ID, vous pouvez récupérer son nom ici
-                                axios.get(`http://localhost:8080/api/utilisateur/${expediteurId}`)
+                                axios.get(`http://localhost:8080/api/utilisateurs/${expediteurId}`)
                                     .then(response => {
                                         expediteurNom = response.data.nom;  // suppose que la réponse contient le nom
                                         console.log("expediteurNom:", expediteurNom);

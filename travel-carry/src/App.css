@@ -1,0 +1,13 @@
+/* Applique un fond sur toute la page */
+body {
+    background-image: url('./assets/photo2.jpg'); /* Modifiez le chemin selon l'emplacement de l'image */
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+.main-container {
+    min-height: 100vh; /* Assurez-vous que le conteneur prend tout l'espace */
+}

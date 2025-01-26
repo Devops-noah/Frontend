@@ -29,7 +29,7 @@ function App() {
         <UserProvider>
             <NotationsProvider>
                 <Router>
-                    <div className="flex flex-col min-h-screen">
+                    <div className="flex flex-col min-h-screen main-container"> {/* Appliquer la classe ici */}
                         <Header />
                         <main className="flex-grow pb-20">
                             <Routes>
