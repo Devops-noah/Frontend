@@ -102,23 +102,41 @@
     text-transform: uppercase;
 }
 
-/* Bouton */
-.btn.btn-primary {
+/* Boutons */
+.btn {
     display: inline-block;
     margin-top: 10px;
     padding: 10px 15px;
-    color: #fff;
-    background-color: #ff7b54;
-    border: none;
     border-radius: 10px;
-    text-decoration: none;
     font-size: 0.9rem;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.btn.btn-primary:hover {
-    background-color: #e86d4a;
+.btn:hover {
     transform: translateY(-2px);
+}
+
+/* Bouton "Voir Détails Annonces" (aligné à gauche) */
+.btn.btn-secondary.voir-details-tous {
+    background-color: #ff6347; /* Retour à la couleur d'avant */
+    color: #fff;
+    float: left;
+    margin-right: 10px;
+}
+
+.btn.btn-secondary.voir-details-tous:hover {
+    background-color: #6cb9e3;
+}
+
+/* Bouton "Retour" (aligné à droite) */
+.btn.btn-secondary.retour {
+    background-color: #3498db; /* Bleu foncé */
+    color: #fff;
+    float: right;
+}
+
+.btn.btn-secondary.retour:hover {
+    background-color: #6cb9e3;
 }
 
 /* Message sans annonce */
@@ -142,5 +160,16 @@
 
     .welcome-message {
         font-size: 1rem;
+    }
+
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        margin-bottom: 10px;
+        width: 100%;
     }
 }

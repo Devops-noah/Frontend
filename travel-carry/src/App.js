@@ -29,7 +29,6 @@ function App() {
         <UserProvider>
             <NotationsProvider>
                 <Router>
-                    {/* Structure principale avec Flexbox */}
                     <div className="flex flex-col min-h-screen">
                         <Header />
                         <main className="flex-grow pb-20">
@@ -44,6 +43,12 @@ function App() {
                                 <Route path="/create-transfer" element={<TransferCreation />} />
                                 <Route path="/transfert-details" element={<TransferDetails />} />
 
+                                {/* Routes dynamiques pour les annonces (IDs multiples) */}
+                                <Route
+                                    path="/annonces/*" // Permet d'accepter plusieurs segments
+                                    element={<PrivateRoute><AnnonceDetail /></PrivateRoute>}
+                                />
+
                                 {/* Routes protégées */}
                                 <Route
                                     path="/create-voyage"
@@ -52,10 +57,6 @@ function App() {
                                 <Route
                                     path="/create-annonce/:id"
                                     element={<PrivateRoute><CreateAnnonce /></PrivateRoute>}
-                                />
-                                <Route
-                                    path="/annonces/:id"
-                                    element={<PrivateRoute><AnnonceDetail /></PrivateRoute>}
                                 />
                                 <Route
                                     path="/colis/details/:annonceId"

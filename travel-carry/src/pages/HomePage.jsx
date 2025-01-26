@@ -109,29 +109,6 @@ export default function HomePage() {
                     </h1>
                 )}
 
-                {/* Button for "Chaine de Transfert" */}
-                <Link to="http://localhost:3000/create-transfer">
-                    <div style={{marginTop: "20px", textAlign: "center"}}>
-                        <p style={{fontSize: "1.2rem", fontWeight: "bold", color: "black"}}>
-                            Si vous souhaitez organiser un transfert en chaîne, cliquez ci-dessous :
-                        </p>
-                        <button
-                            style={{
-                                padding: "10px 20px",
-                                fontSize: "1rem",
-                                fontWeight: "bold",
-                                backgroundColor: "#3498db",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                            }}
-                        >
-                            Chaine de Transfert
-                        </button>
-                    </div>
-                </Link>
-
                 {/* Flight Animation for each annonce */}
                 <div className="bg-transparent py-8">
                     <div className="max-w-6xl mx-auto px-4">
