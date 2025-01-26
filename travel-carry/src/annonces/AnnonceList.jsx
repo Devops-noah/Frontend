@@ -72,6 +72,9 @@ const AnnoncesList = () => {
         });
         setFilteredAnnonces(filtered);
         setCurrentPage(1); // Reset to first page
+        if (filtered.length === 0) {
+            navigate("/create-transfer"); // Redirect to the transfer page if no results
+        }
     };
 
     // Clear filters

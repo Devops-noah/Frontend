@@ -8,14 +8,17 @@ const TransferCreation = () => {
     const [paysDepart, setPaysDepart] = useState('');
     const [paysArrivee, setPaysArrivee] = useState('');
     const [segmentsDisponibles, setSegmentsDisponibles] = useState([]);
+    const [rechercheEffectuee, setRechercheEffectuee] = useState(false); // Nouveau state pour gérer l'état de la recherche
     const navigate = useNavigate();
 
     const rechercherSegments = async () => {
+        setRechercheEffectuee(true); // Indiquer que la recherche a été lancée
+        setSegmentsDisponibles([]);  // Réinitialiser les segments avant chaque recherche
         try {
             const response = await TransferService.rechercherSegments(paysDepart, paysArrivee);
-            if (!response) {
+            if (!response || response.length === 0) {
                 console.warn('Aucune donnée retournée par l\'API');
-                alert('Aucun segment disponible pour ces paramètres.');
+                setSegmentsDisponibles([]); // Réinitialiser les segments si aucun résultat
                 return;
             }
             console.log('Réponse de l\'API:', response);
@@ -71,11 +74,17 @@ const TransferCreation = () => {
                 </label>
             </div>
 
-            <button className="btn btn-primary" onClick={rechercherSegments}>Rechercher les chaînes de transferts</button>
+            {/* Affichage uniquement du bouton de recherche avant la recherche */}
+            {!rechercheEffectuee && (
+                <button className="btn btn-primary" onClick={rechercherSegments}>
+                    Rechercher les chaînes de transferts
+                </button>
+            )}
 
-            <div className="segments-container">
-                <h2 className="available-chains">Chaînes de transfert disponibles</h2>
-                {segmentsDisponibles.length > 0 ? (
+            {/* Affichage uniquement si des segments sont disponibles après la recherche */}
+            {rechercheEffectuee && segmentsDisponibles.length > 0 && (
+                <div className="segments-container">
+                    <h2 className="available-chains">Chaînes de transfert disponibles</h2>
                     <ul>
                         {segmentsDisponibles.map((segment, index) => (
                             <li key={index} className="segment-item">
@@ -95,14 +104,16 @@ const TransferCreation = () => {
                                         </span>
                                     )) : 'Segment non valide'}
                                 </span>
-                                <button className="btn btn-secondary" onClick={() => voirDetails(segment)}>Voir les détails</button>
+                                <button className="btn btn-secondary" onClick={() => voirDetails(segment)}>
+                                    Voir les détails
+                                </button>
                             </li>
                         ))}
                     </ul>
-                ) : (
-                    <p>Aucune chaine de transfert disponible disponible.</p>
-                )}
-            </div>
+                </div>
+            )}
+
+            {/* Si aucun résultat n'est trouvé, n'affiche rien */}
         </div>
     );
 };
