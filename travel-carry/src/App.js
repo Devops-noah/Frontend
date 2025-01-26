@@ -63,7 +63,7 @@ function App() {
                                 />
                                 <Route
                                     path="/user-profile"
-                                    element={<PrivateRoute><UserProfile /></PrivateRoute>}
+                                    element={<UserProfile />}
                                 />
 
                                 {/* Admin Routes */}

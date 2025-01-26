@@ -31,6 +31,19 @@ export default function TousLesAvis() {
 
     const totalPages = Math.ceil(notations.length / notationsPerPage);
 
+    const renderStars = (value) => {
+        const fullStars = Math.floor(value);
+        const halfStar = value % 1 >= 0.5;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        return (
+            <>
+                {"★".repeat(fullStars)}
+                {halfStar && "☆"}
+                {"☆".repeat(emptyStars)}
+            </>
+        );
+    };
+
     return (
         <div className="min-h-screen bg-gray-100 py-8">
             <div className="max-w-6xl mx-auto px-5">
@@ -57,9 +70,7 @@ export default function TousLesAvis() {
                                 >
                                     <p className="mb-2">
                                         <strong>Note :</strong>{" "}
-                                        <span className="text-blue-600 font-semibold">
-                                            {notation.note} / 5
-                                        </span>
+                                        <span className="font-bold text-yellow-700">{renderStars(notation.note)}</span> <span className="text-blue-600">({notation.note} / 5)</span>
                                     </p>
                                     <p className="mb-2">
                                         {notation.commentaire ? (

@@ -192,7 +192,7 @@ export default function HomePage() {
                                 }}
                             >
                                 <p>
-                                    <strong>Note :</strong> {notation.note} / 5
+                                    <strong>Note :</strong> <span className="font-bold text-yellow-700">{renderStars(notation.note)}</span> ({notation.note} / 5)
                                 </p>
                                 <p>
                                     <strong>Commentaire :</strong> {notation.commentaire}

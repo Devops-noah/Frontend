@@ -3,27 +3,42 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import Notifications from "../notifications/Notifications";
+import { jwtDecode } from "jwt-decode";
 
  // Import du composant Notifications
 
 const Header = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
+    const [profileImageUrl, setProfileImageUrl] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
 
     const isAuthenticated = !!localStorage.getItem("token");
     const userType = localStorage.getItem("userType");
 
+    console.log("Is Authenticated:", isAuthenticated);
+
+
     const handleLogoClick = () => navigate("/");
 
     useEffect(() => {
         if (isAuthenticated) {
+            const token = localStorage.getItem("token");
+            const decodedToken = jwtDecode(token);
+            const { profile_image_url } = decodedToken;
             const storedUserName = localStorage.getItem("userName");
+            const storedProfileImage = profile_image_url
+                ? `http://localhost:8080/api/utilisateurs/profiles/images/${profile_image_url}`
+                : null;
+            console.log("stored: ", storedProfileImage)
             if (storedUserName) {
                 const formattedName = storedUserName
                     .replace(/"/g, "")
                     .replace(/^./, (char) => char.toUpperCase());
                 setUserName(formattedName);
+            }
+            if (storedProfileImage) {
+                setProfileImageUrl(storedProfileImage);
             }
         }
     }, [isAuthenticated]);
@@ -32,9 +47,13 @@ const Header = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("userName");
         localStorage.removeItem("userType");
+        localStorage.removeItem("profileImageUrl"); // Clear profile image URL
         setUserName("");
+        setProfileImageUrl("");
         navigate("/login");
     };
+
+    console.log("header profile: ", profileImageUrl)
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
 
@@ -79,8 +98,22 @@ const Header = () => {
                     )}
                     {isAuthenticated ? (
                         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                            {/*<Link to="/user-profile">*/}
+                            {/*    <FaUserCircle className="text-4xl cursor-pointer text-yellow-400" />*/}
+                            {/*</Link>*/}
                             <Link to="/user-profile">
-                                <FaUserCircle className="text-4xl cursor-pointer text-yellow-400" />
+                                {profileImageUrl ? (
+                                    <img
+                                        src={profileImageUrl}
+                                        alt="User Avatar"
+                                        className="h-10 w-10 rounded-full border-2 border-white cursor-pointer"
+                                    />
+                                ) : (
+                                    // <div className="h-10 w-10 bg-gray-300 rounded-full border-2 border-white flex items-center justify-center text-yellow-400 text-4xl">
+                                    //     <span>?</span>
+                                    // </div>
+                                    <FaUserCircle className="text-4xl cursor-pointer text-yellow-400"/>
+                                )}
                             </Link>
                             <button
                                 onClick={handleLogout}

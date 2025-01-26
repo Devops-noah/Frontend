@@ -17,6 +17,7 @@ export const UserProvider = ({ children }) => {
                             Authorization: `Bearer ${token}`,
                         },
                     });
+                    console.log("auth me: " + JSON.stringify(response))
                     setUser(response.data); // Récupérer l'utilisateur depuis la réponse
                     setIsAuthenticated(true);
                 } catch (error) {

@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { FaEdit, FaTrash } from "react-icons/fa";
+import DemandesList from "../demandes/DemandesList";
+import UpdateUserProfileImage from "./UpdateUserProfileImage";
 
 export default function UserProfile() {
     const [profile, setProfile] = useState(null); // State to store user profile
@@ -9,7 +14,6 @@ export default function UserProfile() {
     const [error, setError] = useState(null); // State to handle errors
     const navigate = useNavigate(); // Use navigate hook to navigate to different routes
 
-    console.log("navigate: ", navigate)
     // Get voyages
     const [voyages, setVoyages] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
@@ -22,14 +26,26 @@ export default function UserProfile() {
     const [currentPage, setCurrentPage] = useState(1); // Current page number
     const [voyagesPerPage] = useState(2); // Number of voyages per page
     const [totalPages, setTotalPages] = useState(1); // Total number of pages
+    // Retrieve token from localStorage or cookies
+    const token = localStorage.getItem("token");
+
+    const [isEditing, setIsEditing] = useState({
+        nom: false,
+        prenom: false,
+        telephone: false,
+        adresse: false,
+    });
+    const [editedProfile, setEditedProfile] = useState({
+        nom: "",
+        prenom: "",
+        telephone: "",
+        adresse: "",
+    });
 
     useEffect(() => {
         // Fetch the user profile based on authentication
         const fetchProfile = async () => {
             try {
-                // Retrieve token from localStorage or cookies
-                const token = localStorage.getItem("token");
-
                 if (!token) {
                     throw new Error("User is not authenticated");
                 }
@@ -49,6 +65,12 @@ export default function UserProfile() {
                 const data = await response.json();
                 console.log("data received: " + JSON.stringify(data));
                 setProfile(data); // Set profile data
+                setEditedProfile({
+                    nom: data.nom,
+                    prenom: data.prenom,
+                    telephone: data.telephone || "",
+                    adresse: data.adresse || "",
+                });
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -57,11 +79,10 @@ export default function UserProfile() {
         };
 
         fetchProfile();
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         const fetchProfileType = () => {
-            const token = localStorage.getItem("token");
             if (token) {
                 const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode token to extract profile type
 
@@ -71,7 +92,6 @@ export default function UserProfile() {
 
         const fetchVoyages = async () => {
             try {
-                const token = localStorage.getItem("token"); // Get token from localStorage
                 const userEmail = token ? JSON.parse(atob(token.split('.')[1])).sub : ""; // Extract email from token
 
                 const response = await axios.get("http://localhost:8080/api/voyages", {
@@ -128,7 +148,6 @@ export default function UserProfile() {
 
     const handleUpdateVoyage = async () => {
         try {
-            const token = localStorage.getItem("token");
             const updatedVoyage = {
                 voyage: {
                     dateDepart: currentVoyage.dateDepart,
@@ -170,13 +189,55 @@ export default function UserProfile() {
             .catch((error) => console.error("Error deleting voyage:", error));
     };
 
+    // Handle editing toggle
+    const handleEditClick = (field) => {
+        setIsEditing((prev) => ({ ...prev, [field]: true }));
+    };
+
+    // Handle input change
+    const handleInputChangeEditProfile = (e) => {
+        const { name, value } = e.target;
+        setEditedProfile((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Handle save logic
+    const handleSaveClick = async (field) => {
+        try {
+            const updatedField = { [field]: editedProfile[field] };
+
+            await axios.put(`http://localhost:8080/api/utilisateurs/profile/update/${profile.id}`, updatedField, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Replace with your actual token key
+                }
+            }); // Update field
+            setProfile((prev) => ({ ...prev, ...updatedField })); // Update state
+            // Success toast notification
+            toast.success(`${field} has been successfully updated!`, {
+                position: "top-right", // Correct position
+                autoClose: 5000, // Duration before it disappears
+            });
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            // Error toast notification
+            toast.error(`There was an error updating your ${field}. Please try again.`, {
+                position: "top-right", // Correct position
+                autoClose: 5000,
+            });
+        } finally {
+            setIsEditing((prev) => ({ ...prev, [field]: false })); // Exit edit mode
+        }
+    };
+
+
     // Pagination logic
     const indexOfLastVoyage = currentPage * voyagesPerPage;
     const indexOfFirstVoyage = indexOfLastVoyage - voyagesPerPage;
     const currentVoyages = voyages.slice(indexOfFirstVoyage, indexOfLastVoyage);
     console.log("current voyages: " + JSON.stringify(currentVoyages));
 
-    if (loading) {
+    console.log("profile nom: ", profile)
+
+    if (loading && !profile) {
         return <p className="text-center py-5">Loading...</p>;
     }
 
@@ -184,24 +245,32 @@ export default function UserProfile() {
         return <p className="text-center py-5 text-red-500">Error: {error}</p>;
     }
 
-    console.log("profile value: " + JSON.stringify(profile.type))
+    const profileImageUrl = `http://localhost:8080/api/utilisateurs/profiles/images/${profile.profileImageUrl}`;
+    console.log("profile image url: ", profileImageUrl)
+    console.log("profile type: ", profileType)
 
     return (
         <section className="bg-gray-100 py-5">
             <div className="container mx-auto">
+                <div>
+                    <ToastContainer/>
+                    {/* Your other components */}
+                </div>
                 <div className="flex flex-col lg:flex-row gap-4">
                     {/* Profile Card */}
-                    <div className="lg:w-1/3">
+                    <div className="lg:w-1/3 mx-auto">
                         <div className="bg-white rounded-lg shadow-md p-4 text-center">
                             <img
-                                src={profile.avatar || "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"}
+                                src={profileImageUrl}
                                 alt="avatar"
-                                className="rounded-full w-36 mx-auto mb-4"
+                                className="rounded-full w-36 h-36 object-cover mx-auto mb-4"
                             />
+                            <div className="max-w-xs mx-auto">
+                                <UpdateUserProfileImage/>
+                            </div>
                             <p className="text-lg font-semibold">
-                                {profile.nom} {profile.prenom}
+                                {editedProfile.nom} {editedProfile.prenom}
                             </p>
-                            {/*<p className="text-gray-500 mb-4">{profile.type === "voyageur" ? "Voyageur" : "Expediteur"}</p>*/}
                             <p className="text-gray-500 mb-4">
                                 {{
                                     voyageur: "Voyageur",
@@ -240,7 +309,7 @@ export default function UserProfile() {
                                     </>
                                 ) : profile.type === "expediteur" ? (
                                     <button
-                                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                                        className="hidden bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                                         onClick={() => navigate("/colis/details")}
                                     >
                                         Mes colis
@@ -258,7 +327,7 @@ export default function UserProfile() {
                     </div>
 
                     {/* Details Card */}
-                    <div className="lg:w-2/3">
+                    <div className="w-2/4 mx-auto">
                         <div className="bg-white rounded-lg shadow-md p-6">
                             <hr className="my-4"/>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
@@ -266,15 +335,102 @@ export default function UserProfile() {
                                 <p className="text-gray-500 col-span-2">{profile.email}</p>
                             </div>
                             <hr className="my-4"/>
+                            {/* Editable Nom */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
-                                <p className="font-medium">Telephone</p>
-                                <p className="text-gray-500 col-span-2">{profile.telephone || "N/A"}</p>
+                                <p className="font-medium">Nom</p>
+                                {isEditing.nom ? (
+                                    <input
+                                        type="text"
+                                        name="nom"
+                                        value={editedProfile.nom}
+                                        onChange={handleInputChangeEditProfile}
+                                        className="border px-2 py-1 rounded col-span-2 bg-blue-200"
+                                        onBlur={() => handleSaveClick("nom")}
+                                    />
+                                ) : (
+                                    <p
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-blue-500"
+                                        onClick={() => handleEditClick("nom")}
+                                    >
+                                        {profile.nom}
+                                    </p>
+                                )}
                             </div>
                             <hr className="my-4"/>
+                            {/* Editable Prenom */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
-                                <p className="font-medium">Address</p>
-                                <p className="text-gray-500 col-span-2">{profile.adresse || "N/A"}</p>
+                                <p className="font-medium">Prenom</p>
+                                {isEditing.prenom ? (
+                                    <input
+                                        type="text"
+                                        name="prenom"
+                                        value={editedProfile.prenom}
+                                        onChange={handleInputChangeEditProfile}
+                                        className="border px-2 py-1 rounded col-span-2 bg-green-200"
+                                        onBlur={() => handleSaveClick("prenom")}
+                                    />
+                                ) : (
+                                    <p
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-green-500"
+                                        onClick={() => handleEditClick("prenom")}
+                                    >
+                                        {profile.prenom}
+                                    </p>
+                                )}
                             </div>
+                            <hr className="my-4"/>
+                            {/* Editable Telephone */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
+                                <p className="font-medium">Telephone</p>
+                                {isEditing.telephone ? (
+                                    <input
+                                        type="text"
+                                        name="telephone"
+                                        value={editedProfile.telephone}
+                                        onChange={handleInputChangeEditProfile}
+                                        className="border px-2 py-1 rounded col-span-2 bg-yellow-200"
+                                        onBlur={() => handleSaveClick("telephone")}
+                                    />
+                                ) : (
+                                    <p
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-yellow-500"
+                                        onClick={() => handleEditClick("telephone")}
+                                    >
+                                        {profile.telephone || "N/A"}
+                                    </p>
+                                )}
+                            </div>
+                            <hr className="my-4"/>
+                            {/* Editable Adresse */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
+                                <p className="font-medium">Adresse</p>
+                                {isEditing.adresse ? (
+                                    <input
+                                        type="text"
+                                        name="adresse"
+                                        value={editedProfile.adresse}
+                                        onChange={handleInputChangeEditProfile}
+                                        className="border px-2 py-1 rounded col-span-2 bg-pink-200"
+                                        onBlur={() => handleSaveClick("adresse")}
+                                    />
+                                ) : (
+                                    <p
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-pink-500"
+                                        onClick={() => handleEditClick("adresse")}
+                                    >
+                                        {profile.adresse || "N/A"}
+                                    </p>
+                                )}
+                            </div>
+                            {/*<div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">*/}
+                            {/*    <p className="font-medium">Telephone</p>*/}
+                            {/*    <p className="text-gray-500 col-span-2">{profile.telephone || "N/A"}</p>*/}
+                            {/*</div>*/}
+                            {/*<hr className="my-4"/>*/}
+                            {/*<div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">*/}
+                            {/*    <p className="font-medium">Address</p>*/}
+                            {/*    <p className="text-gray-500 col-span-2">{profile.adresse || "N/A"}</p>*/}
+                            {/*</div>*/}
                             <hr className="my-4"/>
                             {profile.type === "expediteur" && profile.message && (
                                 <div className="text-center text-red-500 mt-4">
@@ -369,13 +525,20 @@ export default function UserProfile() {
 
 
             )}
-            {profileType === "expediteur" && (
-                <p className="text-gray-600">Voyages are not available for expediteur profile.</p>
+            {console.log('Profile Type:', profileType)} {/* Debugging line */}
+            {profile.type === "expediteur" && (
+                <div className="mt-8">
+                    {console.log('Rendering DemandesList component')} {/* Debugging line */}
+                    <DemandesList />
+                </div>
             )}
+            {/*{profileType === "expediteur" && (*/}
+            {/*    <p className="text-red-600">Voyages are not available for expediteur profile.</p>*/}
+            {/*)}*/}
 
             {/* Modal for delete confirmation */}
             {
-                showDeleteConfirmation && (
+            showDeleteConfirmation && (
                     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-10">
                         <div className="bg-white p-8 rounded-lg shadow-md max-w-sm w-full">
                             <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>
