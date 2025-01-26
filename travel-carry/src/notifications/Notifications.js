@@ -7,6 +7,7 @@ const Notifications = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedNotification, setSelectedNotification] = useState(null);
     const [error, setError] = useState(null);
+    const [message, setMessage] = useState(""); // Ajout de l'état pour gérer le message de confirmation
 
     useEffect(() => {
         // Récupérer les notifications non lues pour le voyageur
@@ -23,7 +24,6 @@ const Notifications = () => {
     }, []);
 
     const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-
     const handleNotificationClick = (notification) => {
         setSelectedNotification(notification);  // Afficher les détails de la demande
         toggleDropdown();  // Fermer le dropdown
@@ -40,7 +40,11 @@ const Notifications = () => {
                     },
                 }
             )
-            .then(() => alert("Demande acceptée"))
+            .then(() => {
+                setMessage("Demande acceptée"); // Affichage du message de confirmation
+                setSelectedNotification(null);  // Fermer la modale après acceptation
+                setTimeout(() => setMessage(""), 5000); // Ferme le message après 5 secondes
+            })
             .catch((error) => console.error("Erreur lors de l'acceptation"));
     };
 
@@ -55,7 +59,11 @@ const Notifications = () => {
                     },
                 }
             )
-            .then(() => alert("Demande refusée"))
+            .then(() => {
+                setMessage("Demande refusée"); // Affichage du message de confirmation
+                setSelectedNotification(null);  // Fermer la modale après rejet
+                setTimeout(() => setMessage(""), 5000); // Ferme le message après 5 secondes
+            })
             .catch((error) => console.error("Erreur lors du rejet"));
     };
 
@@ -78,9 +86,23 @@ const Notifications = () => {
                         <p className="text-gray-500">Aucune notification</p>
                     ) : (
                         notifications.map((notification) => {
-                            const informationColis = notification?.demande?.informationColis;
-                            const expediteurNom = notification?.demande?.expediteur?.nom;
-
+                            //modif ici de hawa
+                            // Récupérer l'expéditeur ID de la notification
+                            const expediteurId = notification?.expediteur_id;
+                            console.log("expediteurId:", expediteurId);
+                            // Faire une requête pour récupérer le nom de l'expéditeur (si nécessaire)
+                            let expediteurNom = "";
+                            if (expediteurId) {
+                                // Si vous avez déjà l'expéditeur avec l'ID, vous pouvez récupérer son nom ici
+                                axios.get(`http://localhost:8080/api/utilisateur/${expediteurId}`)
+                                    .then(response => {
+                                        expediteurNom = response.data.nom;  // suppose que la réponse contient le nom
+                                        console.log("expediteurNom:", expediteurNom);
+                                    })
+                                    .catch(error => {
+                                        console.error("Erreur lors de la récupération du nom de l'expéditeur", error);
+                                    });
+                            }
                             return (
                                 <div key={notification.id} className="border-b py-2">
                                     <button
@@ -88,7 +110,7 @@ const Notifications = () => {
                                         onClick={() => handleNotificationClick(notification)}
                                     >
                                         <GoPackage />
-
+                                        <span>Colis proposé par {expediteurNom || "Expéditeur inconnu"}</span>
                                     </button>
                                 </div>
                             );
@@ -131,8 +153,14 @@ const Notifications = () => {
                     </div>
                 </div>
             )}
+
+            {/* Affichage du message de confirmation sans alert() */}
+            {message && (
+                <div className="fixed bottom-5 left-5 bg-green-500 text-white p-4 rounded-lg">
+                    {message}
+                </div>
+            )}
         </div>
     );
 };
-
 export default Notifications;
