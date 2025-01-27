@@ -5,49 +5,82 @@ Ce projet est la partie Frontend de l'application **Travel Carry**, développée
 
 ```
 Frontend/
-├── public/                              # Fichiers publics et modèles HTML
-│   ├── index.html                       # Fichier HTML principal
-│   └── assets/                          # Ressources statiques comme les images
-├── src/
-│   ├── api/                             # Appels API vers le backend
-│   │   ├── userService.js               # API pour les utilisateurs
-│   │   ├── annonceService.js            # API pour les annonces
-│   │   └── voyageService.js             # API pour les voyages
-│   ├── assets/                          # Ressources globales (images, styles, icônes)
-│   ├── components/                      # Composants réutilisables
-│   │   ├── Header.js                    # Barre de navigation principale
-│   │   ├── Footer.js                    # Pied de page
-│   │   ├── Notification.js              # Notifications utilisateur
-│   │   ├── Profile.js                   # Composant du profil utilisateur
-│   │   └── FormInput.js                 # Input générique pour les formulaires
-│   ├── context/                         # Gestion des états globaux
-│   │   ├── UserContext.js               # Context pour l'authentification utilisateur
-│   │   └── NotificationContext.js       # Context pour les notifications
-│   ├── hooks/                           # Hooks personnalisés
-│   │   └── useFetch.js                  # Hook pour les appels API
-│   ├── pages/                           # Pages principales de l'application
-│   │   ├── HomePage.js                  # Page d'accueil
-│   │   ├── Login.js                     # Page de connexion
-│   │   ├── Register.js                  # Page d'inscription
-│   │   ├── Annonces.js                  # Page pour lister les annonces
-│   │   ├── Voyages.js                   # Page pour lister les voyages
-│   │   ├── ColisDetails.js              # Page pour remplir les informations du colis
-│   │   └── NotificationsPage.js         # Page pour afficher les notifications
-│   ├── services/                        # Services pour les appels API
-│   │   ├── axiosConfig.js               # Configuration globale d'Axios
-│   │   ├── userService.js               # Service pour les utilisateurs
-│   │   ├── colisService.js              # Service pour les informations colis
-│   │   └── demandeService.js            # Service pour les demandes
-│   ├── styles/                          # Styles CSS globaux
-│   │   └── global.css                   # Fichier CSS global
-│   ├── utils/                           # Fonctions utilitaires
-│   │   └── validation.js                # Fonctions pour valider les formulaires
-│   ├── App.js                           # Composant principal avec les routes
-│   ├── index.js                         # Point d'entrée principal pour React
-│   └── tailwind.config.js               # Configuration Tailwind CSS (si utilisé)
-├── .gitignore                           # Fichiers à ignorer par Git
-├── package.json                         # Dépendances et scripts NPM
-└── README.md                            # Documentation du projet
+│
+├── .idea/                   # Dossier de configuration de l'IDE (par exemple, IntelliJ ou WebStorm)
+├── travel-carry/            # Dossier principal de l'application
+│   ├── node_modules/        # Dossier contenant les dépendances de l'application
+│   ├── public/              # Dossier contenant les fichiers publics (index.html, assets, etc.)
+│   └── src/                 # Dossier contenant tout le code source
+│       ├── admin/           # Dossier pour les composants/admin
+│       │   ├── components/  # Composants réutilisables pour l'administration
+│       │   │   ├── DashboardLayout.jsx  # Mise en page du dashboard
+│       │   │   └── Sidebar.jsx          # Sidebar du tableau de bord
+│       │   └── pages/       # Pages spécifiques à l'admin
+│       │       ├── AdminAnnonces.jsx     # Page pour la gestion des annonces admin
+│       │       ├── AdminNotationComm.jsx # Page pour les notations admin
+│       │       └── AdminUsers.jsx         # Page pour la gestion des utilisateurs admin
+│       ├── annonces/        # Dossier pour la gestion des annonces
+│       │   ├── AnnonceDetail.jsx         # Détail d'une annonce
+│       │   ├── AnnounceList.jsx          # Liste des annonces
+│       │   ├── AnnounceUpdateForm.jsx    # Formulaire de mise à jour d'une annonce
+│       │   └── CreateAnnounce.jsx        # Page pour créer une annonce
+│       ├── assets/          # Dossier pour les fichiers statiques (images, icônes, etc.)
+│       ├── auth/            # Dossier pour l'authentification (login, signup, etc.)
+│       │   ├── Login.jsx    # Page de connexion
+│       │   └── SignUp.jsx   # Page d'inscription
+│       ├── colis/           # Dossier pour la gestion des colis
+│       │   └── ColisDetails.jsx # Détail d'un colis
+│       ├── components/      # Composants réutilisables dans tout le projet
+│       │   └── BackgroundSlideshow.jsx  # Composant pour le diaporama d'arrière-plan
+│       ├── context/         # Dossier pour les contextes React (gestion d'état global)
+│       │   ├── NotationsContext.js  # Contexte pour gérer les notations
+│       │   └── UserContext.js       # Contexte pour gérer les utilisateurs
+│       ├── demandes/        # Dossier pour les demandes de services
+│       │   └── DemandesList.jsx  # Liste des demandes
+│       ├── notations/       # Dossier pour la gestion des notations
+│       │   ├── NotationsPage.css   # Styles pour la page des notations
+│       │   ├── NotationsPage.jsx   # Composant de la page des notations
+│       │   └── TousLesAvis.jsx      # Composant affichant tous les avis
+│       ├── notifications/   # Dossier pour la gestion des notifications
+│       │   └── Notifications.js  # Gestion des notifications
+│       ├── pages/           # Dossier pour les pages principales de l'application
+│       │   ├── Footer.css         # Styles du footer
+│       │   ├── Footer.jsx         # Composant footer
+│       │   ├── Header.css         # Styles du header
+│       │   ├── Header.jsx         # Composant header
+│       │   ├── HomePage.css       # Styles pour la page d'accueil
+│       │   └── HomePage.jsx       # Composant de la page d'accueil
+│       ├── transfertEnChaine/ # Dossier pour la gestion des transferts en chaîne
+│       │   ├── __tests__/           # Tests pour les transferts en chaîne
+│       │   └── pagesEnchaine/       # Pages relatives au transfert en chaîne
+│       │       ├── TransferCreation.css  # Styles pour la création de transfert
+│       │       ├── TransferCreation.jsx  # Composant de création de transfert
+│       │       ├── TransferDetails.css   # Styles pour les détails du transfert
+│       │       └── TransferDetails.jsx   # Composant pour les détails du transfert
+│       ├── services/         # Dossier pour les services de l'application
+│       │   └── transferService.js  # Service pour la gestion des transferts
+│       ├── userProfile/      # Dossier pour la gestion des profils utilisateurs
+│       │   ├── UpdateUserProfileImage.js # Mise à jour de l'image du profil
+│       │   └── UserProfile.jsx  # Affichage du profil utilisateur
+│       ├── voyages/          # Dossier pour la gestion des voyages
+│       │   └── CreateVoyage.jsx   # Page pour créer un voyage
+│       ├── App.css           # Fichier de styles principaux de l'application
+│       ├── App.js            # Composant principal de l'application
+│       ├── App.test.js       # Fichier de tests pour le composant App
+│       ├── FiltrageForm.jsx  # Composant pour le formulaire de filtrage
+│       ├── index.css         # Fichier CSS principal de l'application
+│       ├── index.js          # Point d'entrée principal de l'application React
+│       ├── logo.svg          # Fichier pour le logo de l'application
+│       ├── NoAnnounceFound.jsx # Composant affiché si aucune annonce n'est trouvée
+│       ├── reportWebVitals.js # Fichier pour mesurer les performances de l'application
+│       ├── setupTests.js     # Configuration pour les tests
+│       ├── TravelAnimation.jsx # Composant pour l'animation des voyages
+│       └── tailwind.config.js  # Fichier de configuration de Tailwind CSS
+├── .gitignore               # Liste des fichiers et dossiers à ignorer par Git
+├── package.json             # Fichier de gestion des dépendances et des scripts npm
+├── package-lock.json        # Fichier qui verrouille les versions des dépendances
+└── LICENSE                  # Fichier de licence du projet
+
 
 ```
 
