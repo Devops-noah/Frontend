@@ -22,34 +22,19 @@ const NotationsPage = () => {
         return savedDate ? JSON.parse(savedDate) : new Date().toISOString().split("T")[0];
     });
     const [confirmationMessage, setConfirmationMessage] = useState("");
+    const [warningMessage, setWarningMessage] = useState("");
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const token = localStorage.getItem("token");
 
-    // Sauvegarde des données dans localStorage
-    useEffect(() => {
-        localStorage.setItem("notations", JSON.stringify(notations));
-    }, [notations]);
+    const decodeToken = JSON.parse(atob(token.split('.')[1]));
+    const userId = decodeToken.user_id;
 
-    useEffect(() => {
-        localStorage.setItem("note", JSON.stringify(note));
-    }, [note]);
-
-    useEffect(() => {
-        localStorage.setItem("comment", JSON.stringify(comment));
-    }, [comment]);
-
-    useEffect(() => {
-        localStorage.setItem("datePublication", JSON.stringify(datePublication));
-    }, [datePublication]);
 
     // Récupération des notations de l'utilisateur
     useEffect(() => {
         const fetchUserNotations = async () => {
-            if (!isAuthenticated || !user) {
-                console.warn("Utilisateur non authentifié");
-                return;
-            }
 
             try {
                 const response = await axios.get(`http://localhost:8080/notations/user/${user.id}`, {
@@ -71,17 +56,8 @@ const NotationsPage = () => {
 
     const validateForm = () => {
         if (hasSubmitted) {
-            alert("Vous avez déjà soumis une notation.");
-            return false;
-        }
-
-        if (note < 1 || note > 5) {
-            alert("La note doit être comprise entre 1 et 5.");
-            return false;
-        }
-
-        if (!user) {
-            alert("Utilisateur non authentifié.");
+            setWarningMessage("Vous avez déjà soumis une notation."); // Mise à jour du warning
+            setTimeout(() => setWarningMessage(""), 5000); // Réinitialisation automatique
             return false;
         }
 
@@ -93,18 +69,19 @@ const NotationsPage = () => {
         setComment("");
         setDatePublication(new Date().toISOString().split("T")[0]);
         setConfirmationMessage("Merci pour votre avis !");
-        setTimeout(() => setConfirmationMessage(""), 3000);
+        setTimeout(() => setConfirmationMessage(""), 5000);
         localStorage.removeItem("note");
         localStorage.removeItem("comment");
         localStorage.removeItem("datePublication");
     };
 
     const handleSubmit = async (e) => {
+
         e.preventDefault();
         if (!validateForm()) return;
 
         const newNotation = {
-            utilisateurId: user.id,
+            utilisateurId: userId,
             note,
             commentaire: comment,
             datePublication: datePublication,
@@ -133,7 +110,7 @@ const NotationsPage = () => {
     };
 
     return (
-        <div style={{ textAlign: "center", margin: "20px auto", maxWidth: "800px" }}>
+        <div style={{ textAlign: "center", margin: "20px auto", maxWidth: "800px" , marginBottom : "57px"}}>
             <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "20px" }}>Évaluer le site</h1>
 
             <div
@@ -210,6 +187,21 @@ const NotationsPage = () => {
                     </button>
                 </form>
 
+                {warningMessage && (
+                    <div
+                        style={{
+                            marginTop: "15px",
+                            padding: "10px",
+                            backgroundColor: "#f8d7da",
+                            color: "#721c24",
+                            border: "1px solid #f5c6cb",
+                            borderRadius: "5px",
+                        }}
+                    >
+                        {warningMessage}
+                    </div>
+                )}
+
                 {confirmationMessage && (
                     <div
                         style={{
@@ -224,37 +216,7 @@ const NotationsPage = () => {
                         {confirmationMessage}
                     </div>
                 )}
-            </div>
-
-            <div style={{ marginTop: "40px" }}>
-                <h2 style={{ fontSize: "1.25rem", marginBottom: "20px" }}>Vos notations</h2>
-                {notations.length === 0 ? (
-                    <p style={{ color: "#555" }}>Vous n'avez soumis aucune notation pour le moment.</p>
-                ) : (
-                    <ul style={{ listStyle: "none", padding: 0 }}>
-                        {notations.map((notation, index) => (
-                            <li
-                                key={index}
-                                style={{
-                                    marginBottom: "15px",
-                                    padding: "15px",
-                                    border: "1px solid #ddd",
-                                    borderRadius: "8px",
-                                }}
-                            >
-                                <p>
-                                    <strong>Note :</strong> {notation.note} / 5
-                                </p>
-                                <p>
-                                    <strong>Commentaire :</strong> {notation.commentaire}
-                                </p>
-                                <p style={{ color: "#888", fontSize: "0.9rem" }}>
-                                    Publié le {new Date(notation.datePublication).toLocaleDateString("fr-FR")}
-                                </p>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                
             </div>
         </div>
     );
