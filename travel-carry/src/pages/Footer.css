@@ -1,0 +1,35 @@
+.footer {
+    background-color: #007BFF; /* Couleur du header pour uniformiser */
+    color: white; /* Texte blanc */
+    text-align: center;
+    padding: 20px 10px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 14px;
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.footer-icons {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.footer-icons a {
+    color: white;
+    font-size: 24px;
+    transition: transform 0.3s, color 0.3s;
+}
+
+.footer-icons a:hover {
+    transform: scale(1.2); /* Agrandit légèrement les icônes au survol */
+    color: #FFD700; /* Ajout d'une couleur dorée au survol */
+}
+
+.footer-text {
+    margin-top: 10px;
+    font-size: 16px;
+}

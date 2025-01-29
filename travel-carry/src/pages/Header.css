@@ -1,0 +1,9 @@
+.header img {
+    border-radius: 50%; /* Ajoute un style rond au logo */
+}
+
+.header .text-3xl {
+    color: white; /* Assurez-vous que le texte reste visible */
+    font-family: "Poppins", Arial, sans-serif;
+    letter-spacing: 1px; /* Optionnel : Ajoutez un espace entre les lettres */
+}

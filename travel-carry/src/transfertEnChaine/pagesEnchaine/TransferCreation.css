@@ -1,0 +1,182 @@
+/* Global styling */
+.transfer-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    word-wrap: break-word; /* Permet de casser les chaînes quand elles sont trop longues */
+}
+
+/* Titre */
+.title {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+/* Styling des champs de saisie */
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.input-field {
+    padding: 15px;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    flex-grow: 1;
+    font-size: 16px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.input-field:focus {
+    border-color: #2980b9;
+    box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
+    outline: none;
+}
+
+.flag {
+    width: 40px;
+    height: 30px;
+}
+
+/* Boutons */
+.btn {
+    padding: 15px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-secondary {
+    background-color: #f39c12;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.btn-secondary:hover {
+    background-color: #e67e22;
+}
+
+/* Liste des segments */
+.segments-container {
+    margin-top: 40px;
+}
+
+.segment-item {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.segment-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Modification du chemin de segment pour qu'il aille horizontalement jusqu'à la limite de la carte */
+.segment-path {
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+/* Styling des pays (chaque pays aura une couleur différente) */
+.pays-france {
+    color: #007bff;  /* Bleu pour la France */
+}
+
+.pays-mali {
+    color: #f39c12;  /* Jaune-orange pour le Mali */
+}
+
+.pays-ghana {
+    color: #27ae60;  /* Vert pour le Ghana */
+}
+
+.pays-senegal {
+    color: #2980b9;  /* Bleu foncé pour le Sénégal */
+}
+
+.pays-germany {
+    color: #8e44ad;  /* Violet pour l'Allemagne */
+}
+
+/* Nom du voyageur */
+.voyageur-dona {
+    color: #e74c3c;  /* Rouge pour le nom 'Dona' */
+}
+
+.voyageur-oumar {
+    color: #f39c12;  /* Orange pour le nom 'Oumar' */
+}
+
+/* Ajouter des effets à l'affichage des chaînes */s
+h2.available-chains {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Pour les chaînes longues, permettre au texte de revenir à la ligne si nécessaire */
+.segment-path {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .transfer-container {
+        padding: 20px;
+    }
+
+    .input-wrapper {
+        flex-direction: column;
+    }
+
+    .input-field, .flag {
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        font-size: 16px;
+    }
+}

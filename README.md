@@ -140,14 +140,11 @@ npm start
 L'application sera accessible sur http://localhost:3000.
 # 🔧 Configuration
 
-Pour configurer les variables d'environnement, créez un fichier .env dans le dossier root :
-
-REACT_APP_API_URL=http://localhost:8080/api
 
 # 📢 Fonctionnalités Principales
 
-    Connexion et Inscription :
-        Authentification sécurisée avec gestion de sessions.
+    Gestion des annonces :
+        Création, affichage et recherche des annonces.
 
     Gestion des Colis :
         Remplir les détails d'un colis.
@@ -156,8 +153,11 @@ REACT_APP_API_URL=http://localhost:8080/api
     Notifications :
         Recevoir des feedbacks sur les demandes envoyées.
 
-    Pages Dynamiques :
-        Page pour voir les annonces et voyages disponibles.
+    Gestion des profils :
+        Permet de gérer les différents profils utilisateur
+
+    Transfert en chaîne :
+        Permet d'achéminer un colis lorsque aucune ne couvre l'intégralité de trajet souhaité.
 
  # 🎥 Lien vers la Vidéo YouTube
 

@@ -1,0 +1,50 @@
+/* Style pour l'arrière-plan du carrousel */
+.homepage-carousel {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.homepage-carousel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 400%; /* Four times the width to fit all images */
+    display: flex; /* Use flex to align images horizontally */
+    z-index: -1; /* Mettre derrière le contenu */
+    animation: slideBackground 20s linear infinite;
+}
+
+/* Place each image as part of the flex container */
+.homepage-carousel::before > div {
+    flex: 0 0 100%; /* Each image takes 100% of the width */
+    background-size: cover;
+    background-position: center;
+}
+
+.homepage-carousel::before > div:nth-child(1) {
+    background-image: url('../assets/photo1.jpg');
+}
+
+.homepage-carousel::before > div:nth-child(2) {
+    background-image: url('../assets/photo2.jpg');
+}
+
+.homepage-carousel::before > div:nth-child(3) {
+    background-image: url('../assets/photo3.jpg');
+}
+
+.homepage-carousel::before > div:nth-child(4) {
+    background-image: url('../assets/photo4.jpg');
+}
+
+/* Animation pour le défilement */
+@keyframes slideBackground {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-100%); }
+    50% { transform: translateX(-200%); }
+    75% { transform: translateX(-300%); }
+    100% { transform: translateX(0); }
+}
