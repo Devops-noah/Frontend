@@ -35,6 +35,7 @@ const CreateAnnonce = () => {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((response) => {
+                console.log('reso: ', JSON.stringify(response))
                 const user = response.data;
                 if (user.type === "expediteur") {
                     toast.error("Unauthorized! Only Voyageurs can create an annonce.", {

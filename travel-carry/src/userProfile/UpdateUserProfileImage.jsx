@@ -5,6 +5,7 @@ const UpdateUserProfileImage = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [message, setMessage] = useState("");
+    const [isUploading, setIsUploading] = useState(false);
 
     // Handle file input change
     const handleFileChange = (e) => {
@@ -30,8 +31,10 @@ const UpdateUserProfileImage = () => {
         formData.append("file", selectedFile);
 
         try {
+            setIsUploading(true); // Set uploading status to true
+
             // Send PUT request to the backend
-            const response = await axios.put("http://localhost:8080/api/utilisateurs/profile/update-image", formData, {
+            const response = await axios.post("http://localhost:8080/api/utilisateurs/profile/upload-image", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data",
@@ -41,9 +44,14 @@ const UpdateUserProfileImage = () => {
             // Display success message
             setMessage("Profile image updated successfully!");
             console.log("New Image URL:", response.data);
+
+            // Refresh the page after successful upload
+            window.location.reload();
         } catch (error) {
             console.error("Error updating profile image:", error);
             setMessage("Failed to update profile image.");
+        } finally {
+            setIsUploading(false); // Reset uploading status
         }
     };
 
@@ -80,8 +88,9 @@ const UpdateUserProfileImage = () => {
                 <button
                     type="submit"
                     className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none"
+                    disabled={isUploading} // Disable the button while uploading
                 >
-                    Update Image
+                    {isUploading ? "Uploading..." : "Update Image"}
                 </button>
             </form>
 

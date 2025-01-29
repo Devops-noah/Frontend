@@ -23,11 +23,16 @@ export default function UserProfile() {
     const [deleteVoyageId, setDeleteVoyageId] = useState(null);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
+    const [profileImage, setProfileImage] = useState(null);
     const [currentPage, setCurrentPage] = useState(1); // Current page number
     const [voyagesPerPage] = useState(2); // Number of voyages per page
     const [totalPages, setTotalPages] = useState(1); // Total number of pages
+
+
     // Retrieve token from localStorage or cookies
     const token = localStorage.getItem("token");
+    const decodeToken = JSON.parse(atob(token.split('.')[1]));
+    const userId = decodeToken.userId;
 
     const [isEditing, setIsEditing] = useState({
         nom: false,
@@ -57,13 +62,13 @@ export default function UserProfile() {
                         "Content-Type": "application/json",
                     },
                 });
+                console.log("response profile: ", JSON.stringify(response))
 
                 if (!response.ok) {
                     throw new Error("Failed to fetch profile data");
                 }
 
                 const data = await response.json();
-                console.log("data received: " + JSON.stringify(data));
                 setProfile(data); // Set profile data
                 setEditedProfile({
                     nom: data.nom,
@@ -116,6 +121,41 @@ export default function UserProfile() {
         fetchProfileType(); // Get profile type from localStorage
         fetchVoyages(); // Fetch voyages
     }, [currentPage]);
+
+    useEffect(() => {
+
+        const fetchProfileImage = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/utilisateurs/profiles/images/${userId}`);
+                setProfileImage(response.data.link);
+            } catch (err) {
+                // Log the error to inspect it
+                console.error("Error fetching profile image:", err);
+
+                // If the error has a response, log that too
+                if (err.response) {
+                    console.error("Error response status:", err.response.status);
+                    console.error("Error response data:", err.response.data);
+                }
+
+                // Check for different error cases
+                if (err.response && err.response.status === 404) {
+                    // Handle 404 specifically if no image is found
+                    console.warn("No profile image found, using default.");
+                    setProfileImage("https://picsum.photos/50/50"); // Set default image
+                } else {
+                    // For other errors, display a general error message
+                    setError("Could not load profile image");
+                }
+            }
+        };
+
+
+        if (userId) {
+            fetchProfileImage();
+        }
+
+    }, [userId]);
 
     const handleEdit = (voyage) => {
         // Format the date as yyyy-MM-dd
@@ -182,7 +222,6 @@ export default function UserProfile() {
                 },
             })
             .then(() => {
-                console.log("Voyage deleted successfully");
                 setVoyages((prev) => prev.filter((a) => a.id !== deleteVoyageId));
                 setShowDeleteConfirmation(false);
             })
@@ -233,21 +272,22 @@ export default function UserProfile() {
     const indexOfLastVoyage = currentPage * voyagesPerPage;
     const indexOfFirstVoyage = indexOfLastVoyage - voyagesPerPage;
     const currentVoyages = voyages.slice(indexOfFirstVoyage, indexOfLastVoyage);
-    console.log("current voyages: " + JSON.stringify(currentVoyages));
-
-    console.log("profile nom: ", profile)
 
     if (loading && !profile) {
-        return <p className="text-center py-5">Loading...</p>;
+        return (
+            <div className="flex justify-center items-center py-5">
+                <svg className="w-10 h-10 text-gray-500 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" strokeOpacity="0.25"></circle>
+                    <path d="M22 12a10 10 0 1 1-10-10" strokeOpacity="0.75"></path>
+                </svg>
+            </div>
+        );
     }
+
 
     if (error) {
         return <p className="text-center py-5 text-red-500">Error: {error}</p>;
     }
-
-    const profileImageUrl = `http://localhost:8080/api/utilisateurs/profiles/images/${profile.profileImageUrl}`;
-    console.log("profile image url: ", profileImageUrl)
-    console.log("profile type: ", profileType)
 
     return (
         <section className="bg-gray-100 py-5">
@@ -261,12 +301,12 @@ export default function UserProfile() {
                     <div className="lg:w-1/3 mx-auto">
                         <div className="bg-white rounded-lg shadow-md p-4 text-center">
                             <img
-                                src={profileImageUrl}
-                                alt="avatar"
+                                src={profileImage}
+                                alt="Upload your photo"
                                 className="rounded-full w-36 h-36 object-cover mx-auto mb-4"
                             />
                             <div className="max-w-xs mx-auto">
-                                <UpdateUserProfileImage/>
+                                <UpdateUserProfileImage />
                             </div>
                             <p className="text-lg font-semibold">
                                 {editedProfile.nom} {editedProfile.prenom}
@@ -292,7 +332,6 @@ export default function UserProfile() {
                                                     // If no annonces, but a voyageId exists, navigate to create-annonce page
                                                     navigate(`/create-annonce/${profile.voyages[0].id}`);
                                                 } else {
-                                                    console.log("profile.voyageId: " + profile.voyageId)
                                                     // Handle case where no annonces exist and no voyageId is available
                                                     alert("No available voyage to create annonce.");
                                                 }
@@ -510,7 +549,6 @@ export default function UserProfile() {
                             Previous
                         </button>
                         <span className="px-4 py-2 text-gray-700">
-                            {console.log("current page value: " + currentPage + " and " + totalPages)}
                                     Page {currentPage} of {totalPages}
                                 </span>
                         <button
@@ -525,10 +563,8 @@ export default function UserProfile() {
 
 
             )}
-            {console.log('Profile Type:', profileType)} {/* Debugging line */}
             {profile.type === "expediteur" && (
                 <div className="mt-8">
-                    {console.log('Rendering DemandesList component')} {/* Debugging line */}
                     <DemandesList />
                 </div>
             )}

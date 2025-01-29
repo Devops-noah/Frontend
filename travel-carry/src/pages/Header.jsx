@@ -10,7 +10,7 @@ import { jwtDecode } from "jwt-decode";
 const Header = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
-    const [profileImageUrl, setProfileImageUrl] = useState("");
+    const [profileImage, setProfileImage] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
 
     const isAuthenticated = !!localStorage.getItem("token");
@@ -24,21 +24,45 @@ const Header = () => {
     useEffect(() => {
         if (isAuthenticated) {
             const token = localStorage.getItem("token");
+            if (!token) return; // Add check to ensure token exists
+
             const decodedToken = jwtDecode(token);
-            const { profile_image_url } = decodedToken;
+            const { userId } = decodedToken; // Extract userId from the token (ensure it's available in the token)
+
             const storedUserName = localStorage.getItem("userName");
-            const storedProfileImage = profile_image_url
-                ? `http://localhost:8080/api/utilisateurs/profiles/images/${profile_image_url}`
-                : null;
-            console.log("stored: ", storedProfileImage)
+            let storedProfileImage = null;
+
+            if (userId) {
+                // Fetch the profile image URL from the backend (assuming it's an Imgur URL)
+                storedProfileImage = `http://localhost:8080/api/utilisateurs/profiles/images/${userId}`;
+            }
+
+            console.log("storedProfileImage: ", storedProfileImage);
+
+            // Set username
             if (storedUserName) {
                 const formattedName = storedUserName
                     .replace(/"/g, "")
                     .replace(/^./, (char) => char.toUpperCase());
                 setUserName(formattedName);
             }
+
+            // Fetch the actual Imgur image URL if available
             if (storedProfileImage) {
-                setProfileImageUrl(storedProfileImage);
+                fetch(storedProfileImage)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        // Assuming your API returns the Imgur image URL in the response
+                        if (data && data.link) {
+                            setProfileImage(data.link); // Set the Imgur URL as the profile image
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching profile image:", error);
+                        setProfileImage(''); // Optional: Set a fallback image or empty string
+                    });
+            } else {
+                setProfileImage(''); // Optional: Set a fallback or placeholder image
             }
         }
     }, [isAuthenticated]);
@@ -47,13 +71,12 @@ const Header = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("userName");
         localStorage.removeItem("userType");
-        localStorage.removeItem("profileImageUrl"); // Clear profile image URL
         setUserName("");
-        setProfileImageUrl("");
+        setProfileImage("");
         navigate("/login");
     };
 
-    console.log("header profile: ", profileImageUrl)
+    console.log("header profile value: ", profileImage)
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
 
@@ -102,9 +125,9 @@ const Header = () => {
                             {/*    <FaUserCircle className="text-4xl cursor-pointer text-yellow-400" />*/}
                             {/*</Link>*/}
                             <Link to="/user-profile">
-                                {profileImageUrl ? (
+                                {profileImage ? (
                                     <img
-                                        src={profileImageUrl}
+                                        src={profileImage}
                                         alt="User Avatar"
                                         className="h-10 w-10 rounded-full border-2 border-white cursor-pointer"
                                     />

@@ -8,16 +8,49 @@ const Notifications = () => {
     const [selectedNotification, setSelectedNotification] = useState(null);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState(""); // Ajout de l'état pour gérer le message de confirmation
+    const [expediteurNames, setExpediteurNames] = useState({});
 
     useEffect(() => {
-        // Récupérer les notifications non lues pour le voyageur
+        // Fetch notifications and prefetch expediteur names
         axios
             .get("http://localhost:8080/api/notifications/unread", {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             })
-            .then((response) => setNotifications(response.data))
+            .then(async (response) => {
+                const notifications = response.data;
+                setNotifications(notifications);
+
+                // Collect expediteur IDs from the notifications
+                const expediteurIds = notifications
+                    .map((notification) => notification?.demande?.expediteurId)
+                    .filter(Boolean); // Remove null/undefined IDs
+
+                // Fetch the names for all expediteur IDs
+                const namesMap = {};
+                const fetchPromises = expediteurIds.map(async (id) => {
+                    try {
+                        const res = await axios.get(
+                            `http://localhost:8080/api/utilisateurs/expediteur/${id}`,
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                },
+                            }
+                        );
+                        namesMap[id] = res.data; // Assuming response contains the expediteur name
+                    } catch (error) {
+                        console.error(`Error fetching expediteur name for ID: ${id}`, error);
+                    }
+                });
+
+                // Wait for all fetches to complete
+                await Promise.all(fetchPromises);
+
+                // Update state with expediteur names
+                setExpediteurNames(namesMap);
+            })
             .catch((error) => {
                 setError("Impossible de charger les notifications.");
             });
@@ -66,7 +99,6 @@ const Notifications = () => {
             })
             .catch((error) => console.error("Erreur lors du rejet"));
     };
-    console.log("hawwaaaaaaaaaaaaaaa: " ,JSON.stringify(notifications));
     return (
         <div className="relative">
             <button
@@ -78,7 +110,7 @@ const Notifications = () => {
 
             {isDropdownOpen && (
                 <div
-                    className="absolute right-0 mt-2 bg-blue-300 w-80 shadow-md rounded p-4 z-50"
+                    className="absolute right-0 mt-2 bg-gray-800 w-80 shadow-md rounded p-4 z-50"
                     onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing when clicking inside
                 >
                     {error && <p className="text-red-500">{error}</p>}
@@ -86,33 +118,21 @@ const Notifications = () => {
                         <p className="text-gray-500">Aucune notification</p>
                     ) : (
                         notifications.map((notification) => {
-                            // Récupérer l'expéditeur ID de la notification
-                            const expediteurId = notification?.demande?.expediteurEmail;
-                            console.log("expediteurId:", expediteurId);
-                            // Faire une requête pour récupérer le nom de l'expéditeur (si nécessaire)
-                            let expediteurNom = "";
-                            if (expediteurId) {
-                                // Si vous avez déjà l'expéditeur avec l'ID, vous pouvez récupérer son nom ici
-                                axios.get(`http://localhost:8080/api/utilisateurs/${expediteurId}`)
-                                    .then(response => {
-                                        expediteurNom = response.data.nom;  // suppose que la réponse contient le nom
-                                        console.log("expediteurNom:", expediteurNom);
-                                    })
-                                    .catch(error => {
-                                        console.error("Erreur lors de la récupération du nom de l'expéditeur", error);
-                                    });
-                            }
-                            return (
-                                <div key={notification.id} className="border-b py-2">
-                                    <button
-                                        className="w-full text-left py-2 px-4 font-semibold text-white bg-blue-500 rounded-md cursor-pointer"
-                                        onClick={() => handleNotificationClick(notification)}
-                                    >
-                                        <GoPackage />
-                                        <span>Colis proposé par {expediteurNom || "Expéditeur inconnu"}</span>
-                                    </button>
-                                </div>
-                            );
+                                const expediteurId = notification?.demande?.expediteurId;
+                                const expediteurNom = expediteurNames[expediteurId] || "Expéditeur inconnu";
+
+                                return (
+                                    <div key={notification.id} className="border-b py-2">
+                                        <a
+                                            className="w-full text-left font-semibold text-white cursor-pointer flex justify-center items-center gap-2"
+                                            onClick={() => handleNotificationClick(notification)}
+                                        >
+                                            <GoPackage className="text-white"/>
+                                            <em className="text-yellow-300">Colis proposé par {expediteurNom}</em>
+                                        </a>
+
+                                    </div>
+                                );
                         })
                     )}
                 </div>
