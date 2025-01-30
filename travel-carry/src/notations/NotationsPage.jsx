@@ -29,30 +29,58 @@ const NotationsPage = () => {
     const token = localStorage.getItem("token");
 
     const decodeToken = JSON.parse(atob(token.split('.')[1]));
-    const userId = decodeToken.user_id;
+    const userId = decodeToken.userId;
+    console.log("user id value: ", userId)
 
 
     // Récupération des notations de l'utilisateur
     useEffect(() => {
         const fetchUserNotations = async () => {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                console.error("Aucun token trouvé, l'utilisateur doit se reconnecter.");
+                setWarningMessage("Votre session a expiré. Veuillez vous reconnecter.");
+                return;
+            }
+
+            console.log("Tentative de récupération des notations pour l'utilisateur:", userId);
+            console.log("Token:", token);  // Debug: Check token value
 
             try {
-                const response = await axios.get(`http://localhost:8080/notations/user/${user.id}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
+                const response = await axios.get(`http://localhost:8080/api/notations/user/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
                 });
+
+                console.log("Réponse des notations :", response.data);
                 setNotations(response.data);
 
                 const userNotations = response.data.filter((notation) => notation.utilisateurId === user.id);
                 setHasSubmitted(userNotations.length > 0);
             } catch (error) {
-                console.error("Erreur lors de la récupération des notations :", error);
+                if (error.response) {
+                    console.error("Erreur lors de la récupération des notations :", error.response);
+                    if (error.response.status === 403) {
+                        // Add a more descriptive message here
+                        console.error("Token invalide ou expiré. Veuillez vous reconnecter.");
+                        setWarningMessage("Votre session a expiré. Veuillez vous reconnecter.");
+                    } else {
+                        console.error("Erreur inconnue lors de la récupération des notations.");
+                        setWarningMessage("Une erreur est survenue, veuillez réessayer.");
+                    }
+                } else {
+                    console.error("Erreur de communication avec le serveur :", error);
+                    setWarningMessage("Une erreur est survenue, veuillez réessayer.");
+                }
             }
         };
 
-        fetchUserNotations();
-    }, [isAuthenticated, user]);
+        if (isAuthenticated) {
+            fetchUserNotations();
+        }
+    }, [isAuthenticated, userId, user]);
+
+
 
     const validateForm = () => {
         if (hasSubmitted) {
@@ -101,8 +129,12 @@ const NotationsPage = () => {
             resetForm();
             setHasSubmitted(true);
         } catch (error) {
-            console.error("Erreur lors de la soumission de la notation :", error);
-            setConfirmationMessage("Une erreur s'est produite. Veuillez réessayer.");
+            if (error.response && error.response.status === 400) {
+                setWarningMessage(error.response.data); // Show "Vous avez déjà soumis une notation."
+            } else {
+                setConfirmationMessage("Une erreur s'est produite. Veuillez réessayer.");
+            }
+
             setTimeout(() => setConfirmationMessage(""), 3000);
         } finally {
             setLoading(false);
