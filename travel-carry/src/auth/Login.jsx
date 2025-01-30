@@ -58,6 +58,7 @@ const LoginPage = () => {
             localStorage.setItem("token", token);
             localStorage.setItem("userName", JSON.stringify(decodedToken.sub));
             localStorage.setItem("userType", userType); // Store userType
+
             console.log("Login successful!");
             console.log("User Type: ", response.data.userType);
 
