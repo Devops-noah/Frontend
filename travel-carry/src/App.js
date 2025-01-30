@@ -46,7 +46,7 @@ function App() {
                                 {/* Routes dynamiques pour les annonces (IDs multiples) */}
                                 <Route
                                     path="/annonces/*" // Permet d'accepter plusieurs segments
-                                    element={<PrivateRoute><AnnonceDetail /></PrivateRoute>}
+                                    element={<AnnonceDetail />}
                                 />
 
                                 {/* Routes protégées */}

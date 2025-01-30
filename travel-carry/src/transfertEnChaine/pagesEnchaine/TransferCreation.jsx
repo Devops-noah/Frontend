@@ -8,20 +8,22 @@ const TransferCreation = () => {
     const [paysDepart, setPaysDepart] = useState('');
     const [paysArrivee, setPaysArrivee] = useState('');
     const [segmentsDisponibles, setSegmentsDisponibles] = useState([]);
-    const [rechercheEffectuee, setRechercheEffectuee] = useState(false); // Nouveau state pour gérer l'état de la recherche
+    const [rechercheEffectuee, setRechercheEffectuee] = useState(false);
     const navigate = useNavigate();
 
     const rechercherSegments = async () => {
-        setRechercheEffectuee(true); // Indiquer que la recherche a été lancée
-        setSegmentsDisponibles([]);  // Réinitialiser les segments avant chaque recherche
+        setRechercheEffectuee(true);
+        setSegmentsDisponibles([]);
         try {
             const response = await TransferService.rechercherSegments(paysDepart, paysArrivee);
-            if (!response || response.length === 0) {
-                console.warn('Aucune donnée retournée par l\'API');
-                setSegmentsDisponibles([]); // Réinitialiser les segments si aucun résultat
+            console.log('Réponse de l\'API:', response);
+            // Vérifier si la réponse est vide ou un tableau de tableaux vide
+            if (!response || (Array.isArray(response) && response.length === 0) || (Array.isArray(response) && response.every(segment => Array.isArray(segment) && segment.length === 0))) {
+                console.warn('Aucune donnée retournée par l\'API ou données invalides');
+                // Rediriger l'utilisateur vers la page des annonces
+                navigate('/annonces');
                 return;
             }
-            console.log('Réponse de l\'API:', response);
             setSegmentsDisponibles(response);
         } catch (error) {
             console.error('Erreur lors de la recherche des segments:', error);
@@ -74,14 +76,12 @@ const TransferCreation = () => {
                 </label>
             </div>
 
-            {/* Affichage uniquement du bouton de recherche avant la recherche */}
             {!rechercheEffectuee && (
                 <button className="btn btn-primary" onClick={rechercherSegments}>
                     Rechercher les chaînes de transferts
                 </button>
             )}
 
-            {/* Affichage uniquement si des segments sont disponibles après la recherche */}
             {rechercheEffectuee && segmentsDisponibles.length > 0 && (
                 <div className="segments-container">
                     <h2 className="available-chains">Chaînes de transfert disponibles</h2>
@@ -91,12 +91,10 @@ const TransferCreation = () => {
                                 <span className="segment-path">
                                     {Array.isArray(segment) ? segment.map((s, idx) => (
                                         <span key={idx}>
-                                            {/* Coloration des pays */}
                                             <span className={`pays-${s.pointDepart.toLowerCase()}`}>{s.pointDepart}</span>
                                             {' -> '}
                                             <span className={`pays-${s.pointArrivee.toLowerCase()}`}>{s.pointArrivee}</span>
                                             {' ('}
-                                            {/* Coloration des voyageurs */}
                                             <span className={s.voyageur.nom.toLowerCase() === 'dona' ? 'voyageur-dona' : 'voyageur-oumar'}>
                                                 {s.voyageur.nom}
                                             </span>
@@ -112,8 +110,6 @@ const TransferCreation = () => {
                     </ul>
                 </div>
             )}
-
-            {/* Si aucun résultat n'est trouvé, n'affiche rien */}
         </div>
     );
 };
