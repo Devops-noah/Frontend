@@ -52,15 +52,15 @@ function App() {
                                 {/* Routes protégées */}
                                 <Route
                                     path="/create-voyage"
-                                    element={<PrivateRoute><CreateVoyage /></PrivateRoute>}
+                                    element={<CreateVoyage />}
                                 />
                                 <Route
                                     path="/create-annonce/:id"
-                                    element={<PrivateRoute><CreateAnnonce /></PrivateRoute>}
+                                    element={<CreateAnnonce />}
                                 />
                                 <Route
                                     path="/colis/details/:annonceId"
-                                    element={<PrivateRoute><ColisDetails /></PrivateRoute>}
+                                    element={<ColisDetails />}
                                 />
                                 <Route
                                     path="/user-profile"

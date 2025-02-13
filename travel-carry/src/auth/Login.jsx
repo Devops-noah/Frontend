@@ -35,37 +35,29 @@ const LoginPage = () => {
         setErrorMessage("");
 
         try {
-            const response = await axios.post(
-                "http://localhost:8080/api/auth/login",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+            const response = await axios.post("http://localhost:8080/api/auth/login", formData, {
+                headers: { "Content-Type": "application/json" },
+            });
 
-            console.log("response data from login: " + JSON.stringify(response))
-            // Get the token
-            const token = response.data.token;
-            const userType = response.data.userType;
+            console.log("Response data from login:", response.data);
 
-            // Decode the token to extract user info
-            const decodedToken = jwtDecode(token);
-            console.log("Decoded Token:", JSON.stringify(decodedToken.sub));
+            // Extract values with correct key names
+            const { jwt, role, userType, userId } = response.data;
 
-            // Store token in localStorage
-            localStorage.setItem("token", token);
-            localStorage.setItem("userName", JSON.stringify(decodedToken.sub));
-            localStorage.setItem("userType", userType); // Store userType
+            console.log("Received JWT:", jwt); // Debugging
 
-            console.log("Login successful!");
-            console.log("User Type: ", response.data.userType);
+            // Store user info in local storage
+            localStorage.setItem("token", jwt);
+            localStorage.setItem("userId", userId);
+            localStorage.setItem("userRole", role);
+            localStorage.setItem("userType", userType || "");
 
+            console.log("Login successful! Role:", role, "User Type:", userType);
 
-            // Redirect to homepage or user dashboard after successful login
-            navigate("/"); // Redirect to homepage or another page after login
+            navigate("/");
         } catch (error) {
+            console.error("Login error:", error);
+
             if (error.response) {
                 setErrorMessage(error.response.data.message || "Identifiants incorrects.");
             } else {
@@ -73,6 +65,7 @@ const LoginPage = () => {
             }
         }
     };
+
 
     return (
 

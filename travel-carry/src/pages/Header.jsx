@@ -18,18 +18,22 @@ const Header = () => {
 
     console.log("Is Authenticated:", isAuthenticated);
 
+    const token = localStorage.getItem("token");
+    let decodedToken = JSON.parse(atob(token.split('.')[1]));
+    console.log("decodedToken:", decodedToken.sub);
+
 
     const handleLogoClick = () => navigate("/");
 
     useEffect(() => {
         if (isAuthenticated) {
-            const token = localStorage.getItem("token");
+
             if (!token) return; // Add check to ensure token exists
 
-            const decodedToken = jwtDecode(token);
-            const { userId } = decodedToken; // Extract userId from the token (ensure it's available in the token)
+            const { userId } = localStorage.getItem("userId");
 
-            const storedUserName = localStorage.getItem("userName");
+            //const storedUserName = localStorage.getItem("userName");
+            const storedUserName = decodedToken.sub;
             let storedProfileImage = null;
 
             if (userId) {
@@ -77,6 +81,7 @@ const Header = () => {
     };
 
     console.log("header profile value: ", profileImage)
+    console.log("user name value: ", userName)
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
 

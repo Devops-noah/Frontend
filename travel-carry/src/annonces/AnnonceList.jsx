@@ -27,9 +27,11 @@ const AnnoncesList = () => {
     const userType = localStorage.getItem("userType"); // Get user type from local storage
 
     const token = localStorage.getItem("token");
+    console.log("tok tok tok: ", token)
     let decodedToken = null;
     if (token) {
         decodedToken = JSON.parse(atob(token.split('.')[1]));
+
         // Use the decoded token here
     } else {
         console.log("Token not found in localStorage.");
