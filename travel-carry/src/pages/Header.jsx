@@ -19,8 +19,17 @@ const Header = () => {
     console.log("Is Authenticated:", isAuthenticated);
 
     const token = localStorage.getItem("token");
-    let decodedToken = JSON.parse(atob(token.split('.')[1]));
-    console.log("decodedToken:", decodedToken.sub);
+    let decodedToken;
+    if (!token) {
+        console.error("No token found in localStorage!");
+    } else {
+        try {
+            decodedToken = JSON.parse(atob(token.split('.')[1]));
+            console.log("Decoded Token:", decodedToken);
+        } catch (error) {
+            console.error("Error decoding token:", error);
+        }
+    }
 
 
     const handleLogoClick = () => navigate("/");
@@ -121,7 +130,7 @@ const Header = () => {
                     {isAuthenticated && userName && (
                         <span className="text-white font-semibold">Bienvenue, {userName}</span>
                     )}
-                    {isAuthenticated && userType === "voyageur" && (
+                    {isAuthenticated && (
                         <Notifications /> // Affiche les notifications uniquement pour les voyageurs
                     )}
                     {isAuthenticated ? (

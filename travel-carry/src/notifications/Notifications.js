@@ -16,7 +16,7 @@ const Notifications = () => {
 
     const token = localStorage.getItem("token");
     const decodeToken = JSON.parse(atob(token.split('.')[1]));
-    const userId = decodeToken.userId;
+    const userId = localStorage.getItem("userId");
 
     // WebSocket setup
     const { lastMessage, readyState } = useWebSocket(
@@ -133,6 +133,8 @@ const Notifications = () => {
         toggleDropdown(); // Close the dropdown
     };
 
+    console.log("notification result: " + JSON.stringify(notifications));
+
     const markNotificationAsRead = async (notificationId) => {
         try {
             await axios.put(`http://localhost:8080/api/notifications/read/${notificationId}`, {}, {
@@ -227,6 +229,7 @@ const Notifications = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
 
     return (
         <div className="relative inline-block">
