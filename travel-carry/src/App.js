@@ -23,10 +23,12 @@ import TousLesAvis from "./notations/TousLesAvis";
 import { useUserContext } from "./context/UserContext";
 import { NotationsProvider } from "./context/NotationsContext";
 import AdminNotationComments from "./admin/pages/AdminNotationComments";
+import {ProfileProvider} from "./context/ProfileContext";
 
 function App() {
     return (
         <UserProvider>
+            <ProfileProvider>
             <NotationsProvider>
                 <Router>
                     <div className="flex flex-col min-h-screen main-container"> {/* Appliquer la classe ici */}
@@ -82,6 +84,7 @@ function App() {
                     </div>
                 </Router>
             </NotationsProvider>
+            </ProfileProvider>
         </UserProvider>
     );
 }

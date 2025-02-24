@@ -105,7 +105,7 @@ const ColisDetails = () => {
         } catch (error) {
             console.error("Erreur lors de l'envoi de la demande :", error);
             setFeedback(
-                "Une erreur s'est produite pour l'envoi de certains colis. Veuillez vérifier et réessayer."
+                "L'utilisateur ne peut pas envoyer une demande sur son annonce."
             );
         }
     };
@@ -113,7 +113,7 @@ const ColisDetails = () => {
     return (
         <div className="p-8 max-w-lg mx-auto bg-white shadow-lg rounded">
             <h2 className="text-2xl font-bold mb-4 text-center">Détails du Colis</h2>
-            {feedback && <div className="mb-4 text-center text-green-600 font-semibold">{feedback}</div>}
+            {feedback && <div className="mb-4 text-center text-red-600 font-semibold">{feedback}</div>}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
+import {useProfile} from "../context/ProfileContext";
 
 const AnnonceDetail = () => {
     const location = useLocation(); // Utilisé pour obtenir l'URL complète
@@ -14,6 +15,9 @@ const AnnonceDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [userType, setUserType] = useState("");
+
+    // Get the profile from global context
+    const { profile } = useProfile();
 
     // Fetch les annonces
     useEffect(() => {
@@ -59,6 +63,8 @@ const AnnonceDetail = () => {
             </div>
         );
     }
+
+    console.log("annonce value: " + JSON.stringify(annonces));
 
     return (
         <div className="min-h-screen bg-gray-100 py-8">
@@ -124,7 +130,7 @@ const AnnonceDetail = () => {
 
                 {/* Boutons */}
                 <div className="mt-8 flex justify-between">
-                    {userType === "expediteur" && annonces.length > 0 && (
+                    {profile?.userTypes?.dtype?.includes("EXPEDITEUR") && annonces.length > 0 && !annonces.some(annonce => profile.annonces?.some(userAnnonce => userAnnonce.id === annonce.id)) && (
                         <button
                             onClick={() => navigate(`/colis/details/${annonceIds.join(',')}`)}
                             className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"

@@ -15,6 +15,7 @@ const Header = () => {
 
     const isAuthenticated = !!localStorage.getItem("token");
     const userType = localStorage.getItem("userType");
+    const userId = localStorage.getItem("userId");
 
     console.log("Is Authenticated:", isAuthenticated);
 
@@ -39,11 +40,10 @@ const Header = () => {
 
             if (!token) return; // Add check to ensure token exists
 
-            const { userId } = localStorage.getItem("userId");
-
             //const storedUserName = localStorage.getItem("userName");
             const storedUserName = decodedToken.sub;
             let storedProfileImage = null;
+            console.log("userId: ", userId)
 
             if (userId) {
                 // Fetch the profile image URL from the backend (assuming it's an Imgur URL)

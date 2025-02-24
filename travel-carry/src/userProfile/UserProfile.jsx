@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FaEdit, FaTrash } from "react-icons/fa";
 import DemandesList from "../demandes/DemandesList";
 import UpdateUserProfileImage from "./UpdateUserProfileImage";
+import notifications from "../notifications/Notifications";
 
 export default function UserProfile() {
     const [profile, setProfile] = useState(null); // State to store user profile
@@ -32,7 +33,7 @@ export default function UserProfile() {
     // Retrieve token from localStorage or cookies
     const token = localStorage.getItem("token");
     const decodeToken = JSON.parse(atob(token.split('.')[1]));
-    const userId = decodeToken.userId;
+    const userId = localStorage.getItem("userId");
 
     const [isEditing, setIsEditing] = useState({
         nom: false,
@@ -267,7 +268,6 @@ export default function UserProfile() {
         }
     };
 
-
     // Pagination logic
     const indexOfLastVoyage = currentPage * voyagesPerPage;
     const indexOfFirstVoyage = indexOfLastVoyage - voyagesPerPage;
@@ -289,6 +289,8 @@ export default function UserProfile() {
         return <p className="text-center py-5 text-red-500">Error: {error}</p>;
     }
 
+    console.log("edit profile value: ", profile.userTypes.dtype[1])
+
     return (
         <section className="bg-gray-100 py-5">
             <div className="container mx-auto">
@@ -306,20 +308,22 @@ export default function UserProfile() {
                                 className="rounded-full w-36 h-36 object-cover mx-auto mb-4"
                             />
                             <div className="max-w-xs mx-auto">
-                                <UpdateUserProfileImage />
+                                <UpdateUserProfileImage/>
                             </div>
                             <p className="text-lg font-semibold">
                                 {editedProfile.nom} {editedProfile.prenom}
                             </p>
                             <p className="text-gray-500 mb-4">
-                                {{
+                                {profile.admin
+                                    ? "Admin"
+                                    : {
                                     voyageur: "Voyageur",
                                     expediteur: "Expediteur",
-                                    admin: "Admin",
                                 }[profile.type] || "Unknown"}
                             </p>
+
                             <div className="flex justify-center gap-2">
-                                {profile.type === "voyageur" ? (
+                                {profile && userId && Number(profile.id) === Number(userId) && !profile.admin ? (
                                     <>
                                         <button
                                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -345,15 +349,17 @@ export default function UserProfile() {
                                         >
                                             Create Voyage
                                         </button>
+
+                                        {/*{profile.userTypes?.dtype?.includes("EXPEDITEUR") && (*/}
+                                        {/*    <button*/}
+                                        {/*        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"*/}
+                                        {/*        onClick={() => navigate("/colis/details")}*/}
+                                        {/*    >*/}
+                                        {/*        Mes colis*/}
+                                        {/*    </button>*/}
+                                        {/*)}*/}
                                     </>
-                                ) : profile.type === "expediteur" ? (
-                                    <button
-                                        className="hidden bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                                        onClick={() => navigate("/colis/details")}
-                                    >
-                                        Mes colis
-                                    </button>
-                                ) : profile.type === "admin" ? (
+                                ) : profile.admin ? (
                                     <button
                                         className="bg-violet-400 text-white px-4 py-2 rounded hover:bg-violet-900"
                                         onClick={() => navigate("/admin/users")}
@@ -368,7 +374,7 @@ export default function UserProfile() {
                     {/* Details Card */}
                     <div className="w-2/4 mx-auto">
                         <div className="bg-white rounded-lg shadow-md p-6">
-                            <hr className="my-4"/>
+                        <hr className="my-4"/>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Email</p>
                                 <p className="text-gray-500 col-span-2">{profile.email}</p>
@@ -482,8 +488,12 @@ export default function UserProfile() {
             </div>
 
             {/* My Voyages */}
-            {profile.type === "voyageur" && (
-                <div className="min-h-screen bg-gray-100 py-10">
+            {console.log("Checking Profile ID and User ID:", profile)}
+            {console.log("Voyages Array:", profile.voyages)}
+            {console.log("Annonces Array:", profile.annonces)}
+
+            {profile && userId && Number(profile.id) === Number(userId) && profile.voyages && profile.voyages.length > 0 && (
+                <div className="bg-gray-100 py-10">
                     <div className="max-w-6xl mx-auto bg-white p-6 shadow rounded-lg">
                         <h1 className="text-2xl font-bold text-gray-800 mb-4">My Voyages</h1>
                         {errorMessage && (
@@ -549,8 +559,8 @@ export default function UserProfile() {
                             Previous
                         </button>
                         <span className="px-4 py-2 text-gray-700">
-                                    Page {currentPage} of {totalPages}
-                                </span>
+                Page {currentPage} of {totalPages}
+            </span>
                         <button
                             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md ml-2"
                             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
@@ -560,14 +570,32 @@ export default function UserProfile() {
                         </button>
                     </div>
                 </div>
+            )}
+            {
+                !profile.admin && (
+                    <div>
+                        <DemandesList/>
+                    </div>
+                )
+            }
 
 
-            )}
-            {profile.type === "expediteur" && (
-                <div className="mt-8">
-                    <DemandesList />
-                </div>
-            )}
+            {/*{profile && userId &&*/}
+            {/*    Number(profile.id) === Number(userId) &&*/}
+            {/*    profile.userTypes?.dType && // ✅ Ensure userTypes exists*/}
+            {/*    Array.isArray(profile.userTypes.dType) && // ✅ Ensure it's an array*/}
+            {/*    profile.userTypes.dType.includes("EXPEDITEUR") && // ✅ Now it's safe to call includes()*/}
+            {/*    profile.demandes && profile.demandes.length > 0 && (*/}
+            {/*        <div className="mt-8">*/}
+            {/*            /!*<DemandesList/>*!/*/}
+            {/*            {profile.demandes[0].createdAt}*/}
+            {/*        </div>*/}
+            {/*    )}*/}
+
+
+
+
+
             {/*{profileType === "expediteur" && (*/}
             {/*    <p className="text-red-600">Voyages are not available for expediteur profile.</p>*/}
             {/*)}*/}
