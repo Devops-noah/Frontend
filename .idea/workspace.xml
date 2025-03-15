@@ -5,17 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ff8cbe2-5c1c-4265-a23f-e2bb97a4a5a0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Frontend.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/travel-carry/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/travel-carry/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/travel-carry/src/admin/components/Sidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/travel-carry/src/admin/components/Sidebar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/travel-carry/src/context/NotationsContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/travel-carry/src/context/NotationsContext.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/travel-carry/src/notations/TousLesAvis.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/travel-carry/src/notations/TousLesAvis.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/travel-carry/src/notifications/Notifications.js" beforeDir="false" afterPath="$PROJECT_DIR$/travel-carry/src/notifications/Notifications.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,9 +18,9 @@
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2rii9LTdqmlXl2QZiefQFWal1QW" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -49,6 +39,14 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Frontend" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -66,6 +64,8 @@
       <option name="presentableId" value="Default" />
       <updated>1737048143486</updated>
       <workItem from="1737048144804" duration="906000" />
+      <workItem from="1738246471502" duration="5792000" />
+      <workItem from="1741009039526" duration="753000" />
     </task>
     <servers />
   </component>
