@@ -4,6 +4,7 @@ import { GoPackage } from "react-icons/go";
 import useWebSocket from "react-use-websocket";
 import { ReadyState } from "react-use-websocket";
 import { RiNotification2Fill } from "react-icons/ri";
+//import { jwtDecode } from "jwt-decode";
 
 const Notifications = () => {
     const [notifications, setNotifications] = useState([]);
@@ -15,7 +16,7 @@ const Notifications = () => {
     const [expediteurNames, setExpediteurNames] = useState({});
 
     const token = localStorage.getItem("token");
-    const decodeToken = JSON.parse(atob(token.split('.')[1]));
+    //const decodeToken = JSON.parse(atob(token.split('.')[1]));
     const userId = localStorage.getItem("userId");
 
     // WebSocket setup
@@ -72,17 +73,26 @@ const Notifications = () => {
                     },
                 }
             );
-            setNotifications(response.data);
-            fetchExpediteurNames(response.data);
+
+            // ✅ Ensure the response is an array before setting state
+            if (Array.isArray(response.data)) {
+                setNotifications(response.data);
+                fetchExpediteurNames(response.data);
+            } else {
+                setNotifications([]); // Fallback to empty array if response is invalid
+                console.error("Expected an array but got:", response.data);
+            }
         } catch (error) {
             setError("Impossible de charger les notifications.");
         }
     };
 
+
     const fetchExpediteurNames = async (notifications) => {
         const expediteurIds = notifications
             .map((notification) => notification?.demande?.expediteurId)
             .filter(Boolean);
+        console.log("expediteur ids: ", expediteurIds)
 
         const namesMap = {};
         const fetchPromises = expediteurIds.map(async (id) => {
