@@ -32,7 +32,9 @@ export default function UserProfile() {
 
     // Retrieve token from localStorage or cookies
     const token = localStorage.getItem("token");
-    const decodeToken = JSON.parse(atob(token.split('.')[1]));
+    // const decodeToken = JSON.parse(atob(token.split('.')[1]));
+    const decodeToken = token ? JSON.parse(atob(token.split('.')[1])) : null;
+
     const userId = localStorage.getItem("userId");
 
     const [isEditing, setIsEditing] = useState({
@@ -98,7 +100,7 @@ export default function UserProfile() {
 
         const fetchVoyages = async () => {
             try {
-                const userEmail = token ? JSON.parse(atob(token.split('.')[1])).sub : ""; // Extract email from token
+                const userEmail = decodeToken?.sub || "Unknow user";  // Use optional chaining to prevent crashes
 
                 const response = await axios.get("http://localhost:8080/api/voyages", {
                     headers: {
@@ -124,39 +126,30 @@ export default function UserProfile() {
     }, [currentPage]);
 
     useEffect(() => {
+        if (!userId || profileImage) return; // ✅ Stop fetch if image is already set
 
         const fetchProfileImage = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/utilisateurs/profiles/images/${userId}`);
-                setProfileImage(response.data.link);
-            } catch (err) {
-                // Log the error to inspect it
-                console.error("Error fetching profile image:", err);
+                const response = await axios.get(`http://localhost:8080/api/utilisateurs/profiles/images/${userId}`, {
+                    responseType: 'text', // ✅ Ensure response is treated as text, not JSON
+                });
 
-                // If the error has a response, log that too
-                if (err.response) {
-                    console.error("Error response status:", err.response.status);
-                    console.error("Error response data:", err.response.data);
-                }
-
-                // Check for different error cases
-                if (err.response && err.response.status === 404) {
-                    // Handle 404 specifically if no image is found
-                    console.warn("No profile image found, using default.");
-                    setProfileImage("https://picsum.photos/50/50"); // Set default image
+                if (response.status === 200) {
+                    setProfileImage(response.data);  // ✅ Directly store image URL
                 } else {
-                    // For other errors, display a general error message
-                    setError("Could not load profile image");
+                    console.error("Profile image not found, using default.");
+                    setProfileImage("https://via.placeholder.com/150"); // ✅ Fallback image
                 }
+            } catch (err) {
+                console.error("Error fetching profile image:", err);
+                setProfileImage("https://via.placeholder.com/150"); // ✅ Fallback image
             }
         };
 
 
-        if (userId) {
-            fetchProfileImage();
-        }
+        fetchProfileImage();
+    }, [userId, profileImage]); // ✅ Stops infinite loop
 
-    }, [userId]);
 
     const handleEdit = (voyage) => {
         // Format the date as yyyy-MM-dd
@@ -289,7 +282,8 @@ export default function UserProfile() {
         return <p className="text-center py-5 text-red-500">Error: {error}</p>;
     }
 
-    console.log("edit profile value: ", profile.userTypes.dtype[1])
+    console.log("edit profile value: ", profile.userTypes.dtype[1]);
+    console.log("test profile image: ", profileImage)
 
     return (
         <section className="bg-gray-100 py-5">
@@ -303,7 +297,7 @@ export default function UserProfile() {
                     <div className="lg:w-1/3 mx-auto">
                         <div className="bg-white rounded-lg shadow-md p-4 text-center">
                             <img
-                                src={profileImage}
+                                src={profileImage || "https://via.placeholder.com/150"}
                                 alt="Upload your photo"
                                 className="rounded-full w-36 h-36 object-cover mx-auto mb-4"
                             />
@@ -374,7 +368,7 @@ export default function UserProfile() {
                     {/* Details Card */}
                     <div className="w-2/4 mx-auto">
                         <div className="bg-white rounded-lg shadow-md p-6">
-                        <hr className="my-4"/>
+                            <hr className="my-4"/>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Email</p>
                                 <p className="text-gray-500 col-span-2">{profile.email}</p>
@@ -467,15 +461,6 @@ export default function UserProfile() {
                                     </p>
                                 )}
                             </div>
-                            {/*<div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">*/}
-                            {/*    <p className="font-medium">Telephone</p>*/}
-                            {/*    <p className="text-gray-500 col-span-2">{profile.telephone || "N/A"}</p>*/}
-                            {/*</div>*/}
-                            {/*<hr className="my-4"/>*/}
-                            {/*<div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">*/}
-                            {/*    <p className="font-medium">Address</p>*/}
-                            {/*    <p className="text-gray-500 col-span-2">{profile.adresse || "N/A"}</p>*/}
-                            {/*</div>*/}
                             <hr className="my-4"/>
                             {profile.type === "expediteur" && profile.message && (
                                 <div className="text-center text-red-500 mt-4">
@@ -602,7 +587,7 @@ export default function UserProfile() {
 
             {/* Modal for delete confirmation */}
             {
-            showDeleteConfirmation && (
+                showDeleteConfirmation && (
                     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-10">
                         <div className="bg-white p-8 rounded-lg shadow-md max-w-sm w-full">
                             <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>
@@ -611,19 +596,19 @@ export default function UserProfile() {
                                 <button
                                     onClick={() => setShowDeleteConfirmation(false)}
                                     className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg"
-                        >
-                            Annuler
-                        </button>
-                        <button
-                            onClick={handleDelete}
-                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
-                        >
-                            Supprimer
-                        </button>
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+                                >
+                                    Supprimer
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
             {/* Modal for Editing Voyage */}
             {modalVisible && currentVoyage && (
