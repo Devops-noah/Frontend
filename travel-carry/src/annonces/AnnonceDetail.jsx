@@ -22,6 +22,7 @@ const AnnonceDetail = () => {
     // Fetch les annonces
     useEffect(() => {
         const token = localStorage.getItem("token");
+        console.log("uuuu token: ", token)
         const storedUserType = localStorage.getItem("userType");
         setUserType(storedUserType);
 
