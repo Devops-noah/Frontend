@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FaEdit, FaTrash } from "react-icons/fa";
 import DemandesList from "../demandes/DemandesList";
 import UpdateUserProfileImage from "./UpdateUserProfileImage";
+import CalendarSection from "../calendar/CalendarSection";
 import notifications from "../notifications/Notifications";
 
 export default function UserProfile() {
@@ -35,6 +36,7 @@ export default function UserProfile() {
     // const decodeToken = JSON.parse(atob(token.split('.')[1]));
     const decodeToken = token ? JSON.parse(atob(token.split('.')[1])) : null;
 
+    console.log("decode for calendar: ", decodeToken)
     const userId = localStorage.getItem("userId");
 
     const [isEditing, setIsEditing] = useState({
@@ -297,7 +299,7 @@ export default function UserProfile() {
                     <div className="lg:w-1/3 mx-auto">
                         <div className="bg-white rounded-lg shadow-md p-4 text-center">
                             <img
-                                src={profileImage || "https://via.placeholder.com/150"}
+                                src={"https://avatar.iran.liara.run/public"}
                                 alt="Upload your photo"
                                 className="rounded-full w-36 h-36 object-cover mx-auto mb-4"
                             />
@@ -343,15 +345,6 @@ export default function UserProfile() {
                                         >
                                             Create Voyage
                                         </button>
-
-                                        {/*{profile.userTypes?.dtype?.includes("EXPEDITEUR") && (*/}
-                                        {/*    <button*/}
-                                        {/*        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"*/}
-                                        {/*        onClick={() => navigate("/colis/details")}*/}
-                                        {/*    >*/}
-                                        {/*        Mes colis*/}
-                                        {/*    </button>*/}
-                                        {/*)}*/}
                                     </>
                                 ) : profile.admin ? (
                                     <button
@@ -366,14 +359,16 @@ export default function UserProfile() {
                     </div>
 
                     {/* Details Card */}
-                    <div className="w-2/4 mx-auto">
-                        <div className="bg-white rounded-lg shadow-md p-6">
-                            <hr className="my-4"/>
+                    <div className="w-full sm:w-11/12 md:w-3/4 lg:w-2/4 mx-auto px-4">
+                        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                            <hr className="my-4" />
+
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Email</p>
-                                <p className="text-gray-500 col-span-2">{profile.email}</p>
+                                <p className="text-gray-500 col-span-2 break-words">{profile.email}</p>
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {/* Editable Nom */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Nom</p>
@@ -383,19 +378,20 @@ export default function UserProfile() {
                                         name="nom"
                                         value={editedProfile.nom}
                                         onChange={handleInputChangeEditProfile}
-                                        className="border px-2 py-1 rounded col-span-2 bg-blue-200"
+                                        className="border px-2 py-1 rounded col-span-2 bg-blue-200 w-full"
                                         onBlur={() => handleSaveClick("nom")}
                                     />
                                 ) : (
                                     <p
-                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-blue-500"
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-blue-500 break-words"
                                         onClick={() => handleEditClick("nom")}
                                     >
                                         {profile.nom}
                                     </p>
                                 )}
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {/* Editable Prenom */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Prenom</p>
@@ -405,19 +401,20 @@ export default function UserProfile() {
                                         name="prenom"
                                         value={editedProfile.prenom}
                                         onChange={handleInputChangeEditProfile}
-                                        className="border px-2 py-1 rounded col-span-2 bg-green-200"
+                                        className="border px-2 py-1 rounded col-span-2 bg-green-200 w-full"
                                         onBlur={() => handleSaveClick("prenom")}
                                     />
                                 ) : (
                                     <p
-                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-green-500"
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-green-500 break-words"
                                         onClick={() => handleEditClick("prenom")}
                                     >
                                         {profile.prenom}
                                     </p>
                                 )}
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {/* Editable Telephone */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Telephone</p>
@@ -427,19 +424,20 @@ export default function UserProfile() {
                                         name="telephone"
                                         value={editedProfile.telephone}
                                         onChange={handleInputChangeEditProfile}
-                                        className="border px-2 py-1 rounded col-span-2 bg-yellow-200"
+                                        className="border px-2 py-1 rounded col-span-2 bg-yellow-200 w-full"
                                         onBlur={() => handleSaveClick("telephone")}
                                     />
                                 ) : (
                                     <p
-                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-yellow-500"
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-yellow-500 break-words"
                                         onClick={() => handleEditClick("telephone")}
                                     >
                                         {profile.telephone || "N/A"}
                                     </p>
                                 )}
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {/* Editable Adresse */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Adresse</p>
@@ -449,26 +447,32 @@ export default function UserProfile() {
                                         name="adresse"
                                         value={editedProfile.adresse}
                                         onChange={handleInputChangeEditProfile}
-                                        className="border px-2 py-1 rounded col-span-2 bg-pink-200"
+                                        className="border px-2 py-1 rounded col-span-2 bg-pink-200 w-full"
                                         onBlur={() => handleSaveClick("adresse")}
                                     />
                                 ) : (
                                     <p
-                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-pink-500"
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-pink-500 break-words"
                                         onClick={() => handleEditClick("adresse")}
                                     >
                                         {profile.adresse || "N/A"}
                                     </p>
                                 )}
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {profile.type === "expediteur" && profile.message && (
                                 <div className="text-center text-red-500 mt-4">
                                     <p>{profile.message}</p>
                                 </div>
                             )}
                         </div>
+
+                        <div className="mt-6">
+                            <CalendarSection userEmail={decodeToken.sub} />
+                        </div>
                     </div>
+
                 </div>
             </div>
 
