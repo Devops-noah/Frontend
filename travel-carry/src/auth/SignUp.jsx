@@ -39,7 +39,6 @@ const SignUp = () => {
             const response = await axios.post("http://localhost:8080/api/auth/register", {
                 nom: formData.nom,
                 prenom: formData.prenom,
-                type: formData.type,
                 email: formData.email,
                 motDePasse: formData.motDePasse,
                 telephone: formData.telephone,
@@ -112,22 +111,6 @@ const SignUp = () => {
                             placeholder="Prénom"
                             required
                         />
-                    </div>
-
-                    {/* Type */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 font-semibold mb-2">Type</label>
-                        <select
-                            name="type"
-                            value={formData.type}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        >
-                            <option value="">Sélectionner un type</option>
-                            <option value="expediteur">Expéditeur</option>
-                            <option value="voyageur">Voyageur</option>
-                        </select>
                     </div>
 
                     {/* Email */}

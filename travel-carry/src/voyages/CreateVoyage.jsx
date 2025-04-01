@@ -12,31 +12,55 @@ const CreateVoyage = () => {
     const [paysDepart, setPaysDepart] = useState("");
     const [paysDestination, setPaysDestination] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(true); // To handle loading state
     const navigate = useNavigate();
 
-    // Check if the user is a Voyageur
+    // ✅ Fetch User Profile & Check if User is a Voyageur
     useEffect(() => {
-        const userType = localStorage.getItem("userType"); // Assuming you store the user type in localStorage
-        if (userType !== "voyageur") {
-            navigate("/"); // Redirect to home or another page if the user is not a Voyageur
-        }
+        const fetchUserProfile = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get("http://localhost:8080/api/utilisateurs/profile", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                const userProfile = response.data;
+                const userTypes = userProfile.userTypes?.dtype || []; // Extract user types
+
+                console.log("User types:", userTypes);
+
+                if (!userTypes.includes("VOYAGEUR")) {
+                    navigate("/"); // Redirect if user is NOT a Voyageur
+                } else {
+                    setIsLoading(false); // Allow the user to access the page
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+                navigate("/"); // Redirect on error
+            }
+        };
+
+        fetchUserProfile();
     }, [navigate]);
 
-    // Fetch Pays data from the backend
+    // ✅ Fetch Pays Data
     useEffect(() => {
         const fetchPays = async () => {
             try {
-                const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
+                const token = localStorage.getItem("token");
                 const response = await axios.get("http://localhost:8080/api/pays", {
                     headers: {
-                        Authorization: `Bearer ${token}`, // Add the token to the request
+                        Authorization: `Bearer ${token}`,
                     },
                 });
-                console.log("pays response: " + JSON.stringify(response.data));
+
+                console.log("Pays response:", response.data);
                 setPaysDepartOptions(response.data);
                 setPaysDestinationOptions(response.data);
             } catch (error) {
-                console.error("Error fetching pays", error);
+                console.error("Error fetching pays:", error);
                 setErrorMessage("Failed to load countries.");
             }
         };
@@ -44,35 +68,43 @@ const CreateVoyage = () => {
         fetchPays();
     }, []);
 
+    // ✅ Handle Form Submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem("token"); // Get the stored token
+            const token = localStorage.getItem("token");
 
-            // Make the POST request with the correct structure
+            // Make the POST request
             const response = await axios.post(
                 "http://localhost:8080/api/voyages",
                 {
-                    voyage: voyage, // Payload object
+                    voyage: voyage,
                     paysDepart: paysDepart,
                     paysDestination: paysDestination,
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`, // Add the token in the headers
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );
 
             console.log("Voyage created:", response.data);
-            // Redirect to another page or show success message
-            navigate("/user-profile"); // Replace with the desired route
+            navigate("/user-profile"); // Redirect to user profile or success page
         } catch (error) {
             console.error("Error creating voyage:", error);
             setErrorMessage(error.response?.data || "An error occurred while creating the voyage.");
         }
     };
 
+    // ✅ Show Loading Until User Type is Verified
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-lg font-semibold text-gray-700">Loading...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto px-4 py-6">
@@ -81,27 +113,31 @@ const CreateVoyage = () => {
                 <div className="mb-4">
                     <label htmlFor="dateDepart" className="block text-sm font-medium text-gray-700">Date Départ:</label>
                     <input
-                        type="date"
+                        type="datetime-local" // ✅ Change input type to include time
                         id="dateDepart"
                         value={voyage.dateDepart}
-                        onChange={(e) => setVoyage({ ...voyage, dateDepart: e.target.value })}
+                        onChange={(e) => setVoyage({...voyage, dateDepart: e.target.value})}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
+
                 <div className="mb-4">
-                    <label htmlFor="dateArrivee" className="block text-sm font-medium text-gray-700">Date Arrivée:</label>
+                    <label htmlFor="dateArrivee" className="block text-sm font-medium text-gray-700">Date
+                        Arrivée:</label>
                     <input
-                        type="date"
+                        type="datetime-local" // ✅ Change input type to include time
                         id="dateArrivee"
                         value={voyage.dateArrivee}
-                        onChange={(e) => setVoyage({ ...voyage, dateArrivee: e.target.value })}
+                        onChange={(e) => setVoyage({...voyage, dateArrivee: e.target.value})}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                     />
                 </div>
+
                 <div className="mb-4">
-                    <label htmlFor="paysDepart" className="block text-sm font-medium text-gray-700">Pays de Départ:</label>
+                    <label htmlFor="paysDepart" className="block text-sm font-medium text-gray-700">Pays de
+                        Départ:</label>
                     <select
                         id="paysDepart"
                         value={paysDepart}
@@ -118,7 +154,8 @@ const CreateVoyage = () => {
                     </select>
                 </div>
                 <div className="mb-6">
-                    <label htmlFor="paysDestination" className="block text-sm font-medium text-gray-700">Pays de Destination:</label>
+                    <label htmlFor="paysDestination" className="block text-sm font-medium text-gray-700">Pays de
+                        Destination:</label>
                     <select
                         id="paysDestination"
                         value={paysDestination}

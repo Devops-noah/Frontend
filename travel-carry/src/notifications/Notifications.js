@@ -1,185 +1,358 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { GoPackage } from "react-icons/go";
+import useWebSocket from "react-use-websocket";
+import { ReadyState } from "react-use-websocket";
+import { RiNotification2Fill } from "react-icons/ri";
+//import { jwtDecode } from "jwt-decode";
 
 const Notifications = () => {
     const [notifications, setNotifications] = useState([]);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedNotification, setSelectedNotification] = useState(null);
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState(""); // Ajout de l'état pour gérer le message de confirmation
+    const [message, setMessage] = useState(""); // Confirmation message state
+    const [isMessageVisible, setIsMessageVisible] = useState(false); // Control message visibility
     const [expediteurNames, setExpediteurNames] = useState({});
 
+    const token = localStorage.getItem("token");
+    //const decodeToken = JSON.parse(atob(token.split('.')[1]));
+    const userId = localStorage.getItem("userId");
+
+    // WebSocket setup
+    const { lastMessage, readyState } = useWebSocket(
+        `ws://localhost:8080/ws?userId=${userId}`,
+        {
+            shouldReconnect: () => true,
+            reconnectAttempts: 10,
+            reconnectInterval: 3000,
+        }
+    );
+
+    // Handle WebSocket messages
     useEffect(() => {
-        // Fetch notifications and prefetch expediteur names
-        axios
-            .get("http://localhost:8080/api/notifications/unread", {
+        if (lastMessage !== null) {
+            try {
+                const newNotification = JSON.parse(lastMessage.data);
+
+                setNotifications(prev => {
+                    // Remove notification if it's read
+                    if (newNotification.read) {
+                        return prev.filter(n => n.id !== newNotification.id);
+                    }
+
+                    // Add notification if it's new
+                    if (!prev.some(n => n.id === newNotification.id)) {
+                        return [newNotification, ...prev];
+                    }
+                    return prev;
+                });
+
+                const expediteurId = newNotification?.demande?.expediteurId;
+                if (expediteurId && !expediteurNames[expediteurId]) {
+                    fetchExpediteurName(expediteurId);
+                }
+            } catch (err) {
+                console.error("Error parsing WebSocket message:", err);
+            }
+        }
+    }, [lastMessage]);
+
+    // Initial fetch of notifications
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            const response = await axios.get(
+                "http://localhost:8080/api/notifications/unread",
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+
+            // ✅ Ensure the response is an array before setting state
+            if (Array.isArray(response.data)) {
+                setNotifications(response.data);
+                fetchExpediteurNames(response.data);
+            } else {
+                setNotifications([]); // Fallback to empty array if response is invalid
+                console.error("Expected an array but got:", response.data);
+            }
+        } catch (error) {
+            setError("Impossible de charger les notifications.");
+        }
+    };
+
+
+    const fetchExpediteurNames = async (notifications) => {
+        const expediteurIds = notifications
+            .map((notification) => notification?.demande?.expediteurId)
+            .filter(Boolean);
+        console.log("expediteur ids: ", expediteurIds)
+
+        const namesMap = {};
+        const fetchPromises = expediteurIds.map(async (id) => {
+            if (!expediteurNames[id]) {
+                try {
+                    const res = await axios.get(
+                        `http://localhost:8080/api/utilisateurs/expediteur/${id}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            },
+                        }
+                    );
+                    namesMap[id] = res.data;
+                } catch (error) {
+                    console.error(`Error fetching expediteur name for ID: ${id}`, error);
+                }
+            }
+        });
+
+        await Promise.all(fetchPromises);
+        setExpediteurNames((prev) => ({ ...prev, ...namesMap }));
+    };
+
+    const fetchExpediteurName = async (expediteurId) => {
+        try {
+            const res = await axios.get(
+                `http://localhost:8080/api/utilisateurs/expediteur/${expediteurId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+            setExpediteurNames((prev) => ({
+                ...prev,
+                [expediteurId]: res.data,
+            }));
+        } catch (error) {
+            console.error(`Error fetching expediteur name for ID: ${expediteurId}`, error);
+        }
+    };
+
+    const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+
+    const handleNotificationClick = (notification) => {
+        setSelectedNotification(notification); // Show the details of the notification
+        toggleDropdown(); // Close the dropdown
+    };
+
+    console.log("notification result: " + JSON.stringify(notifications));
+
+    const markNotificationAsRead = async (notificationId) => {
+        try {
+            await axios.put(`http://localhost:8080/api/notifications/read/${notificationId}`, {}, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
-            })
-            .then(async (response) => {
-                const notifications = response.data;
-                setNotifications(notifications);
-
-                // Collect expediteur IDs from the notifications
-                const expediteurIds = notifications
-                    .map((notification) => notification?.demande?.expediteurId)
-                    .filter(Boolean); // Remove null/undefined IDs
-
-                // Fetch the names for all expediteur IDs
-                const namesMap = {};
-                const fetchPromises = expediteurIds.map(async (id) => {
-                    try {
-                        const res = await axios.get(
-                            `http://localhost:8080/api/utilisateurs/expediteur/${id}`,
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                },
-                            }
-                        );
-                        namesMap[id] = res.data; // Assuming response contains the expediteur name
-                    } catch (error) {
-                        console.error(`Error fetching expediteur name for ID: ${id}`, error);
-                    }
-                });
-
-                // Wait for all fetches to complete
-                await Promise.all(fetchPromises);
-
-                // Update state with expediteur names
-                setExpediteurNames(namesMap);
-            })
-            .catch((error) => {
-                setError("Impossible de charger les notifications.");
             });
-    }, []);
-
-    const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-    const handleNotificationClick = (notification) => {
-        setSelectedNotification(notification);  // Afficher les détails de la demande
-        toggleDropdown();  // Fermer le dropdown
+        } catch (error) {
+            console.error("Error marking notification as read", error);
+        }
     };
 
-    const handleAccept = (demandeId) => {
+    const handleAccept = (demandeId, notificationId) => {
+        if (!demandeId) {
+            console.error("demandeId is undefined! Cannot proceed.");
+            return;
+        }
+
         axios
             .put(
                 `http://localhost:8080/api/demandes/${demandeId}/status`,
                 { status: "ACCEPTE" },
                 {
                     headers: {
+                        "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 }
             )
             .then(() => {
-                setMessage("Demande acceptée"); // Affichage du message de confirmation
-                setSelectedNotification(null);  // Fermer la modale après acceptation
-                setTimeout(() => setMessage(""), 5000); // Ferme le message après 5 secondes
+                setMessage("Demande acceptée"); // Display success message
+                setIsMessageVisible(true); // Show the confirmation message immediately
+
+                // Mark notification as read in the database
+                markNotificationAsRead(notificationId);
+
+                // Close the modal and hide the message after a short delay
+                setTimeout(() => {
+                    setSelectedNotification(null); // Close the modal
+                    setIsMessageVisible(false); // Hide the message
+                }, 3000); // 3-second delay
+
+                // Remove notification dynamically
+                setNotifications(prev => prev.filter(n => n.id !== notificationId));
             })
-            .catch((error) => console.error("Erreur lors de l'acceptation"));
+            .catch((error) => {
+                console.error("Erreur lors de l'acceptation", error.response?.data || error.message);
+            });
     };
 
-    const handleReject = (demandeId) => {
+    const handleReject = (demandeId, notificationId) => {
         axios
             .put(
                 `http://localhost:8080/api/demandes/${demandeId}/status`,
                 { status: "REFUSE" },
                 {
                     headers: {
+                        "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 }
             )
             .then(() => {
-                setMessage("Demande refusée"); // Affichage du message de confirmation
-                setSelectedNotification(null);  // Fermer la modale après rejet
-                setTimeout(() => setMessage(""), 5000); // Ferme le message après 5 secondes
+                setMessage("Demande refusée"); // Display failure message
+                setIsMessageVisible(true); // Show the confirmation message immediately
+
+                // Mark notification as read in the database
+                markNotificationAsRead(notificationId);
+
+                // Close the modal and hide the message after a short delay
+                setTimeout(() => {
+                    setSelectedNotification(null); // Close the modal
+                    setIsMessageVisible(false); // Hide the message
+                }, 3000); // 3-second delay
+
+                // Remove notification dynamically
+                setNotifications(prev => prev.filter(n => n.id !== notificationId));
             })
             .catch((error) => console.error("Erreur lors du rejet"));
     };
-    return (
-        <div className="relative">
-            <button
-                onClick={toggleDropdown}
-                className="text-white font-bold px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded"
-            >
-                Notifications [{notifications.length}]
-            </button>
 
+    const modalRef = useRef(null);
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                setSelectedNotification(null); // Close modal if click is outside
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+
+    return (
+        <div className="relative inline-block">
+            {/* Notification Icon */}
+            <div className="relative">
+                <RiNotification2Fill
+                    className="text-white text-2xl cursor-pointer"
+                    onClick={toggleDropdown}
+                />
+                <div
+                    className={`absolute -top-2 -right-2 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full 
+                ${readyState === ReadyState.OPEN ? 'bg-pink-600' : 'bg-red-600'}`}
+                    title={readyState === ReadyState.OPEN ? 'Connected' : 'Disconnected'}
+                >
+                    {notifications.length > 0 ? notifications.length : ""}
+                </div>
+            </div>
+
+            {/* Notifications Dropdown */}
             {isDropdownOpen && (
                 <div
-                    className="absolute right-0 mt-2 bg-gray-800 w-80 shadow-md rounded p-4 z-50"
-                    onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing when clicking inside
+                    className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-60 bg-white shadow-lg rounded-lg max-h-96 overflow-auto z-50
+        sm:w-72 md:w-80 lg:w-96
+        sm:max-h-80 md:max-h-96 lg:max-h-[28rem]
+        sm:text-sm md:text-base"
+                    onClick={(e) => e.stopPropagation()}
                 >
-                    {error && <p className="text-red-500">{error}</p>}
+                    {error && <p className="text-red-500 text-center py-1 px-2 text-sm">{error}</p>}
                     {notifications.length === 0 ? (
-                        <p className="text-gray-500">Aucune notification</p>
+                        <p className="text-center text-gray-400 py-2 text-sm">Aucune notification</p>
                     ) : (
-                        notifications.map((notification) => {
+                        <div className="space-y-1">
+                            {notifications.map((notification) => {
                                 const expediteurId = notification?.demande?.expediteurId;
                                 const expediteurNom = expediteurNames[expediteurId] || "Expéditeur inconnu";
 
                                 return (
-                                    <div key={notification.id} className="border-b py-2">
-                                        <a
-                                            className="w-full text-left font-semibold text-white cursor-pointer flex justify-center items-center gap-2"
-                                            onClick={() => handleNotificationClick(notification)}
-                                        >
-                                            <GoPackage className="text-white"/>
-                                            <em className="text-yellow-300">Colis proposé par {expediteurNom}</em>
-                                        </a>
-
+                                    <div
+                                        key={notification.id}
+                                        className="flex items-center justify-between p-2 hover:bg-amber-400 rounded cursor-pointer"
+                                        onClick={() => handleNotificationClick(notification)}
+                                    >
+                                        <div className="flex items-center space-x-1">
+                                            <GoPackage className="text-blue-500"/>
+                                            <p className="font-medium text-sm text-gray-800">
+                                                {`Colis proposé par ${expediteurNom}`}
+                                            </p>
+                                        </div>
                                     </div>
                                 );
-                        })
+                            })}
+                        </div>
                     )}
                 </div>
             )}
 
+            {/* Modal for Accepting/Rejecting */}
             {selectedNotification && (
                 <div className="modal fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-black p-6 shadow-lg rounded-lg w-1/2">
-                        <h3 className="text-2xl font-bold mb-4">Détails de la demande</h3>
-                        {selectedNotification?.demande?.informationColis ? (
-                            <>
-                                <p><strong>Nature:</strong> {selectedNotification.demande.informationColis.nature}</p>
-                                <p><strong>Dimensions:</strong> {selectedNotification.demande.informationColis.dimensions}</p>
-                                <p><strong>Poids:</strong> {selectedNotification.demande.informationColis.poids} kg</p>
-                                <p><strong>Catégorie:</strong> {selectedNotification.demande.informationColis.categorie}</p>
-                                <p><strong>Date prise en charge:</strong> {selectedNotification.demande.informationColis.datePriseEnCharge}</p>
-                                <p><strong>Plage horaire:</strong> {selectedNotification.demande.informationColis.plageHoraire}</p>
-                            </>
-                        ) : (
-                            <p className="text-gray-500">Informations colis indisponibles</p>
+                    <div ref={modalRef}
+                         className="bg-white p-6 shadow-lg rounded-lg w-full max-w-lg relative transform transition-all duration-300">
+                        {/* Confirmation Message Inside Modal */}
+                        {isMessageVisible && (
+                            <span
+                                className={`absolute top-2 right-4 text-center font-medium w-auto max-w-xs 
+        ${message === 'Demande acceptée' ? 'text-green-500' : message === 'Demande refusée' ? 'text-red-500' : 'text-violet-950'} p-2 shadow-lg shadow-sky-300 opacity-60`}>
+                                {message}
+                            </span>
                         )}
 
-                        <div className="flex justify-between mt-4">
+                        <h3 className="text-2xl font-semibold text-gray-800 mb-4">Détails de la demande</h3>
+                        {selectedNotification?.demande?.informationColis ? (
+                            <>
+                                <p className="text-gray-800">
+                                    <strong>Nature:</strong> {selectedNotification.demande.informationColis.nature}</p>
+                                <p className="text-gray-800">
+                                    <strong>Dimensions:</strong> {selectedNotification.demande.informationColis.dimensions}
+                                </p>
+                                <p className="text-gray-800">
+                                    <strong>Poids:</strong> {selectedNotification.demande.informationColis.poids} kg</p>
+                                <p className="text-gray-800">
+                                    <strong>Catégorie:</strong> {selectedNotification.demande.informationColis.categorie}
+                                </p>
+                                <p className="text-gray-800"><strong>Date prise en
+                                    charge:</strong> {selectedNotification.demande.informationColis.datePriseEnCharge}
+                                </p>
+                                <p className="text-gray-800"><strong>Plage
+                                    horaire:</strong> {selectedNotification.demande.informationColis.plageHoraire}</p>
+                            </>
+                        ) : (
+                            <p className="text-red-500 text-center">Détails du colis indisponibles</p>
+                        )}
+
+                        <div className="flex justify-center space-x-20 mt-6">
                             <button
-                                onClick={() => handleAccept(selectedNotification.id)}
-                                className="px-4 py-2 bg-green-500 text-white rounded"
+                                className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700"
+                                onClick={() => handleAccept(selectedNotification.demande.id, selectedNotification.id)}
                             >
                                 Accepter
                             </button>
                             <button
-                                onClick={() => handleReject(selectedNotification.id)}
-                                className="px-4 py-2 bg-red-500 text-white rounded"
+                                className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700"
+                                onClick={() => handleReject(selectedNotification.demande.id, selectedNotification.id)}
                             >
                                 Refuser
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
 
-            {/* Affichage du message de confirmation sans alert() */}
-            {message && (
-                <div className="fixed bottom-5 left-5 bg-green-500 text-white p-4 rounded-lg">
-                    {message}
+                    </div>
                 </div>
             )}
         </div>
     );
 };
+
 export default Notifications;

@@ -91,7 +91,7 @@ export default function HomePage() {
         );
     };
 
-    console.log("recent notations: " + JSON.stringify(recentNotations));
+    console.log("recent annonces: " + JSON.stringify(recentAnnonces));
 
     return (
         <div className="homepage-background min-h-screen" style={{paddingBottom: "64px", paddingTop: "10px"}}>

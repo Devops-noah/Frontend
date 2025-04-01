@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; // Import React Icons
 import TravelAnimation from "../TravelAnimation";
 import { format } from "date-fns";
+import {useProfile} from "../context/ProfileContext";
 
 const AnnoncesList = () => {
     const [annonces, setAnnonces] = useState([]);
@@ -24,12 +25,17 @@ const AnnoncesList = () => {
     //const [selectedAnnonces, setSelectedAnnonces] = useState([]); // New state for selected annonces
     const navigate = useNavigate();
 
-    const userType = localStorage.getItem("userType"); // Get user type from local storage
+    //const userType = localStorage.getItem("userType"); // Get user type from local storage
+
+    // Get the profile from global context
+    const { profile } = useProfile();
 
     const token = localStorage.getItem("token");
+    console.log("tok tok tok: ", token)
     let decodedToken = null;
     if (token) {
         decodedToken = JSON.parse(atob(token.split('.')[1]));
+
         // Use the decoded token here
     } else {
         console.log("Token not found in localStorage.");
@@ -108,11 +114,12 @@ const AnnoncesList = () => {
     // Handle update
     const handleUpdate = () => {
         const updatedAnnonce = { ...selectedAnnonce };
-        if (userType === "voyageur") {
+        if (profile?.userTypes?.dtype?.includes("VOYAGEUR")) {
             // Only update datePublication and poidsDisponible for voyageur
             updatedAnnonce.datePublication = selectedAnnonce.datePublication;
             updatedAnnonce.poidsDisponible = selectedAnnonce.poidsDisponible;
         }
+        console.log("talalla: ", updatedAnnonce)
 
         axios
             .put(
@@ -331,7 +338,7 @@ const AnnoncesList = () => {
                                         <div
                                             className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
                                             {
-                                                userType === "voyageur" && decodedToken?.sub === annonce.voyageurEmail
+                                                profile?.userTypes?.dtype?.includes("VOYAGEUR") && decodedToken?.sub === annonce.voyageurEmail
                                                     ? (
                                                         <>
                                                             {renderEditAndDeleteButton(annonce)}
@@ -347,7 +354,7 @@ const AnnoncesList = () => {
                     </div>
 
                     {
-                        userType === "voyageur"
+                        profile?.userTypes?.dtype?.includes("VOYAGEUR")
                             ? (
                                 <>
                                     {rendreDeletAllButton()}

@@ -40,6 +40,7 @@ export const UserProvider = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
     };
+    console.log("test user display or not: " + JSON.stringify(user))
 
     return (
         <UserContext.Provider value={{ user, isAuthenticated, logout }}>

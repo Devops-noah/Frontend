@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FaEdit, FaTrash } from "react-icons/fa";
 import DemandesList from "../demandes/DemandesList";
 import UpdateUserProfileImage from "./UpdateUserProfileImage";
+import CalendarSection from "../calendar/CalendarSection";
+import notifications from "../notifications/Notifications";
 
 export default function UserProfile() {
     const [profile, setProfile] = useState(null); // State to store user profile
@@ -31,8 +33,11 @@ export default function UserProfile() {
 
     // Retrieve token from localStorage or cookies
     const token = localStorage.getItem("token");
-    const decodeToken = JSON.parse(atob(token.split('.')[1]));
-    const userId = decodeToken.userId;
+    // const decodeToken = JSON.parse(atob(token.split('.')[1]));
+    const decodeToken = token ? JSON.parse(atob(token.split('.')[1])) : null;
+
+    console.log("decode for calendar: ", decodeToken)
+    const userId = localStorage.getItem("userId");
 
     const [isEditing, setIsEditing] = useState({
         nom: false,
@@ -97,7 +102,7 @@ export default function UserProfile() {
 
         const fetchVoyages = async () => {
             try {
-                const userEmail = token ? JSON.parse(atob(token.split('.')[1])).sub : ""; // Extract email from token
+                const userEmail = decodeToken?.sub || "Unknow user";  // Use optional chaining to prevent crashes
 
                 const response = await axios.get("http://localhost:8080/api/voyages", {
                     headers: {
@@ -123,39 +128,30 @@ export default function UserProfile() {
     }, [currentPage]);
 
     useEffect(() => {
+        if (!userId || profileImage) return; // ✅ Stop fetch if image is already set
 
         const fetchProfileImage = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/utilisateurs/profiles/images/${userId}`);
-                setProfileImage(response.data.link);
-            } catch (err) {
-                // Log the error to inspect it
-                console.error("Error fetching profile image:", err);
+                const response = await axios.get(`http://localhost:8080/api/utilisateurs/profiles/images/${userId}`, {
+                    responseType: 'text', // ✅ Ensure response is treated as text, not JSON
+                });
 
-                // If the error has a response, log that too
-                if (err.response) {
-                    console.error("Error response status:", err.response.status);
-                    console.error("Error response data:", err.response.data);
-                }
-
-                // Check for different error cases
-                if (err.response && err.response.status === 404) {
-                    // Handle 404 specifically if no image is found
-                    console.warn("No profile image found, using default.");
-                    setProfileImage("https://picsum.photos/50/50"); // Set default image
+                if (response.status === 200) {
+                    setProfileImage(response.data);  // ✅ Directly store image URL
                 } else {
-                    // For other errors, display a general error message
-                    setError("Could not load profile image");
+                    console.error("Profile image not found, using default.");
+                    setProfileImage("https://via.placeholder.com/150"); // ✅ Fallback image
                 }
+            } catch (err) {
+                console.error("Error fetching profile image:", err);
+                setProfileImage("https://via.placeholder.com/150"); // ✅ Fallback image
             }
         };
 
 
-        if (userId) {
-            fetchProfileImage();
-        }
+        fetchProfileImage();
+    }, [userId, profileImage]); // ✅ Stops infinite loop
 
-    }, [userId]);
 
     const handleEdit = (voyage) => {
         // Format the date as yyyy-MM-dd
@@ -267,7 +263,6 @@ export default function UserProfile() {
         }
     };
 
-
     // Pagination logic
     const indexOfLastVoyage = currentPage * voyagesPerPage;
     const indexOfFirstVoyage = indexOfLastVoyage - voyagesPerPage;
@@ -289,6 +284,9 @@ export default function UserProfile() {
         return <p className="text-center py-5 text-red-500">Error: {error}</p>;
     }
 
+    console.log("edit profile value: ", profile.userTypes.dtype[1]);
+    console.log("test profile image: ", profileImage)
+
     return (
         <section className="bg-gray-100 py-5">
             <div className="container mx-auto">
@@ -301,25 +299,27 @@ export default function UserProfile() {
                     <div className="lg:w-1/3 mx-auto">
                         <div className="bg-white rounded-lg shadow-md p-4 text-center">
                             <img
-                                src={profileImage}
+                                src={"https://avatar.iran.liara.run/public"}
                                 alt="Upload your photo"
                                 className="rounded-full w-36 h-36 object-cover mx-auto mb-4"
                             />
                             <div className="max-w-xs mx-auto">
-                                <UpdateUserProfileImage />
+                                <UpdateUserProfileImage/>
                             </div>
                             <p className="text-lg font-semibold">
                                 {editedProfile.nom} {editedProfile.prenom}
                             </p>
                             <p className="text-gray-500 mb-4">
-                                {{
+                                {profile.admin
+                                    ? "Admin"
+                                    : {
                                     voyageur: "Voyageur",
                                     expediteur: "Expediteur",
-                                    admin: "Admin",
                                 }[profile.type] || "Unknown"}
                             </p>
+
                             <div className="flex justify-center gap-2">
-                                {profile.type === "voyageur" ? (
+                                {profile && userId && Number(profile.id) === Number(userId) && !profile.admin ? (
                                     <>
                                         <button
                                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -346,14 +346,7 @@ export default function UserProfile() {
                                             Create Voyage
                                         </button>
                                     </>
-                                ) : profile.type === "expediteur" ? (
-                                    <button
-                                        className="hidden bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                                        onClick={() => navigate("/colis/details")}
-                                    >
-                                        Mes colis
-                                    </button>
-                                ) : profile.type === "admin" ? (
+                                ) : profile.admin ? (
                                     <button
                                         className="bg-violet-400 text-white px-4 py-2 rounded hover:bg-violet-900"
                                         onClick={() => navigate("/admin/users")}
@@ -366,14 +359,16 @@ export default function UserProfile() {
                     </div>
 
                     {/* Details Card */}
-                    <div className="w-2/4 mx-auto">
-                        <div className="bg-white rounded-lg shadow-md p-6">
-                            <hr className="my-4"/>
+                    <div className="w-full sm:w-11/12 md:w-3/4 lg:w-2/4 mx-auto px-4">
+                        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                            <hr className="my-4" />
+
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Email</p>
-                                <p className="text-gray-500 col-span-2">{profile.email}</p>
+                                <p className="text-gray-500 col-span-2 break-words">{profile.email}</p>
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {/* Editable Nom */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Nom</p>
@@ -383,19 +378,20 @@ export default function UserProfile() {
                                         name="nom"
                                         value={editedProfile.nom}
                                         onChange={handleInputChangeEditProfile}
-                                        className="border px-2 py-1 rounded col-span-2 bg-blue-200"
+                                        className="border px-2 py-1 rounded col-span-2 bg-blue-200 w-full"
                                         onBlur={() => handleSaveClick("nom")}
                                     />
                                 ) : (
                                     <p
-                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-blue-500"
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-blue-500 break-words"
                                         onClick={() => handleEditClick("nom")}
                                     >
                                         {profile.nom}
                                     </p>
                                 )}
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {/* Editable Prenom */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Prenom</p>
@@ -405,19 +401,20 @@ export default function UserProfile() {
                                         name="prenom"
                                         value={editedProfile.prenom}
                                         onChange={handleInputChangeEditProfile}
-                                        className="border px-2 py-1 rounded col-span-2 bg-green-200"
+                                        className="border px-2 py-1 rounded col-span-2 bg-green-200 w-full"
                                         onBlur={() => handleSaveClick("prenom")}
                                     />
                                 ) : (
                                     <p
-                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-green-500"
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-green-500 break-words"
                                         onClick={() => handleEditClick("prenom")}
                                     >
                                         {profile.prenom}
                                     </p>
                                 )}
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {/* Editable Telephone */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Telephone</p>
@@ -427,19 +424,20 @@ export default function UserProfile() {
                                         name="telephone"
                                         value={editedProfile.telephone}
                                         onChange={handleInputChangeEditProfile}
-                                        className="border px-2 py-1 rounded col-span-2 bg-yellow-200"
+                                        className="border px-2 py-1 rounded col-span-2 bg-yellow-200 w-full"
                                         onBlur={() => handleSaveClick("telephone")}
                                     />
                                 ) : (
                                     <p
-                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-yellow-500"
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-yellow-500 break-words"
                                         onClick={() => handleEditClick("telephone")}
                                     >
                                         {profile.telephone || "N/A"}
                                     </p>
                                 )}
                             </div>
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {/* Editable Adresse */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Adresse</p>
@@ -449,41 +447,42 @@ export default function UserProfile() {
                                         name="adresse"
                                         value={editedProfile.adresse}
                                         onChange={handleInputChangeEditProfile}
-                                        className="border px-2 py-1 rounded col-span-2 bg-pink-200"
+                                        className="border px-2 py-1 rounded col-span-2 bg-pink-200 w-full"
                                         onBlur={() => handleSaveClick("adresse")}
                                     />
                                 ) : (
                                     <p
-                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-pink-500"
+                                        className="text-gray-500 col-span-2 cursor-pointer underline decoration-2 decoration-pink-500 break-words"
                                         onClick={() => handleEditClick("adresse")}
                                     >
                                         {profile.adresse || "N/A"}
                                     </p>
                                 )}
                             </div>
-                            {/*<div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">*/}
-                            {/*    <p className="font-medium">Telephone</p>*/}
-                            {/*    <p className="text-gray-500 col-span-2">{profile.telephone || "N/A"}</p>*/}
-                            {/*</div>*/}
-                            {/*<hr className="my-4"/>*/}
-                            {/*<div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">*/}
-                            {/*    <p className="font-medium">Address</p>*/}
-                            {/*    <p className="text-gray-500 col-span-2">{profile.adresse || "N/A"}</p>*/}
-                            {/*</div>*/}
-                            <hr className="my-4"/>
+
+                            <hr className="my-4" />
                             {profile.type === "expediteur" && profile.message && (
                                 <div className="text-center text-red-500 mt-4">
                                     <p>{profile.message}</p>
                                 </div>
                             )}
                         </div>
+
+                        <div className="mt-6">
+                            <CalendarSection userEmail={decodeToken.sub} />
+                        </div>
                     </div>
+
                 </div>
             </div>
 
             {/* My Voyages */}
-            {profile.type === "voyageur" && (
-                <div className="min-h-screen bg-gray-100 py-10">
+            {console.log("Checking Profile ID and User ID:", profile)}
+            {console.log("Voyages Array:", profile.voyages)}
+            {console.log("Annonces Array:", profile.annonces)}
+
+            {profile && userId && Number(profile.id) === Number(userId) && profile.voyages && profile.voyages.length > 0 && (
+                <div className="bg-gray-100 py-10">
                     <div className="max-w-6xl mx-auto bg-white p-6 shadow rounded-lg">
                         <h1 className="text-2xl font-bold text-gray-800 mb-4">My Voyages</h1>
                         {errorMessage && (
@@ -549,8 +548,8 @@ export default function UserProfile() {
                             Previous
                         </button>
                         <span className="px-4 py-2 text-gray-700">
-                                    Page {currentPage} of {totalPages}
-                                </span>
+                Page {currentPage} of {totalPages}
+            </span>
                         <button
                             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md ml-2"
                             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
@@ -560,21 +559,39 @@ export default function UserProfile() {
                         </button>
                     </div>
                 </div>
+            )}
+            {
+                !profile.admin && (
+                    <div>
+                        <DemandesList/>
+                    </div>
+                )
+            }
 
 
-            )}
-            {profile.type === "expediteur" && (
-                <div className="mt-8">
-                    <DemandesList />
-                </div>
-            )}
+            {/*{profile && userId &&*/}
+            {/*    Number(profile.id) === Number(userId) &&*/}
+            {/*    profile.userTypes?.dType && // ✅ Ensure userTypes exists*/}
+            {/*    Array.isArray(profile.userTypes.dType) && // ✅ Ensure it's an array*/}
+            {/*    profile.userTypes.dType.includes("EXPEDITEUR") && // ✅ Now it's safe to call includes()*/}
+            {/*    profile.demandes && profile.demandes.length > 0 && (*/}
+            {/*        <div className="mt-8">*/}
+            {/*            /!*<DemandesList/>*!/*/}
+            {/*            {profile.demandes[0].createdAt}*/}
+            {/*        </div>*/}
+            {/*    )}*/}
+
+
+
+
+
             {/*{profileType === "expediteur" && (*/}
             {/*    <p className="text-red-600">Voyages are not available for expediteur profile.</p>*/}
             {/*)}*/}
 
             {/* Modal for delete confirmation */}
             {
-            showDeleteConfirmation && (
+                showDeleteConfirmation && (
                     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-10">
                         <div className="bg-white p-8 rounded-lg shadow-md max-w-sm w-full">
                             <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>
@@ -583,19 +600,19 @@ export default function UserProfile() {
                                 <button
                                     onClick={() => setShowDeleteConfirmation(false)}
                                     className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg"
-                        >
-                            Annuler
-                        </button>
-                        <button
-                            onClick={handleDelete}
-                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
-                        >
-                            Supprimer
-                        </button>
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+                                >
+                                    Supprimer
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
             {/* Modal for Editing Voyage */}
             {modalVisible && currentVoyage && (

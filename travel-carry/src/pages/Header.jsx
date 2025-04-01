@@ -5,8 +5,6 @@ import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import Notifications from "../notifications/Notifications";
 import { jwtDecode } from "jwt-decode";
 
- // Import du composant Notifications
-
 const Header = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
@@ -14,117 +12,108 @@ const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const isAuthenticated = !!localStorage.getItem("token");
-    const userType = localStorage.getItem("userType");
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
 
-    console.log("Is Authenticated:", isAuthenticated);
+    let decodedToken = null;
 
-
-    const handleLogoClick = () => navigate("/");
+    if (token) {
+        try {
+            decodedToken = jwtDecode(token);
+        } catch (error) {
+            console.error("Error decoding token:", error);
+        }
+    }
 
     useEffect(() => {
-        if (isAuthenticated) {
-            const token = localStorage.getItem("token");
-            if (!token) return; // Add check to ensure token exists
-
-            const decodedToken = jwtDecode(token);
-            const { userId } = decodedToken; // Extract userId from the token (ensure it's available in the token)
-
-            const storedUserName = localStorage.getItem("userName");
+        if (isAuthenticated && decodedToken) {
+            const storedUserName = decodedToken?.sub || "Utilisateur";
             let storedProfileImage = null;
 
             if (userId) {
-                // Fetch the profile image URL from the backend (assuming it's an Imgur URL)
                 storedProfileImage = `http://localhost:8080/api/utilisateurs/profiles/images/${userId}`;
             }
 
-            console.log("storedProfileImage: ", storedProfileImage);
+            setUserName(
+                storedUserName.replace(/"/g, "").replace(/^./, (char) => char.toUpperCase())
+            );
 
-            // Set username
-            if (storedUserName) {
-                const formattedName = storedUserName
-                    .replace(/"/g, "")
-                    .replace(/^./, (char) => char.toUpperCase());
-                setUserName(formattedName);
-            }
-
-            // Fetch the actual Imgur image URL if available
             if (storedProfileImage) {
                 fetch(storedProfileImage)
                     .then((response) => response.json())
                     .then((data) => {
-                        // Assuming your API returns the Imgur image URL in the response
                         if (data && data.link) {
-                            setProfileImage(data.link); // Set the Imgur URL as the profile image
+                            setProfileImage(data.link);
                         }
                     })
                     .catch((error) => {
                         console.error("Error fetching profile image:", error);
-                        setProfileImage(''); // Optional: Set a fallback image or empty string
+                        setProfileImage("");
                     });
             } else {
-                setProfileImage(''); // Optional: Set a fallback or placeholder image
+                setProfileImage("");
             }
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, decodedToken, userId]);
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("userName");
-        localStorage.removeItem("userType");
+        localStorage.clear();
         setUserName("");
         setProfileImage("");
         navigate("/login");
     };
 
-    console.log("header profile value: ", profileImage)
-
-    const toggleMenu = () => setMenuOpen(!menuOpen);
-
     return (
-        <header className="bg-blue-500 text-white">
-            <div className="flex justify-between items-center p-4">
-                {/* Logo Section */}
-                <div className="flex items-center">
-                    <img
-                        src={logo}
-                        alt="Logo"
-                        className="h-10 w-10 mr-2 cursor-pointer rounded-full border-2 border-white"
-                        onClick={handleLogoClick}
-                    />
-                    <h1
-                        className="text-2xl font-bold cursor-pointer"
-                        onClick={handleLogoClick}
-                    >
-                        <span style={{ color: "#ffffff" }}>Travel</span>{" "}
-                        <span style={{ color: "#004080" }}>Carry</span>
-                    </h1>
+        <header className="bg-blue-500 text-white w-full">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center p-4 relative">
+                {/* Logo + Titre */}
+                <div className="flex items-center justify-between md:justify-start w-full md:w-auto">
+                    <div className="flex items-center">
+                        <img
+                            src={logo}
+                            alt="Logo"
+                            className="h-10 w-10 mr-2 cursor-pointer rounded-full border-2 border-white"
+                            onClick={() => navigate("/")}
+                        />
+                        <h1
+                            className="text-xl md:text-2xl font-bold cursor-pointer"
+                            onClick={() => navigate("/")}
+                        >
+                            <span className="text-white">Travel</span>{" "}
+                            <span className="text-[#004080]">Carry</span>
+                        </h1>
+                    </div>
+
+                    {/* Hamburger / Close Icon */}
+                    <div className="md:hidden">
+                        <button onClick={() => setMenuOpen(!menuOpen)}>
+                            {menuOpen ? (
+                                <FaTimes className="text-2xl" />
+                            ) : (
+                                <FaBars className="text-2xl" />
+                            )}
+                        </button>
+                    </div>
                 </div>
 
-                {/* Hamburger Menu for Mobile */}
-                <div className="md:hidden">
-                    <button onClick={toggleMenu} className="text-white text-3xl">
-                        {menuOpen ? <FaTimes /> : <FaBars />}
-                    </button>
-                </div>
-
-                {/* Navigation Links */}
+                {/* Navigation */}
                 <nav
                     className={`${
                         menuOpen ? "flex" : "hidden"
-                    } md:flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 absolute md:static top-16 left-0 md:top-auto md:left-auto w-full md:w-auto bg-blue-500 md:bg-transparent z-10 md:z-auto p-4 md:p-0`}
+                    } flex-col md:flex md:flex-row md:items-center md:space-x-6 w-full md:w-auto bg-blue-500 md:bg-transparent z-50 p-4 md:p-0 space-y-4 md:space-y-0 md:justify-end`}
                 >
-                    {isAuthenticated && userName && (
-                        <span className="text-white font-semibold">Bienvenue, {userName}</span>
-                    )}
-                    {isAuthenticated && userType === "voyageur" && (
-                        <Notifications /> // Affiche les notifications uniquement pour les voyageurs
-                    )}
-                    {isAuthenticated ? (
-                        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-                            {/*<Link to="/user-profile">*/}
-                            {/*    <FaUserCircle className="text-4xl cursor-pointer text-yellow-400" />*/}
-                            {/*</Link>*/}
-                            <Link to="/user-profile">
+                    {isAuthenticated && (
+                        <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 text-center md:text-left w-full md:w-auto">
+                            <div className="flex flex-col md:flex-row md:items-center md:space-x-2">
+                                <span className="text-sm text-white font-semibold">Bienvenue,</span>
+                                <span className="text-sm text-white break-all">{userName}</span>
+                            </div>
+
+                            <div className="flex justify-center items-center">
+                                <Notifications />
+                            </div>
+
+                            <Link to="/user-profile" className="flex justify-center">
                                 {profileImage ? (
                                     <img
                                         src={profileImage}
@@ -132,28 +121,28 @@ const Header = () => {
                                         className="h-10 w-10 rounded-full border-2 border-white cursor-pointer"
                                     />
                                 ) : (
-                                    // <div className="h-10 w-10 bg-gray-300 rounded-full border-2 border-white flex items-center justify-center text-yellow-400 text-4xl">
-                                    //     <span>?</span>
-                                    // </div>
-                                    <FaUserCircle className="text-4xl cursor-pointer text-yellow-400"/>
+                                    <FaUserCircle className="text-4xl cursor-pointer text-yellow-400" />
                                 )}
                             </Link>
+
                             <button
                                 onClick={handleLogout}
-                                className="px-4 py-2 bg-white text-blue-500 font-semibold rounded hover:bg-gray-100"
+                                className="px-4 py-2 bg-white text-blue-500 font-semibold rounded hover:bg-gray-100 w-full md:w-auto"
                             >
                                 Déconnexion
                             </button>
                         </div>
-                    ) : (
-                        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                    )}
+
+                    {!isAuthenticated && (
+                        <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">
                             <Link to="/login">
-                                <button className="px-4 py-2 font-semibold rounded border-2 border-white text-white hover:bg-white hover:text-blue-500">
+                                <button className="px-4 py-2 font-semibold rounded border-2 border-white text-white hover:bg-white hover:text-blue-500 w-full md:w-auto">
                                     Connexion
                                 </button>
                             </Link>
                             <Link to="/register">
-                                <button className="px-4 py-2 font-semibold rounded border-2 border-white text-white hover:bg-white hover:text-blue-500">
+                                <button className="px-4 py-2 font-semibold rounded border-2 border-white text-white hover:bg-white hover:text-blue-500 w-full md:w-auto">
                                     Inscription
                                 </button>
                             </Link>

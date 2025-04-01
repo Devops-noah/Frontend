@@ -8,82 +8,128 @@ const LoginPage = () => {
         email: "",
         motDePasse: "",
     });
-    const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
+
+    const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [needsGoogleAuth, setNeedsGoogleAuth] = useState(false);
+    const [isGmailUser, setIsGmailUser] = useState(false);
     const navigate = useNavigate();
 
-    // Check if user is already logged in
     useEffect(() => {
+        // ✅ Check if user is already logged in
         const token = localStorage.getItem("token");
         if (token) {
-            navigate("/"); // Redirect to home or dashboard if already logged in
+            navigate("/"); // ✅ Redirect to home if already logged in
+            return;
+        }
+
+        // ✅ Handle Auto-Login After Google Authorization
+        const params = new URLSearchParams(window.location.search);
+        const tokenFromUrl = params.get("token");
+        const userId = params.get("userId");
+        const role = params.get("role");
+
+        if (tokenFromUrl && userId && role) {
+            console.log("🔹 Auto-login after Google Auth...");
+
+            // ✅ Store the token in localStorage
+            localStorage.setItem("token", tokenFromUrl);
+            localStorage.setItem("userId", userId);
+            localStorage.setItem("userRole", role);
+
+            // ✅ Clear URL params (prevent re-login on refresh)
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            // ✅ Redirect to home
+            navigate("/");
         }
     }, [navigate]);
 
-    // Handle input changes in the form
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
             [name]: value,
         });
+
+        // Check if the email belongs to a Gmail account
+        if (name === "email") {
+            setIsGmailUser(value.toLowerCase().endsWith("@gmail.com"));
+        }
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage("");
 
         try {
-            const response = await axios.post(
-                "http://localhost:8080/api/auth/login",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+            const response = await axios.post("http://localhost:8080/api/auth/login", formData, {
+                headers: { "Content-Type": "application/json" },
+            });
 
-            console.log("response data from login: " + JSON.stringify(response))
-            // Get the token
-            const token = response.data.token;
-            const userType = response.data.userType;
+            console.log("Response data from login:", response.data);
 
-            // Decode the token to extract user info
-            const decodedToken = jwtDecode(token);
-            console.log("Decoded Token:", JSON.stringify(decodedToken.sub));
+            const { token, role, userType, userId, needsGoogleAuth } = response.data;
 
-            // Store token in localStorage
+            // ✅ Store user info
             localStorage.setItem("token", token);
-            localStorage.setItem("userName", JSON.stringify(decodedToken.sub));
-            localStorage.setItem("userType", userType); // Store userType
+            localStorage.setItem("userId", userId);
+            localStorage.setItem("userRole", role);
+            localStorage.setItem("userType", userType || "");
 
-            console.log("Login successful!");
-            console.log("User Type: ", response.data.userType);
+            if (needsGoogleAuth) {
+                setNeedsGoogleAuth(true); // Show Google Auth button
+            } else {
+                navigate("/"); // ✅ Redirect user if no Google Auth is required
+            }
 
-
-            // Redirect to homepage or user dashboard after successful login
-            navigate("/"); // Redirect to homepage or another page after login
         } catch (error) {
+            console.error("Login error:", error);
+
             if (error.response) {
-                setErrorMessage(error.response.data.message || "Identifiants incorrects.");
+                const errorMessage = error.response.data.message || "Identifiants incorrects.";
+
+                // ✅ If Gmail user needs Google Auth, show button
+                if (error.response.status === 403 && error.response.data.needsGoogleAuth) {
+                    setNeedsGoogleAuth(true);
+                    setErrorMessage("Vous devez autoriser Google Calendar pour continuer.");
+                } else {
+                    setErrorMessage(errorMessage);
+                }
             } else {
                 setErrorMessage("Une erreur s'est produite. Veuillez réessayer.");
             }
         }
     };
 
-    return (
 
+
+    const handleGoogleAuth = () => {
+        console.log("Google Client ID:", process.env.REACT_APP_GOOGLE_CLIENT_ID);
+        const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID; // Replace with your actual Client ID
+        const redirectUri = "http://localhost:8080/api/auth/callback";
+        const scope = "https://www.googleapis.com/auth/calendar.events";
+        const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline&prompt=consent&state=${encodeURIComponent(formData.email)}`;
+
+        console.log("Redirecting user to Google OAuth:", authUrl);
+
+        // Show a loading message before redirecting
+        alert("Vous allez être redirigé vers Google pour autoriser votre calendrier.");
+        window.location.href = authUrl;
+    };
+
+    return (
         <div className="flex items-center justify-center h-screen bg-gray-100">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
                 <h2 className="text-2xl font-bold mb-6 text-center">Connexion</h2>
+
                 {errorMessage && (
                     <div className="mb-4 text-red-500 text-center font-semibold">
                         {errorMessage}
                     </div>
                 )}
+
                 <form onSubmit={handleSubmit}>
                     {/* Email */}
                     <div className="mb-4">
@@ -102,7 +148,7 @@ const LoginPage = () => {
                     {/* Mot de passe */}
                     <div className="mb-4 relative">
                         <input
-                            type={showPassword ? "text" : "password"} // Toggle password visibility
+                            type={showPassword ? "text" : "password"}
                             id="motDePasse"
                             name="motDePasse"
                             value={formData.motDePasse}
@@ -113,7 +159,7 @@ const LoginPage = () => {
                         />
                         <button
                             type="button"
-                            onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+                            onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-2 top-2 text-gray-500 hover:text-gray-700 focus:outline-none"
                             aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                         >
@@ -129,6 +175,21 @@ const LoginPage = () => {
                         Se connecter
                     </button>
                 </form>
+
+                {/* Google Auth Button */}
+                {needsGoogleAuth && isGmailUser && (
+                    <div className="mt-4 text-center">
+                        {/*<p className="text-red-500 font-semibold">*/}
+                        {/*    Vous devez autoriser Google Calendar pour continuer.*/}
+                        {/*</p>*/}
+                        <button
+                            onClick={handleGoogleAuth}
+                            className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 font-semibold inline-block mt-2"
+                        >
+                            Autoriser Google Calendar
+                        </button>
+                    </div>
+                )}
 
                 {/* Link to registration page */}
                 <div className="mt-4 text-center">
