@@ -24,6 +24,7 @@ import { useUserContext } from "./context/UserContext";
 import { NotationsProvider } from "./context/NotationsContext";
 import AdminNotationComments from "./admin/pages/AdminNotationComments";
 import {ProfileProvider} from "./context/ProfileContext";
+import MessagingApp from './Messageries/MessagingApp';
 
 function App() {
     return (
@@ -44,6 +45,8 @@ function App() {
                                 <Route path="/notations" element={<NotationsPage />} />
                                 <Route path="/create-transfer" element={<TransferCreation />} />
                                 <Route path="/transfert-details" element={<TransferDetails />} />
+                                {/* Routes pour les messageries */}
+                                <Route path="/conversation" element={<MessagingApp />} />
 
                                 {/* Routes dynamiques pour les annonces (IDs multiples) */}
                                 <Route
