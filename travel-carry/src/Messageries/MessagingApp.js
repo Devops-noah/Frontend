@@ -140,7 +140,7 @@ export default function MessagingApp() {
                 <h2 className="text-xl font-bold mb-2 sm:mb-0">Messagerie</h2>
                 <div className="flex space-x-2">
                     <button onClick={processAcceptedRequests} className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded">Synchroniser</button>
-                    <button onClick={deleteAllMessages} className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded">Supprimer tous</button>
+                    <button onClick={deleteAllMessages} className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded hidden">Supprimer tous</button>
                 </div>
             </div>
 
