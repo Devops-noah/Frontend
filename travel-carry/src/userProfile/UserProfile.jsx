@@ -8,6 +8,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import DemandesList from "../demandes/DemandesList";
 import UpdateUserProfileImage from "./UpdateUserProfileImage";
 import CalendarSection from "../calendar/CalendarSection";
+import { ChatBubbleLeftEllipsisIcon } from '@heroicons/react/24/solid';
 import notifications from "../notifications/Notifications";
 
 export default function UserProfile() {
@@ -361,14 +362,23 @@ export default function UserProfile() {
                     {/* Details Card */}
                     <div className="w-full sm:w-11/12 md:w-3/4 lg:w-2/4 mx-auto px-4">
                         <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-                            <hr className="my-4" />
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
+                                <button
+                                    onClick={() => window.location.href = "/conversation"}
+                                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-2 px-4 rounded-xl shadow-md transition duration-200 w-full"
+                                >
+                                    <ChatBubbleLeftEllipsisIcon className="h-5 w-5"/>
+                                    <span>Open Chat</span>
+                                </button>
+                            </div>
+                            <hr className="my-4"/>
 
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Email</p>
                                 <p className="text-gray-500 col-span-2 break-words">{profile.email}</p>
                             </div>
 
-                            <hr className="my-4" />
+                            <hr className="my-4"/>
                             {/* Editable Nom */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Nom</p>
@@ -391,7 +401,7 @@ export default function UserProfile() {
                                 )}
                             </div>
 
-                            <hr className="my-4" />
+                            <hr className="my-4"/>
                             {/* Editable Prenom */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Prenom</p>
@@ -414,7 +424,7 @@ export default function UserProfile() {
                                 )}
                             </div>
 
-                            <hr className="my-4" />
+                            <hr className="my-4"/>
                             {/* Editable Telephone */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Telephone</p>
@@ -437,7 +447,7 @@ export default function UserProfile() {
                                 )}
                             </div>
 
-                            <hr className="my-4" />
+                            <hr className="my-4"/>
                             {/* Editable Adresse */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4">
                                 <p className="font-medium">Adresse</p>
@@ -460,7 +470,7 @@ export default function UserProfile() {
                                 )}
                             </div>
 
-                            <hr className="my-4" />
+                            <hr className="my-4"/>
                             {profile.type === "expediteur" && profile.message && (
                                 <div className="text-center text-red-500 mt-4">
                                     <p>{profile.message}</p>
@@ -469,7 +479,7 @@ export default function UserProfile() {
                         </div>
 
                         <div className="mt-6">
-                            <CalendarSection userEmail={decodeToken.sub} />
+                            <CalendarSection userEmail={decodeToken.sub}/>
                         </div>
                     </div>
 
